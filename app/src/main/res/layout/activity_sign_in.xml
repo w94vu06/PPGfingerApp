@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".SignInActivity"
+    android:background="@color/shironeri">
+
+    <ImageView
+        android:id="@+id/img_signin"
+        android:layout_width="@dimen/dp_198"
+        android:layout_height="@dimen/dp_55"
+        android:layout_marginTop="@dimen/dp_20"
+        android:src="@drawable/sign_in"
+        android:scaleType="fitXY"
+        android:layout_centerHorizontal="true"/>
+
+    <LinearLayout
+        android:id="@+id/linear_signin"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="@dimen/dp_20"
+        android:background="@drawable/sign_background"
+        android:layout_below="@+id/img_signin"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_35"
+            android:layout_marginStart="@dimen/dp_30"
+            android:text="歡迎回來！"
+            android:textSize="@dimen/sp_34"
+            android:textColor="@color/black"
+            android:fontFamily="@font/jf_openhuninn"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_30"
+            android:text="量測登入以繼續"
+            android:fontFamily="@font/jf_openhuninn"/>
+
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/lineChart"
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            android:layout_gravity="center"/>
+        <FrameLayout
+            android:layout_width="@dimen/dp_100"
+            android:layout_height="@dimen/dp_100"
+            android:layout_gravity="center">
+
+            <TextureView
+                android:id="@+id/texture"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:screenOrientation="portrait" />
+            <View
+                android:id="@+id/overlay"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/shape_oval"/>
+
+        </FrameLayout>
+
+
+
+
+        <Button
+            android:id="@+id/btn_restart"
+            android:layout_width="165dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:padding="5dp"
+            android:text="重新量測" />
+
+        <TextView
+            android:id="@+id/heartBeatCount"
+            android:layout_width="260dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:padding="5dp"
+            android:text="@string/warn"
+            android:textSize="20dp"
+            android:textAlignment="center"/>
+
+
+    </LinearLayout>
+
+</RelativeLayout>

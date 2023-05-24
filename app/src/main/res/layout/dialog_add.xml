@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@drawable/background_dialog"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dp_10"
+        android:layout_marginStart="@dimen/dp_10"
+        android:layout_marginEnd="@dimen/dp_10">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="添加項目"
+            android:textColor="@color/yellow"
+            android:textSize="@dimen/sp_22"
+            android:fontFamily="@font/glowsanssc_condensed_regular"/>
+
+        <ImageButton
+            android:id="@+id/imgbtn_close"
+            android:layout_width="@dimen/dp_20"
+            android:layout_height="@dimen/dp_20"
+            android:src="@drawable/cancel"
+            android:background="@null"
+            android:scaleType="fitXY"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"/>
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dp_5"
+        android:orientation="vertical">
+
+        <com.google.android.flexbox.FlexboxLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_10"
+            android:layout_marginEnd="@dimen/dp_10"
+            app:flexWrap="wrap">
+
+            <CheckBox
+                android:id="@+id/check_dbp"
+                style="@style/select_flex_style"
+                android:tag="f1"
+                android:text="舒張壓 DBP" />
+
+            <CheckBox
+                android:id="@+id/check_sbp"
+                style="@style/select_flex_style"
+                android:tag="f2"
+                android:text="收縮壓 SBP" />
+
+            <CheckBox
+                android:id="@+id/check_bs"
+                style="@style/select_flex_style"
+                android:tag="f3"
+                android:text="血糖 BS-mg/dL" />
+
+            <CheckBox
+                android:id="@+id/check_hr"
+                style="@style/select_flex_style"
+                android:tag="f4"
+                android:text="心率 Heart Rate" />
+
+            <CheckBox
+                android:id="@+id/check_sdnn"
+                style="@style/select_flex_style"
+                android:tag="f5"
+                android:text="SDNN" />
+
+            <CheckBox
+                android:id="@+id/check_rmssd"
+                style="@style/select_flex_style"
+                android:tag="f6"
+                android:text="RMSSD" />
+
+        </com.google.android.flexbox.FlexboxLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="@dimen/dp_10"
+            android:layout_marginEnd="@dimen/dp_10"
+            android:layout_marginBottom="@dimen/dp_10">
+
+            <Button
+                android:id="@+id/btn_dialogCancel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toLeftOf="@+id/btn_dialogSure"
+                android:padding="@dimen/dp_8"
+                android:text="取消"
+                android:textSize="@dimen/sp_18"
+                android:textColor="@color/shironeri"
+                android:fontFamily="@font/glowsanssc_condensed_regular"
+                android:backgroundTint="@color/green"
+                android:minHeight="0dp"/>
+
+            <Button
+                android:id="@+id/btn_dialogSure"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:padding="@dimen/dp_8"
+                android:text="確認"
+                android:textSize="@dimen/sp_18"
+                android:textColor="@color/shironeri"
+                android:fontFamily="@font/glowsanssc_condensed_regular"
+                android:backgroundTint="@color/green"
+                android:minHeight="0dp"/>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+</LinearLayout>
