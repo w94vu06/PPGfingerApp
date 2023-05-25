@@ -293,9 +293,9 @@ public class SignInActivity extends AppCompatActivity {
 //                idleHandler.postDelayed(idleRunnable, 15000);
 //                qualityHandler.postDelayed(qualityRunnable, 5000);
             } else {
-
-            }qualityHandler.postDelayed(qualityRunnable, 5000);
-            idleHandler.postDelayed(idleRunnable, 15000);
+                qualityHandler.postDelayed(qualityRunnable, 5000);
+                idleHandler.postDelayed(idleRunnable, 15000);
+            }
         }
     };
 
@@ -573,7 +573,7 @@ public class SignInActivity extends AppCompatActivity {
      * 觸發心跳
      */
     public void triggerHandler() {
-        float inputData = 70;
+        float inputData = 60;
         addData(inputData);
     }
 
@@ -582,11 +582,11 @@ public class SignInActivity extends AppCompatActivity {
      */
     private void initChart() {
         chart.getDescription().setEnabled(false);//設置不要圖表標籤
-        chart.setBackgroundColor(Color.parseColor("#fdf3f1"));
+        chart.setBackgroundColor(Color.parseColor("#FFFFFFFF"));//畫布顏色
         chart.setTouchEnabled(false);//設置不可觸碰
         chart.setDragEnabled(false);//設置不可互動
         chart.setDrawBorders(true);  // 啟用畫布的外框線
-        chart.setBorderWidth(0.5f);   // 設置外框線的寬度
+        chart.setBorderWidth(1.5f);   // 設置外框線的寬度
         chart.setBorderColor(Color.BLACK);  // 設置外框線的顏色
         //設置單一線數據
         LineData data = new LineData();
@@ -594,26 +594,25 @@ public class SignInActivity extends AppCompatActivity {
         chart.setData(data);
         //設置左下角標籤
         Legend l = chart.getLegend();
-        l.setForm(Legend.LegendForm.LINE);
-        l.setTextColor(Color.BLACK);
+        l.setEnabled(false);
 
         //設置Ｘ軸
         XAxis x = chart.getXAxis();
-        x.setTextColor(Color.BLACK);
+        x.setTextColor(Color.parseColor("#F2E5CC"));
         x.setDrawLabels(false);//去掉X軸標籤
         x.setDrawGridLines(true);//畫X軸線
-        x.setGridColor(Color.GRAY);
+        x.setGridColor(Color.parseColor("#F2E5CC"));
         x.setGranularity(0.5f);
 
         YAxis y = chart.getAxisLeft();
-        y.setTextColor(Color.BLACK);
+        y.setTextColor(Color.parseColor("#F2E5CC"));
         y.setDrawLabels(false);//去掉Y軸標籤
         y.setDrawGridLines(true);//畫Y軸線
-        y.setGridColor(Color.GRAY);
+        y.setGridColor(Color.parseColor("#F2E5CC"));
         y.setGranularity(0.2f);
 
-        y.setAxisMaximum(100);//最高100
-        y.setAxisMinimum(0);//最低0
+        y.setAxisMaximum(80);//最高100
+        y.setAxisMinimum(30);//最低0
 
         chart.getAxisRight().setEnabled(false);//右邊Y軸不可視
 //        chart.setVisibleXRange(0,60);//設置顯示範圍
@@ -635,7 +634,7 @@ public class SignInActivity extends AppCompatActivity {
         data.setDrawValues(false);//是否繪製線條上的文字
         chart.notifyDataSetChanged();
         chart.setVisibleXRange(0, 60);//設置可見範圍
-        chart.moveViewToX(data.getEntryCount());//將可視焦點放在最新一個數據，使圖表可移動
+        chart.moveViewToX(data.getEntryCount()+3);//將可視焦點放在最新一個數據，使圖表可移動
     }
 
     /**
@@ -644,7 +643,7 @@ public class SignInActivity extends AppCompatActivity {
     private LineDataSet createSet() {
         LineDataSet set = new LineDataSet(null, "");
         set.setAxisDependency(YAxis.AxisDependency.LEFT);
-        set.setColor(Color.parseColor("#7d7d7d"));
+        set.setColor(Color.parseColor("#6D8B75"));//線的顏色
         set.setLineWidth(2);
         set.setDrawCircles(false);
         set.setDrawFilled(false);
