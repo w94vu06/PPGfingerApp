@@ -88,6 +88,9 @@
                         android:textSize="@dimen/sp_18"
                         android:textColor="#707070"
                         android:hint="用戶名稱*"
+                        android:text="王禹翔"
+                        android:inputType="text"
+                        android:maxLines="1"
                         android:fontFamily="@font/glowsanssc_condensed_book"/>
 
                 </com.google.android.material.textfield.TextInputLayout>
@@ -111,9 +114,12 @@
                         android:textSize="@dimen/sp_18"
                         android:textColor="#707070"
                         android:hint="E-mail"
+                        android:maxLines="1"
                         android:fontFamily="@font/glowsanssc_condensed_book"
                         android:inputType="textEmailAddress"
                         android:ellipsize="end"
+                        android:text="doob925@gmail.com"
+
                         android:lines="1"/>
 
                 </com.google.android.material.textfield.TextInputLayout>
@@ -137,6 +143,9 @@
                         android:textSize="@dimen/sp_18"
                         android:textColor="#707070"
                         android:hint="手機號碼"
+                        android:text="0939907010"
+                        android:maxLines="1"
+                        android:maxLength="10"
                         android:fontFamily="@font/glowsanssc_condensed_book"
                         android:ellipsize="end"
                         android:lines="1"/>
@@ -162,6 +171,8 @@
                         android:textSize="@dimen/sp_18"
                         android:textColor="#707070"
                         android:hint="出生日期*"
+                        android:text="2023/6/13"
+                        android:maxLines="1"
                         android:fontFamily="@font/glowsanssc_condensed_book"/>
 
                 </com.google.android.material.textfield.TextInputLayout>
@@ -194,6 +205,8 @@
                         android:textSize="@dimen/sp_18"
                         android:textColor="#707070"
                         android:hint="身高(公分cm)*"
+                        android:text="173"
+                        android:maxLines="1"
                         android:fontFamily="@font/glowsanssc_condensed_book"
                         android:inputType="number"
                         android:ellipsize="end"
@@ -224,6 +237,8 @@
                         android:textSize="@dimen/sp_18"
                         android:textColor="#707070"
                         android:hint="體重(公斤kg)*"
+                        android:text="55"
+                        android:maxLines="1"
                         android:fontFamily="@font/glowsanssc_condensed_book"
                         android:inputType="number"
                         android:ellipsize="end"
@@ -258,7 +273,7 @@
                     android:layout_weight="0.5"
                     android:text="男 Male"
                     android:textSize="@dimen/sp_18"
-                    android:tag="rd1"
+                    android:tag="1"
                     style="@style/checkBox_style"/>
 
                 <Space
@@ -273,7 +288,7 @@
                     android:layout_weight="0.5"
                     android:text="女 Female"
                     android:textSize="@dimen/sp_18"
-                    android:tag="rd2"
+                    android:tag="2"
                     style="@style/checkBox_style"/>
 
             </LinearLayout>
@@ -303,7 +318,7 @@
                     android:layout_weight="0.5"
                     android:text="有 Yes"
                     android:textSize="@dimen/sp_18"
-                    android:tag="rd3"
+                    android:tag="1"
                     style="@style/checkBox_style"/>
 
                 <Space
@@ -318,7 +333,7 @@
                     android:layout_weight="0.5"
                     android:text="沒有 No"
                     android:textSize="@dimen/sp_18"
-                    android:tag="rd4"
+                    android:tag="0"
                     style="@style/checkBox_style"/>
 
             </LinearLayout>
@@ -348,7 +363,7 @@
                     android:layout_weight="0.5"
                     android:text="有 Yes"
                     android:textSize="@dimen/sp_18"
-                    android:tag="rd5"
+                    android:tag="1"
                     style="@style/checkBox_style"/>
 
                 <Space
@@ -363,7 +378,7 @@
                     android:layout_weight="0.5"
                     android:text="沒有 No"
                     android:textSize="@dimen/sp_18"
-                    android:tag="rd6"
+                    android:tag="0"
                     style="@style/checkBox_style"/>
 
             </LinearLayout>
@@ -393,7 +408,7 @@
                     android:layout_weight="0.5"
                     android:text="有 Yes"
                     android:textSize="@dimen/sp_18"
-                    android:tag="rd7"
+                    android:tag="1"
                     style="@style/checkBox_style"/>
 
                 <Space
@@ -408,7 +423,7 @@
                     android:layout_weight="0.5"
                     android:text="沒有 No"
                     android:textSize="@dimen/sp_18"
-                    android:tag="rd8"
+                    android:tag="0"
                     style="@style/checkBox_style"/>
 
             </LinearLayout>

@@ -3,9 +3,8 @@ package com.example.myapplication;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.DatePickerDialog;
-import android.content.Intent;
 import android.os.Bundle;
-import android.util.Patterns;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.CheckBox;
@@ -13,14 +12,20 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.example.myapplication.Util.CommonUtil;
 import com.example.myapplication.Util.TextUtil;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.lang.ref.Cleaner;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.SimpleTimeZone;
 
 import butterknife.BindViews;
 import butterknife.ButterKnife;
@@ -39,6 +44,12 @@ public class SignUpActivity extends AppCompatActivity {
     List<CheckBox> radiosDia;
     @BindViews({R.id.check_hbpY,R.id.check_hbpN})
     List<CheckBox> radiosHbp;
+    Boolean isValid = true;
+    JsonUpload jsonUpload = new JsonUpload();
+
+    String profileJson;
+
+    String old;
 
     String userName,email,phone,birth,height,weight,checkedSex,checkedSmoke,checkedDia,checkedHbp = "";
 
@@ -137,7 +148,7 @@ public class SignUpActivity extends AppCompatActivity {
         datePickerDialog.show();
     }
 
-    private void getValue(){
+    private String getValue(){
         userName = edit_userName.getText().toString();
         email = edit_email.getText().toString();
         phone = edit_phone.getText().toString();
@@ -148,50 +159,109 @@ public class SignUpActivity extends AppCompatActivity {
         checkedSmoke = CommonUtil.getOne(radiosSmoke);
         checkedDia = CommonUtil.getOne(radiosDia);
         checkedHbp = CommonUtil.getOne(radiosHbp);
+        calAge();
+
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("userName", userName);
+            jsonObject.put("email", email);
+            jsonObject.put("phone", phone);
+            jsonObject.put("birth", birth);
+            jsonObject.put("old", old);
+            jsonObject.put("height", height);
+            jsonObject.put("weight", weight);
+            jsonObject.put("checkedSex", checkedSex);
+            jsonObject.put("checkedSmoke", checkedSmoke);
+            jsonObject.put("checkedDia", checkedDia);
+            jsonObject.put("checkedHbp", checkedHbp);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        profileJson = String.valueOf(jsonObject);
+
+        return profileJson;
     }
 
     View.OnClickListener lis = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            Intent intent = new Intent(SignUpActivity.this, MainActivity.class);
-            startActivity(intent);
-//            getValue();
-//            checkEmpty();
-//            if (TextUtil.isValidEmailFormat(email) == false){
-//                Toast.makeText(SignUpActivity.this, "Email格式錯誤",Toast.LENGTH_SHORT).show();
-//            }
-//            if (TextUtil.isPhoneLegal(phone) == false){
-//                Toast.makeText(SignUpActivity.this, "手機號碼格式錯誤",Toast.LENGTH_SHORT).show();
-//            }
+            try {
+                getValue();
+                checkEmpty();
+                if (isValid) {
+                    Toast.makeText(SignUpActivity.this, "success", Toast.LENGTH_SHORT).show();
+                    jsonUpload.controlMariaDB(profileJson);
+                }
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+
         }
     };
 
+    private void calAge() {
+        //get current time
+        SimpleDateFormat dtf = new SimpleDateFormat("yyyy");
+        Calendar calendar = Calendar.getInstance();
+        Date date = calendar.getTime();
+        String formattedDate = dtf.format(date);
+        //get birth's year
+        String years = birth.substring(4);
+        int pastYear = Integer.parseInt(years);
+        int currentYear = Integer.parseInt(formattedDate);
+        int howOldAreYou = currentYear - pastYear;
+        old = String.valueOf(howOldAreYou);
+    }
+
     /** 判斷輸入欄是否空白 **/
-    private void checkEmpty(){
-        if (userName.isEmpty()){
-            Toast.makeText(SignUpActivity.this, "用戶名稱欄不得空白",Toast.LENGTH_SHORT).show();
+    private boolean checkEmpty() {
+        isValid = true;
+        try {
+            if (userName.isEmpty()) {
+                Toast.makeText(SignUpActivity.this, "用戶名稱欄不得空白", Toast.LENGTH_SHORT).show();
+                isValid = false;
+            }
+            if (birth.isEmpty()) {
+                Toast.makeText(SignUpActivity.this, "出生日期欄不得空白", Toast.LENGTH_SHORT).show();
+                isValid = false;
+            }
+            if (height.isEmpty()) {
+                Toast.makeText(SignUpActivity.this, "身高欄不得空白", Toast.LENGTH_SHORT).show();
+                isValid = false;
+            }
+            if (weight.isEmpty()) {
+                Toast.makeText(SignUpActivity.this, "體重欄不得空白", Toast.LENGTH_SHORT).show();
+                isValid = false;
+            }
+            if (checkedSex.isEmpty()) {
+                Toast.makeText(SignUpActivity.this, "性別欄不得空白", Toast.LENGTH_SHORT).show();
+                isValid = false;
+            }
+            if (checkedSmoke.isEmpty()) {
+                Toast.makeText(SignUpActivity.this, "抽菸欄不得空白", Toast.LENGTH_SHORT).show();
+                isValid = false;
+            }
+            if (checkedDia.isEmpty()) {
+                Toast.makeText(SignUpActivity.this, "糖尿病欄不得空白", Toast.LENGTH_SHORT).show();
+                isValid = false;
+            }
+            if (checkedHbp.isEmpty()) {
+                Toast.makeText(SignUpActivity.this, "高血壓欄不得空白", Toast.LENGTH_SHORT).show();
+                isValid = false;
+            }
+            if (!TextUtil.isValidEmailFormat(email)) {
+                Toast.makeText(SignUpActivity.this, "Email格式錯誤", Toast.LENGTH_SHORT).show();
+                isValid = false;
+            }
+            if (!TextUtil.isPhoneLegal(phone)) {
+                Toast.makeText(SignUpActivity.this, "手機號碼格式錯誤", Toast.LENGTH_SHORT).show();
+                isValid = false;
+            }
+        } catch (Exception e) {
+            Toast.makeText(SignUpActivity.this, "請正確填寫資料", Toast.LENGTH_SHORT).show();
+            System.out.println(e);
         }
-        if (birth.isEmpty()){
-            Toast.makeText(SignUpActivity.this, "出生日期欄不得空白",Toast.LENGTH_SHORT).show();
-        }
-        if (height.isEmpty()){
-            Toast.makeText(SignUpActivity.this, "身高欄不得空白",Toast.LENGTH_SHORT).show();
-        }
-        if (weight.isEmpty()){
-            Toast.makeText(SignUpActivity.this, "體重欄不得空白",Toast.LENGTH_SHORT).show();
-        }
-        if (checkedSex.isEmpty()){
-            Toast.makeText(SignUpActivity.this, "性別欄不得空白",Toast.LENGTH_SHORT).show();
-        }
-        if (checkedSmoke.isEmpty()){
-            Toast.makeText(SignUpActivity.this, "抽菸欄不得空白",Toast.LENGTH_SHORT).show();
-        }
-        if (checkedDia.isEmpty()){
-            Toast.makeText(SignUpActivity.this, "糖尿病欄不得空白",Toast.LENGTH_SHORT).show();
-        }
-        if (checkedHbp.isEmpty()){
-            Toast.makeText(SignUpActivity.this, "高血壓欄不得空白",Toast.LENGTH_SHORT).show();
-        }
+        return isValid;
     }
 
 }
