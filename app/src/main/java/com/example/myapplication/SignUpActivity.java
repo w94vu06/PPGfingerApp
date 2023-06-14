@@ -2,6 +2,7 @@ package com.example.myapplication;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.os.Bundle;
 import android.util.Log;
@@ -113,22 +114,28 @@ public class SignUpActivity extends AppCompatActivity {
 
     /** 出生日期欄點擊事件 **/
     private void showDateOnClick(final EditText edt){
-        edt.setOnTouchListener(new View.OnTouchListener() {
+//        edt.setOnTouchListener(new View.OnTouchListener() {
+//            @Override
+//            public boolean onTouch(View view, MotionEvent motionEvent) {
+//                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+//                    showDatePick(edt);
+//                    return true;
+//                }
+//
+//                return false;
+//            }
+//        });
+        edt.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                    showDatePick(edt);
-                    return true;
-                }
-
-                return false;
+            public void onClick(View view) {
+                showDatePick(edt);
             }
         });
 
         edt.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View view, boolean b) {
-                if (b){
+                if (b && !edt.isClickable()){
                     showDatePick(edt);
                 }
             }
@@ -177,6 +184,7 @@ public class SignUpActivity extends AppCompatActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
         profileJson = String.valueOf(jsonObject);
 
         return profileJson;
@@ -186,6 +194,9 @@ public class SignUpActivity extends AppCompatActivity {
         @Override
         public void onClick(View view) {
             try {
+                CheckInternetDialog checkInternetDialog = new CheckInternetDialog(SignUpActivity.this);
+                checkInternetDialog.checkInternet();
+
                 getValue();
                 checkEmpty();
                 if (isValid) {
@@ -195,7 +206,6 @@ public class SignUpActivity extends AppCompatActivity {
             } catch (Exception e) {
                 System.out.println(e);
             }
-
         }
     };
 
@@ -205,12 +215,19 @@ public class SignUpActivity extends AppCompatActivity {
         Calendar calendar = Calendar.getInstance();
         Date date = calendar.getTime();
         String formattedDate = dtf.format(date);
+
+
         //get birth's year
-        String years = birth.substring(4);
+        String years = birth.substring(0,4);
+        Log.d("tttt", "years: "+years);
         int pastYear = Integer.parseInt(years);
+        Log.d("tttt", "pastYear: "+pastYear);
         int currentYear = Integer.parseInt(formattedDate);
+        Log.d("tttt", "currentYear: "+currentYear);
         int howOldAreYou = currentYear - pastYear;
+        Log.d("tttt", "howOldAreYou: "+howOldAreYou);
         old = String.valueOf(howOldAreYou);
+        Log.d("tttt", "getValue: "+old);
     }
 
     /** 判斷輸入欄是否空白 **/

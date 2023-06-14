@@ -1,9 +1,14 @@
 package com.example.myapplication;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityOptionsCompat;
 
+import android.app.DatePickerDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
@@ -27,7 +32,11 @@ public class BeginActivity extends AppCompatActivity {
         }
         setContentView(R.layout.activity_begin);
         initParameter();
+        CheckInternetDialog checkInternetDialog = new CheckInternetDialog(BeginActivity.this);
+        checkInternetDialog.checkInternet();
     }
+
+
 
     public void initParameter(){
         btn_signin = findViewById(R.id.btn_signin);

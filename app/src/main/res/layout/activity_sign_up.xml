@@ -171,11 +171,11 @@
                         android:textSize="@dimen/sp_18"
                         android:textColor="#707070"
                         android:hint="出生日期*"
-                        android:text="2023/6/13"
+                        android:text="2023-6-13"
                         android:maxLines="1"
                         android:fontFamily="@font/glowsanssc_condensed_book"/>
-
                 </com.google.android.material.textfield.TextInputLayout>
+
 
             </RelativeLayout>
 
