@@ -70,6 +70,20 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="@drawable/shape_oval"/>
+                <ProgressBar
+                    android:id="@+id/progressBar_Circle"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:indeterminateOnly="false"
+                    android:progressDrawable="@drawable/progress_bar"/>
+                <TextView
+                    android:id="@+id/progress_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text=""
+                    android:textSize="@dimen/dp_20"
+                    android:gravity="center"
+                    android:fontFamily="@font/jf_openhuninn"/>
             </FrameLayout>
 
         </RelativeLayout>
@@ -79,6 +93,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="@string/warn"
+            android:fontFamily="@font/jf_openhuninn"
             android:textSize="@dimen/dp_20"
             android:textAlignment="center"
             android:padding="@dimen/dp_5"/>

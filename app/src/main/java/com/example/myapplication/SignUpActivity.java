@@ -2,11 +2,8 @@ package com.example.myapplication;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
@@ -21,12 +18,11 @@ import com.example.myapplication.Util.TextUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.ref.Cleaner;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.SimpleTimeZone;
 
 import butterknife.BindViews;
 import butterknife.ButterKnife;
@@ -34,25 +30,25 @@ import butterknife.OnClick;
 
 public class SignUpActivity extends AppCompatActivity {
 
-    EditText edit_userName,edit_email,edit_phone,edit_birth,edit_height,edit_weight;
+    EditText edit_userName, edit_email, edit_phone, edit_birth, edit_height, edit_weight;
     ImageButton imgbtn_signUp;
-    ImageView img_signup,img_signUpback;
+    ImageView img_signup, img_signUpback;
     @BindViews({R.id.check_sexMale, R.id.check_sexFemale})
     List<CheckBox> radiosSex;
     @BindViews({R.id.check_smokeY, R.id.check_smokeN})
     List<CheckBox> radiosSmoke;
     @BindViews({R.id.check_diaY, R.id.check_diaN})
     List<CheckBox> radiosDia;
-    @BindViews({R.id.check_hbpY,R.id.check_hbpN})
+    @BindViews({R.id.check_hbpY, R.id.check_hbpN})
     List<CheckBox> radiosHbp;
     Boolean isValid = true;
-    JsonUpload jsonUpload = new JsonUpload();
+    ControlMariaDB controlMariaDB = new ControlMariaDB();
 
     String profileJson;
 
     String old;
 
-    String userName,email,phone,birth,height,weight,checkedSex,checkedSmoke,checkedDia,checkedHbp = "";
+    String userName, email, phone, birth, height, weight, checkedSex, checkedSmoke, checkedDia, checkedHbp = "";
 
 
     @Override
@@ -63,7 +59,7 @@ public class SignUpActivity extends AppCompatActivity {
         ButterKnife.bind(SignUpActivity.this);
     }
 
-    private void initWidget(){
+    private void initWidget() {
         edit_userName = findViewById(R.id.edit_userName);
         edit_email = findViewById(R.id.edit_email);
         edit_phone = findViewById(R.id.edit_phone);
@@ -80,7 +76,9 @@ public class SignUpActivity extends AppCompatActivity {
         showDateOnClick(edit_birth);
     }
 
-    /** 性別單選 **/
+    /**
+     * 性別單選
+     **/
     @OnClick({R.id.check_sexMale, R.id.check_sexFemale})
     void changeSex(CheckBox checkBox) {
         CommonUtil.unCheck(radiosSex);
@@ -88,7 +86,9 @@ public class SignUpActivity extends AppCompatActivity {
         checkedSex = CommonUtil.getOne(radiosSex);
     }
 
-    /** 抽菸單選 **/
+    /**
+     * 抽菸單選
+     **/
     @OnClick({R.id.check_smokeY, R.id.check_smokeN})
     void changeSmoke(CheckBox checkBox) {
         CommonUtil.unCheck(radiosSmoke);
@@ -96,7 +96,9 @@ public class SignUpActivity extends AppCompatActivity {
         checkedSmoke = CommonUtil.getOne(radiosSmoke);
     }
 
-    /** 糖尿病單選 **/
+    /**
+     * 糖尿病單選
+     **/
     @OnClick({R.id.check_diaY, R.id.check_diaN})
     void changeDia(CheckBox checkBox) {
         CommonUtil.unCheck(radiosDia);
@@ -104,27 +106,20 @@ public class SignUpActivity extends AppCompatActivity {
         checkedDia = CommonUtil.getOne(radiosDia);
     }
 
-    /** 高血壓單選 **/
-    @OnClick({R.id.check_hbpY,R.id.check_hbpN})
+    /**
+     * 高血壓單選
+     **/
+    @OnClick({R.id.check_hbpY, R.id.check_hbpN})
     void changeHbp(CheckBox checkBox) {
         CommonUtil.unCheck(radiosHbp);
         checkBox.setChecked(true);
         checkedHbp = CommonUtil.getOne(radiosHbp);
     }
 
-    /** 出生日期欄點擊事件 **/
-    private void showDateOnClick(final EditText edt){
-//        edt.setOnTouchListener(new View.OnTouchListener() {
-//            @Override
-//            public boolean onTouch(View view, MotionEvent motionEvent) {
-//                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-//                    showDatePick(edt);
-//                    return true;
-//                }
-//
-//                return false;
-//            }
-//        });
+    /**
+     * 出生日期欄點擊事件
+     **/
+    private void showDateOnClick(final EditText edt) {
         edt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -135,27 +130,29 @@ public class SignUpActivity extends AppCompatActivity {
         edt.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View view, boolean b) {
-                if (b && !edt.isClickable()){
+                if (b && !edt.isClickable()) {
                     showDatePick(edt);
                 }
             }
         });
     }
 
-    /** 日期選擇Dialog **/
-    private void showDatePick(final EditText edt){
+    /**
+     * 日期選擇Dialog
+     **/
+    private void showDatePick(final EditText edt) {
         Calendar calendar = Calendar.getInstance();
         DatePickerDialog datePickerDialog = new DatePickerDialog(SignUpActivity.this, new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int month, int day) {
-                month+=1;
-                edt.setText(year + "-" + month + "-" +day);
+                month += 1;
+                edt.setText(year + "-" + month + "-" + day);
             }
         }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
         datePickerDialog.show();
     }
 
-    private String getValue(){
+    private void getValue() {
         userName = edit_userName.getText().toString();
         email = edit_email.getText().toString();
         phone = edit_phone.getText().toString();
@@ -166,8 +163,12 @@ public class SignUpActivity extends AppCompatActivity {
         checkedSmoke = CommonUtil.getOne(radiosSmoke);
         checkedDia = CommonUtil.getOne(radiosDia);
         checkedHbp = CommonUtil.getOne(radiosHbp);
+        checkEmpty();
         calAge();
+        packedJson();
+    }
 
+    public String packedJson() {
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("userName", userName);
@@ -184,7 +185,6 @@ public class SignUpActivity extends AppCompatActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
         profileJson = String.valueOf(jsonObject);
 
         return profileJson;
@@ -198,10 +198,10 @@ public class SignUpActivity extends AppCompatActivity {
                 checkInternetDialog.checkInternet();
 
                 getValue();
-                checkEmpty();
+
                 if (isValid) {
                     Toast.makeText(SignUpActivity.this, "success", Toast.LENGTH_SHORT).show();
-                    jsonUpload.controlMariaDB(profileJson);
+                    controlMariaDB.UserRegister(profileJson);
                 }
             } catch (Exception e) {
                 System.out.println(e);
@@ -216,21 +216,17 @@ public class SignUpActivity extends AppCompatActivity {
         Date date = calendar.getTime();
         String formattedDate = dtf.format(date);
 
-
         //get birth's year
-        String years = birth.substring(0,4);
-        Log.d("tttt", "years: "+years);
+        String years = birth.substring(0, 4);
         int pastYear = Integer.parseInt(years);
-        Log.d("tttt", "pastYear: "+pastYear);
         int currentYear = Integer.parseInt(formattedDate);
-        Log.d("tttt", "currentYear: "+currentYear);
         int howOldAreYou = currentYear - pastYear;
-        Log.d("tttt", "howOldAreYou: "+howOldAreYou);
         old = String.valueOf(howOldAreYou);
-        Log.d("tttt", "getValue: "+old);
     }
 
-    /** 判斷輸入欄是否空白 **/
+    /**
+     * 判斷輸入欄是否空白
+     **/
     private boolean checkEmpty() {
         isValid = true;
         try {

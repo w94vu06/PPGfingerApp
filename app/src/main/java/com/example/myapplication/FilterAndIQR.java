@@ -1,6 +1,7 @@
 package com.example.myapplication;
 
 import android.os.Build;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,7 +13,13 @@ public class FilterAndIQR {
 
     public long[] IQR(long[] RRI) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            double[] arr = Arrays.stream(RRI).asDoubleStream().toArray();
+//            double[] arr = Arrays.stream(RRI).asDoubleStream().toArray();
+
+            double[] arr = new double[RRI.length];
+            for (int i = 0; i < RRI.length; i++) {
+                arr[i] = (double) RRI[i];
+            }
+
             Arrays.sort(arr);
 
             double q1 = findMedian(arr, 0, arr.length / 2 - 1);
@@ -42,6 +49,7 @@ public class FilterAndIQR {
                 nonZeroValues[i] = clearArrayList.get(i);
             }
         }
+        Log.d("tttt", "IQR: "+nonZeroValues);
         return nonZeroValues;
     }
 

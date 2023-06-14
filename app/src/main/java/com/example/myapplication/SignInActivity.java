@@ -1,5 +1,7 @@
 package com.example.myapplication;
 
+import static com.example.myapplication.FilterAndIQR.findMedian;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -7,7 +9,6 @@ import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -22,20 +23,19 @@ import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.params.StreamConfigurationMap;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Log;
 import android.util.Size;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewOutlineProvider;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -49,6 +49,7 @@ import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -92,12 +93,16 @@ public class SignInActivity extends AppCompatActivity {
     private Thread chartThread;
     //IQR
     private FilterAndIQR filterAndIQR;
-    private JsonUpload jsonUpload;
+    private ControlMariaDB jsonUpload;
 
+    long[] nonZeroValuesAPI23;
     long[] outlierRRI;
     int fullAvgRed, fullAvgGreen, fullAvgBlue;
     int fixDarkRed;
     int fixAvgRedThreshold;
+
+    ProgressBar progressBar;
+    TextView progressBar_text;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,8 +117,9 @@ public class SignInActivity extends AppCompatActivity {
 //        scv_text = findViewById(R.id.scv_text);
         CameraView.setSurfaceTextureListener(textureListener);
         filterAndIQR = new FilterAndIQR();
-        jsonUpload = new JsonUpload();
-
+        jsonUpload = new ControlMariaDB();
+        progressBar = findViewById(R.id.progressBar_Circle);
+        progressBar_text = findViewById(R.id.progress_text);
         chart = findViewById(R.id.lineChart);
         initChart();
 
@@ -163,6 +169,7 @@ public class SignInActivity extends AppCompatActivity {
     public void restartBtn() {
         btn_restart.setOnClickListener(v -> {
             heartBeatCount.setText("量測準備中...");
+            initProgressBar();
             shoutDownDetect();
             onResume();
         });
@@ -266,6 +273,7 @@ public class SignInActivity extends AppCompatActivity {
                     mCurrentRollingAverage = (mCurrentRollingAverage * 29 + fixDarkRed) / 30;//改
                     if (mLastRollingAverage > mCurrentRollingAverage && mLastRollingAverage > mLastLastRollingAverage && mNumBeats < captureRate) {
                         mTimeArray[mNumBeats] = System.currentTimeMillis();
+                        initProgressBar();
                         mNumBeats++;
                         if (mNumBeats > prevNumBeats) {
                             triggerHandler();
@@ -273,7 +281,7 @@ public class SignInActivity extends AppCompatActivity {
 
                         prevNumBeats = mNumBeats;
                         startChartRun();//開始跑圖表
-                        heartBeatCount.setText("檢測到的心跳次數：" + mNumBeats);
+//                        heartBeatCount.setText("檢測到的心跳次數：" + mNumBeats);
                         if (mNumBeats == captureRate) {
                             chartIsRunning = false;
                             closeCamera();
@@ -383,23 +391,35 @@ public class SignInActivity extends AppCompatActivity {
         for (int i = 5; i < time_dist.length - 1; i++) {
             time_dist[i] = mTimeArray[i + 1] - mTimeArray[i];
         }
-        outlierRRI = filterAndIQR.IQR(time_dist);//去掉離群值
-
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            outlierRRI = filterAndIQR.IQR(time_dist);//去掉離群值
+        } else {
+            outlierRRI = IQRForAPI23(time_dist);//去掉離群值
+        }
         //calcBPM
         long[] getBPMOutlier = outlierRRI;
-        Arrays.sort(getBPMOutlier);
-        med = (int) outlierRRI[outlierRRI.length / 2];
-        heart_rate_bpm = 60000 / med;
+        if (getBPMOutlier != null) {
+            try {
+                Arrays.sort(getBPMOutlier);
+                med = (int) outlierRRI[outlierRRI.length / 2];
+                heart_rate_bpm = 60000 / med;
 
-        //calcRMSSD_SDNN
-        double rmssd = filterAndIQR.calculateRMSSD(outlierRRI);
-        double sdnn = filterAndIQR.calculateSDNN(outlierRRI);
-        DecimalFormat df = new DecimalFormat("#.##");//設定輸出格式
-        String RMSSD = df.format(rmssd);
-        String SDNN = df.format(sdnn);
+                //calcRMSSD_SDNN
+                double rmssd = filterAndIQR.calculateRMSSD(outlierRRI);
+                double sdnn = filterAndIQR.calculateSDNN(outlierRRI);
+                DecimalFormat df = new DecimalFormat("#.##");//設定輸出格式
+                String RMSSD = df.format(rmssd);
+                String SDNN = df.format(sdnn);
 
-        heartBeatCount.setText("RMSSD：" + RMSSD + "\n" + "SDNN：" + SDNN + "\n" + "BPM：" + heart_rate_bpm);
-        onPause();
+                heartBeatCount.setText("RMSSD：" + RMSSD + "\n" + "SDNN：" + SDNN + "\n" + "BPM：" + heart_rate_bpm);
+                onPause();
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+        } else {
+
+        }
+
     }
 
     /**
@@ -634,7 +654,7 @@ public class SignInActivity extends AppCompatActivity {
         data.setDrawValues(false);//是否繪製線條上的文字
         chart.notifyDataSetChanged();
         chart.setVisibleXRange(0, 60);//設置可見範圍
-        chart.moveViewToX(data.getEntryCount()+3);//將可視焦點放在最新一個數據，使圖表可移動
+        chart.moveViewToX(data.getEntryCount() + 3);//將可視焦點放在最新一個數據，使圖表可移動
     }
 
     /**
@@ -652,6 +672,60 @@ public class SignInActivity extends AppCompatActivity {
         set.setValueTextColor(Color.BLACK);
         set.setDrawValues(false);
         return set;
+    }
+
+    public void initProgressBar() {
+        progressBar.setVisibility(View.VISIBLE);
+        progressBar_text.setVisibility(View.VISIBLE);
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (mNumBeats <= 35) {
+                    int progress = (int) (mNumBeats / 35.0 * 100); // 计算当前进度的百分比
+                    progressBar_text.setText(progress + "%");
+                    progressBar.setProgress(progress);
+                }
+            }
+        }, 200);
+    }
+
+    public long[] IQRForAPI23(long[] RRI) {
+
+        double[] arr = new double[RRI.length];
+        for (int i = 0; i < RRI.length; i++) {
+            arr[i] = (double) RRI[i];
+        }
+
+        Arrays.sort(arr);
+
+        double q1 = findMedian(arr, 0, arr.length / 2 - 1);
+        double q3 = findMedian(arr, arr.length / 2 + arr.length % 2, arr.length - 1);
+        // 計算 IQR
+        double iqr = q3 - q1;
+
+        // 計算上下界
+        double upperBound = q3 + 1 * iqr;
+        double lowerBound = q1 - 1 * iqr;
+
+        // 將超過上下界的值設為0
+        for (int i = 0; i < RRI.length; i++) {
+            if (RRI[i] > upperBound || RRI[i] < lowerBound) {
+                RRI[i] = 0;
+            }
+        }
+        ArrayList<Long> clearArrayList = new ArrayList<>();
+        // 找出所有不為0的值的平均數
+        for (int i = 0; i < RRI.length; i++) {
+            if (RRI[i] != 0 && RRI[i] > 300 && RRI[i] < 1100) {
+                clearArrayList.add(RRI[i]);
+            }
+        }
+        nonZeroValuesAPI23 = new long[clearArrayList.size()];
+        for (int i = 0; i < clearArrayList.size(); i++) {
+            nonZeroValuesAPI23[i] = clearArrayList.get(i);
+        }
+        return nonZeroValuesAPI23;
     }
 
 //    @Override

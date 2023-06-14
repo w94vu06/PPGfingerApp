@@ -21,7 +21,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class JsonUpload {
+public class ControlMariaDB {
     private Double AF_Similarity, AI_Depression, AI_Heart_age, AI_bshl, AI_dis,
             AI_medic, BMI, BPc_dia, BPc_sys, BSc, Excellent_no, Lf_Hf, RMSSD, Shannon_h,
             Total_Power, ULF, Unacceptable_no, VHF, VLF, dis0bs1_0, dis0bs1_1, dis1bs1_0,
@@ -35,6 +35,68 @@ public class JsonUpload {
     private static String json;
     Handler mHandler = new MHandler();
     boolean uploadSuccess = true;
+    String serverUrl = "http://192.168.2.5:5000/";
+
+    public void UserLogin(String jsonObject) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                MediaType mediaType = MediaType.parse("application/json; charset=utf-8");
+                RequestBody requestBody = RequestBody.create(mediaType, jsonObject);
+
+                // 登入
+                Request loginRequest = new Request.Builder()
+                        .url(serverUrl + "login")
+                        .post(requestBody)
+                        .build();
+
+                try {
+                    // 發送登入請求
+                    Response loginResponse = client.newCall(loginRequest).execute();
+                    if (loginResponse.isSuccessful()) {
+                        // 登入回應
+                        String loginRes = Objects.requireNonNull(loginResponse.body()).string();
+                        Log.d("loginRes", "getLoginRes: " + loginRes);
+                    } else {
+                        uploadSuccess = false;
+                        throw new IOException("Unexpected code " + loginResponse);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
+    public void UserRegister(String jsonObject) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                MediaType mediaType = MediaType.parse("application/json; charset=utf-8");
+                RequestBody requestBody = RequestBody.create(mediaType, jsonObject);
+
+                // 註冊
+                Request registerRequest = new Request.Builder()
+                        .url(serverUrl + "register")
+                        .post(requestBody)
+                        .build();
+                try {
+                    // 發送註冊請求
+                    Response registerResponse = client.newCall(registerRequest).execute();
+                    if (registerResponse.isSuccessful()) {
+                        // 註冊回應
+                        String registerRes = Objects.requireNonNull(registerResponse.body()).string();
+                        Log.d("registerRes", "getRegisterRes: " + registerRes);
+                    } else {
+                        uploadSuccess = false;
+                        throw new IOException("Unexpected code " + registerResponse);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
 
     public void jsonUploadToServer(long[] time_dist) {
 
@@ -171,53 +233,6 @@ public class JsonUpload {
         }).start();
     }
 
-    public void controlMariaDB(String jsonObject) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                MediaType mediaType = MediaType.parse("application/json; charset=utf-8");
-                RequestBody requestBody = RequestBody.create(mediaType, jsonObject);
 
-                // 登入
-//                Request loginRequest = new Request.Builder()
-//                        .url("http://192.168.2.11:8090/login")
-//                        .post(requestBody)
-//                        .build();
-
-                // 註冊
-                Request registerRequest = new Request.Builder()
-                        .url("http://192.168.2.5:5000/register")
-                        .post(requestBody)
-                        .build();
-
-                try {
-                    // 發送登入請求
-//                    Response loginResponse = client.newCall(loginRequest).execute();
-//                    if (loginResponse.isSuccessful()) {
-//                        // 登入回應
-//                        String loginRes = Objects.requireNonNull(loginResponse.body()).string();
-//                        Log.d("loginRes", "getLoginRes: " + loginRes);
-//                    } else {
-//                        uploadSuccess = false;
-//                        throw new IOException("Unexpected code " + loginResponse);
-//                    }
-
-                    // 發送註冊請求
-                    Response registerResponse = client.newCall(registerRequest).execute();
-                    if (registerResponse.isSuccessful()) {
-                        // 註冊回應
-                        String registerRes = Objects.requireNonNull(registerResponse.body()).string();
-                        Log.d("registerRes", "getRegisterRes: " + registerRes);
-                    } else {
-                        uploadSuccess = false;
-                        throw new IOException("Unexpected code " + registerResponse);
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
-
-    }
-    }
+}
 
