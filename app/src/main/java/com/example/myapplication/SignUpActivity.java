@@ -3,6 +3,7 @@ package com.example.myapplication;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.CheckBox;
@@ -151,7 +152,9 @@ public class SignUpActivity extends AppCompatActivity {
         }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
         datePickerDialog.show();
     }
-
+    /**
+     * 取欄位值
+     **/
     private void getValue() {
         userName = edit_userName.getText().toString();
         email = edit_email.getText().toString();
@@ -167,7 +170,9 @@ public class SignUpActivity extends AppCompatActivity {
         calAge();
         packedJson();
     }
-
+    /**
+     * 打包JSON
+     **/
     public String packedJson() {
         JSONObject jsonObject = new JSONObject();
         try {
@@ -178,10 +183,10 @@ public class SignUpActivity extends AppCompatActivity {
             jsonObject.put("old", old);
             jsonObject.put("height", height);
             jsonObject.put("weight", weight);
-            jsonObject.put("checkedSex", checkedSex);
-            jsonObject.put("checkedSmoke", checkedSmoke);
-            jsonObject.put("checkedDia", checkedDia);
-            jsonObject.put("checkedHbp", checkedHbp);
+            jsonObject.put("sex", checkedSex);
+            jsonObject.put("smokes", checkedSmoke);
+            jsonObject.put("diabetes", checkedDia);
+            jsonObject.put("hbp", checkedHbp);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -190,25 +195,9 @@ public class SignUpActivity extends AppCompatActivity {
         return profileJson;
     }
 
-    View.OnClickListener lis = new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-            try {
-                CheckInternetDialog checkInternetDialog = new CheckInternetDialog(SignUpActivity.this);
-                checkInternetDialog.checkInternet();
-
-                getValue();
-
-                if (isValid) {
-                    Toast.makeText(SignUpActivity.this, "success", Toast.LENGTH_SHORT).show();
-                    controlMariaDB.UserRegister(profileJson);
-                }
-            } catch (Exception e) {
-                System.out.println(e);
-            }
-        }
-    };
-
+    /**
+     * 算年齡
+     **/
     private void calAge() {
         //get current time
         SimpleDateFormat dtf = new SimpleDateFormat("yyyy");
@@ -223,6 +212,43 @@ public class SignUpActivity extends AppCompatActivity {
         int howOldAreYou = currentYear - pastYear;
         old = String.valueOf(howOldAreYou);
     }
+
+    /**
+     * 註冊
+     **/
+    View.OnClickListener lis = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            Intent goHomePage = new Intent(SignUpActivity.this, MainActivity.class);
+            startActivity(goHomePage);
+
+//            try {
+//                CheckInternetDialog checkInternetDialog = new CheckInternetDialog(SignUpActivity.this);
+//                checkInternetDialog.checkInternet();
+//
+//                getValue();
+//
+//                if (isValid) {
+////                    Toast.makeText(SignUpActivity.this, "success", Toast.LENGTH_SHORT).show();
+//                    controlMariaDB.UserRegister(profileJson);
+//                    String registerRes = controlMariaDB.registerRes;
+//                    if (registerRes == "0") {
+//                        Toast.makeText(SignUpActivity.this, "註冊失敗", Toast.LENGTH_SHORT).show();
+//                    }
+//                    if (registerRes == "1") {
+//                        Toast.makeText(SignUpActivity.this, "註冊成功", Toast.LENGTH_SHORT).show();
+//
+////                        Intent goHomePage = new Intent(SignUpActivity.this, MainActivity.class);
+////                        startActivity(goHomePage);
+//                    } else {
+//                        Toast.makeText(SignUpActivity.this, "帳戶已經存在", Toast.LENGTH_SHORT).show();
+//                    }
+//                }
+//            } catch (Exception e) {
+//                System.out.println(e);
+//            }
+        }
+    };
 
     /**
      * 判斷輸入欄是否空白

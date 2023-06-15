@@ -43,6 +43,7 @@ public class Profile extends Fragment {
         recycler_profile.addItemDecoration(new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL));
 
         ArrayList<DataProfile> profileList = new ArrayList<>();
+        profileList.add(new DataProfile("姓名 Name","已驗證"));
         profileList.add(new DataProfile("手機 Phone","已驗證"));
         profileList.add(new DataProfile("信箱 Email","已驗證"));
         profileList.add(new DataProfile("身高 Height",null));

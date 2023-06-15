@@ -37,6 +37,11 @@ public class ControlMariaDB {
     boolean uploadSuccess = true;
     String serverUrl = "http://192.168.2.5:5000/";
 
+    String registerRes;
+
+    /**
+     * 登入
+     **/
     public void UserLogin(String jsonObject) {
         new Thread(new Runnable() {
             @Override
@@ -68,6 +73,9 @@ public class ControlMariaDB {
         }).start();
     }
 
+    /**
+     * 註冊
+     **/
     public void UserRegister(String jsonObject) {
         new Thread(new Runnable() {
             @Override
@@ -85,8 +93,10 @@ public class ControlMariaDB {
                     Response registerResponse = client.newCall(registerRequest).execute();
                     if (registerResponse.isSuccessful()) {
                         // 註冊回應
-                        String registerRes = Objects.requireNonNull(registerResponse.body()).string();
+                        registerRes = Objects.requireNonNull(registerResponse.body()).string();
+                        // 0:註冊失敗、1:註冊成功、2:使用者已存在
                         Log.d("registerRes", "getRegisterRes: " + registerRes);
+
                     } else {
                         uploadSuccess = false;
                         throw new IOException("Unexpected code " + registerResponse);
