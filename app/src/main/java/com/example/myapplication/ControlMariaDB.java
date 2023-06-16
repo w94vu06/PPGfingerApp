@@ -1,11 +1,14 @@
 package com.example.myapplication;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import org.greenrobot.eventbus.EventBus;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -34,10 +37,14 @@ public class ControlMariaDB {
     private static final OkHttpClient client = new OkHttpClient();
     private static String json;
     Handler mHandler = new MHandler();
+
     boolean uploadSuccess = true;
     String serverUrl = "http://192.168.2.5:5000/";
 
     String registerRes;
+
+    Handler resHandler = new ResHandler();
+
 
     /**
      * 登入
@@ -62,6 +69,9 @@ public class ControlMariaDB {
                         // 登入回應
                         String loginRes = Objects.requireNonNull(loginResponse.body()).string();
                         Log.d("loginRes", "getLoginRes: " + loginRes);
+                        Message resMsg = Message.obtain();
+                        resMsg.obj = loginRes;
+                        resHandler.sendMessage(resMsg);
                     } else {
                         uploadSuccess = false;
                         throw new IOException("Unexpected code " + loginResponse);
@@ -93,10 +103,11 @@ public class ControlMariaDB {
                     Response registerResponse = client.newCall(registerRequest).execute();
                     if (registerResponse.isSuccessful()) {
                         // 註冊回應
-                        registerRes = Objects.requireNonNull(registerResponse.body()).string();
+                        String registerRes = Objects.requireNonNull(registerResponse.body()).string();
                         // 0:註冊失敗、1:註冊成功、2:使用者已存在
-                        Log.d("registerRes", "getRegisterRes: " + registerRes);
-
+                        Message resMsg = Message.obtain();
+                        resMsg.obj = registerRes;
+                        resHandler.sendMessage(resMsg);
                     } else {
                         uploadSuccess = false;
                         throw new IOException("Unexpected code " + registerResponse);
@@ -107,6 +118,30 @@ public class ControlMariaDB {
             }
         }).start();
     }
+
+    class ResHandler extends Handler {
+        @Override
+        public void handleMessage(@NonNull Message resMsg) {
+            super.handleMessage(resMsg);
+            registerRes = resMsg.obj.toString();
+            EventBus.getDefault().post(new MessageEvent("Hi"));
+        }
+    }
+
+    public class MessageEvent {
+        private String message;
+
+        public MessageEvent(String message) {
+            this.message = message;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+    }
+
+
+
 
     public void jsonUploadToServer(long[] time_dist) {
 
@@ -242,6 +277,7 @@ public class ControlMariaDB {
             }
         }).start();
     }
+
 
 
 }

@@ -55,4 +55,7 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:4.5.0'
 
     implementation 'androidx.core:core-ktx:1.6.0'
+
+    //eventbus
+    implementation("org.greenrobot:eventbus:3.3.1")
 }
