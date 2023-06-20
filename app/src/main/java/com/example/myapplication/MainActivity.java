@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         initPermission();
         fragmentContainer = findViewById(R.id.fragmentContainer);
-        setMain();
+        setMain();//設定主畫面
         navigationView = findViewById(R.id.navigationView);
         navigationView.setOnItemSelectedListener(NaviSelectedListener);
     }
@@ -79,27 +79,28 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        EventBus.getDefault().register(this);
-    }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        EventBus.getDefault().unregister(this);
-    }
-
-    /**
-     * 接收profile
-     **/
-    @Subscribe(sticky = true, threadMode = ThreadMode.ASYNC)
-    public void onMessageEvent(SignUpActivity.MessageEvent event) {
-        // 收到MessageEvent時要做的事寫在這裡
-        String profileMsg = event.getMessage();
-        Log.d("rrrr", "onProfileEvent: " + profileMsg);
-    }
+//    @Override
+//    protected void onStart() {
+//        super.onStart();
+//        EventBus.getDefault().register(this);
+//    }
+//
+//    @Override
+//    protected void onStop() {
+//        super.onStop();
+//        EventBus.getDefault().unregister(this);
+//    }
+//
+//    /**
+//     * 接收profile
+//     **/
+//    @Subscribe(sticky = true, threadMode = ThreadMode.ASYNC)
+//    public void onMessageEvent(SignUpActivity.MessageEvent event) {
+//        // 收到MessageEvent時要做的事寫在這裡
+//        String profileMsg = event.getMessage();
+//        Log.d("rrrr", "onProfileEvent: " + profileMsg);
+//    }
 
     private NavigationBarView.OnItemSelectedListener NaviSelectedListener = new NavigationBarView.OnItemSelectedListener() {
         @Override

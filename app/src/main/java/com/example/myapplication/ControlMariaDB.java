@@ -38,8 +38,8 @@ public class ControlMariaDB {
     Handler mHandler = new MHandler();
 
     boolean uploadSuccess = true;
-//    String serverUrl = "http://192.168.2.5:5000/"; //公司
-    String serverUrl = "http://192.168.0.102:5000/"; //家裡
+    String serverUrl = "http://192.168.2.5:5000/"; //公司
+//    String serverUrl = "http://192.168.0.102:5000/"; //家裡
 
     String registerRes;
 
@@ -47,21 +47,16 @@ public class ControlMariaDB {
 
     private Context context;
 
+    private MariaDBCallback mCallback;
 
-
-    public void registerEventBus() {
-        EventBus.getDefault().register(this);
+    public ControlMariaDB(MariaDBCallback mCallback) {
+        this.mCallback = mCallback;
     }
-
-    public void unregisterEventBus() {
-        EventBus.getDefault().unregister(this);
-    }
-
 
     /**
      * 登入
      **/
-    public void UserLogin(String jsonObject) {
+    public void userLogin(String jsonObject) {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -98,7 +93,7 @@ public class ControlMariaDB {
     /**
      * 註冊
      **/
-    public void UserRegister(String jsonObject) {
+    public void userRegister(String jsonObject) {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -138,9 +133,10 @@ public class ControlMariaDB {
             super.handleMessage(resMsg);
             registerRes = resMsg.obj.toString();
             int intRegisterRes = Integer.parseInt(registerRes);
-            Log.d("hhhh", "before: "+registerRes);
             Log.d("hhhh", "before Int: "+intRegisterRes);
-            EventBus.getDefault().postSticky(new CodeEvent("Hi"));
+            mCallback.onResult(registerRes);
+
+//            EventBus.getDefault().postSticky(new CodeEvent("Hi"));
         }
     }
 

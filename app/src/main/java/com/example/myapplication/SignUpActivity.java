@@ -1,6 +1,5 @@
 package com.example.myapplication;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.DatePickerDialog;
@@ -35,7 +34,7 @@ import butterknife.BindViews;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class SignUpActivity extends AppCompatActivity {
+public class SignUpActivity extends AppCompatActivity implements MariaDBCallback {
 
     EditText edit_userName, edit_email, edit_phone, edit_birth, edit_height, edit_weight;
     ImageButton imgbtn_signUp;
@@ -48,14 +47,14 @@ public class SignUpActivity extends AppCompatActivity {
     List<CheckBox> radiosDia;
     @BindViews({R.id.check_hbpY, R.id.check_hbpN})
     List<CheckBox> radiosHbp;
-    Boolean isValid = true;
-    ControlMariaDB controlMariaDB = new ControlMariaDB();
 
-    String profileJson;
+    Boolean isValid = true; //判斷欄位是否為空
+    ControlMariaDB controlMariaDB = new ControlMariaDB(this);
 
-    String old;
+    String profileJson; //profile的JSON
 
-    String userName, email, phone, birth, height, weight, checkedSex, checkedSmoke, checkedDia, checkedHbp = "";
+    String userName, email, phone, birth, old, height, weight,
+            checkedSex, checkedSmoke, checkedDia, checkedHbp = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -218,9 +217,7 @@ public class SignUpActivity extends AppCompatActivity {
                     getValue();
                     if (isValid) {
                         /**註冊按鈕按下後，用UserRegister，會回傳事件代碼 */
-//                        controlMariaDB.UserRegister(profileJson);
-                        controlMariaDB.UserRegister(profileJson);
-
+                        controlMariaDB.userRegister(profileJson);
                     }
                 } catch (Exception e) {
                     System.out.println(e);
@@ -229,25 +226,22 @@ public class SignUpActivity extends AppCompatActivity {
         }
     };
 
-    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
-    public void onCodeEvent(ControlMariaDB.CodeEvent event) {
-        // 收到MessageEvent時要做的事寫在這裡
-        String profileMsg = event.getCodeEvent();
-        Log.d("rrrr", "onProfileEvent: " + profileMsg);
-
-        Log.d("hhhh", "事件代號 " + profileMsg);
-//        judgeEventCode(registerRes);
+    /**
+     * 註冊按鈕按下後，從MariaDBCallback，回傳事件代碼
+     */
+    @Override
+    public void onResult(String result) {
+        int eventCode = Integer.parseInt(result);
+        judgeEventCode(eventCode);
     }
 
     /**
      * 判斷事件代碼
-     *  */
+     */
     public void judgeEventCode(int registerRes) {
         if (registerRes == 1) {
             Toast.makeText(SignUpActivity.this, "註冊成功", Toast.LENGTH_SHORT).show();
-
-            EventBus.getDefault().postSticky(new MessageEvent(profileJson));
-
+            EventBus.getDefault().postSticky(new MessageEvent(profileJson));//把profile資料送去MainActivity
             Intent goHomePage = new Intent(SignUpActivity.this, MainActivity.class);
             startActivity(goHomePage);
         }
@@ -257,8 +251,6 @@ public class SignUpActivity extends AppCompatActivity {
             Toast.makeText(SignUpActivity.this, "註冊失敗", Toast.LENGTH_SHORT).show();
         }
     }
-
-
 
     /**
      * 註冊成功後傳profile到MainActivity
@@ -349,21 +341,15 @@ public class SignUpActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        /** 只有要使用EventBus的activity才能打開*/
-        EventBus.getDefault().register(this);
-
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        EventBus.getDefault().unregister(this);
-        controlMariaDB.unregisterEventBus();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
     }
 }

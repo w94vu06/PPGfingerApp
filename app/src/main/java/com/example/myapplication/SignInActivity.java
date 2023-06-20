@@ -93,7 +93,6 @@ public class SignInActivity extends AppCompatActivity {
     private Thread chartThread;
     //IQR
     private FilterAndIQR filterAndIQR;
-    private ControlMariaDB jsonUpload;
 
     long[] nonZeroValuesAPI23;
     long[] outlierRRI;
@@ -103,6 +102,8 @@ public class SignInActivity extends AppCompatActivity {
 
     ProgressBar progressBar;
     TextView progressBar_text;
+
+    ControlMariaDB controlMariaDB = new ControlMariaDB((MariaDBCallback) this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,7 +118,7 @@ public class SignInActivity extends AppCompatActivity {
 //        scv_text = findViewById(R.id.scv_text);
         CameraView.setSurfaceTextureListener(textureListener);
         filterAndIQR = new FilterAndIQR();
-        jsonUpload = new ControlMariaDB();
+
         progressBar = findViewById(R.id.progressBar_Circle);
         progressBar_text = findViewById(R.id.progress_text);
         chart = findViewById(R.id.lineChart);
@@ -435,7 +436,7 @@ public class SignInActivity extends AppCompatActivity {
      * 上傳量測結果至伺服器
      */
     private void uploadResult() {
-        jsonUpload.jsonUploadToServer(outlierRRI);//上傳完成的RRI
+        controlMariaDB.jsonUploadToServer(outlierRRI); //上傳完成的RRI
     }
 
     /**

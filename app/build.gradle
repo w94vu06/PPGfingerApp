@@ -59,4 +59,6 @@ dependencies {
     //eventbus
     implementation("org.greenrobot:eventbus:3.3.1")
 
+    implementation 'com.android.volley:volley:1.1.1'
+
 }
