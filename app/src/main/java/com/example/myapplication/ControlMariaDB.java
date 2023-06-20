@@ -1,7 +1,6 @@
 package com.example.myapplication;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -39,11 +38,24 @@ public class ControlMariaDB {
     Handler mHandler = new MHandler();
 
     boolean uploadSuccess = true;
-    String serverUrl = "http://192.168.2.5:5000/";
+//    String serverUrl = "http://192.168.2.5:5000/"; //公司
+    String serverUrl = "http://192.168.0.102:5000/"; //家裡
 
     String registerRes;
 
     Handler resHandler = new ResHandler();
+
+    private Context context;
+
+
+
+    public void registerEventBus() {
+        EventBus.getDefault().register(this);
+    }
+
+    public void unregisterEventBus() {
+        EventBus.getDefault().unregister(this);
+    }
 
 
     /**
@@ -108,6 +120,7 @@ public class ControlMariaDB {
                         Message resMsg = Message.obtain();
                         resMsg.obj = registerRes;
                         resHandler.sendMessage(resMsg);
+
                     } else {
                         uploadSuccess = false;
                         throw new IOException("Unexpected code " + registerResponse);
@@ -124,24 +137,23 @@ public class ControlMariaDB {
         public void handleMessage(@NonNull Message resMsg) {
             super.handleMessage(resMsg);
             registerRes = resMsg.obj.toString();
-            EventBus.getDefault().post(new MessageEvent("Hi"));
+            int intRegisterRes = Integer.parseInt(registerRes);
+            Log.d("hhhh", "before: "+registerRes);
+            Log.d("hhhh", "before Int: "+intRegisterRes);
+            EventBus.getDefault().postSticky(new CodeEvent("Hi"));
         }
     }
 
-    public class MessageEvent {
-        private String message;
+    public class CodeEvent {
+        private String CodeMsg;
 
-        public MessageEvent(String message) {
-            this.message = message;
+        public CodeEvent(String message) {
+            this.CodeMsg = CodeMsg;
         }
-
-        public String getMessage() {
-            return message;
+        public String getCodeEvent() {
+            return CodeMsg;
         }
     }
-
-
-
 
     public void jsonUploadToServer(long[] time_dist) {
 

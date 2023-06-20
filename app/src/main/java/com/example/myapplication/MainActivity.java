@@ -17,6 +17,7 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.GlideBuilder;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.myapplication.Fragment.Category;
@@ -90,14 +91,15 @@ public class MainActivity extends AppCompatActivity {
         EventBus.getDefault().unregister(this);
     }
 
+    /**
+     * 接收profile
+     **/
     @Subscribe(sticky = true, threadMode = ThreadMode.ASYNC)
-    public void onProfileEvent(SignUpActivity.ProfileEvent profileEvent) {
+    public void onMessageEvent(SignUpActivity.MessageEvent event) {
         // 收到MessageEvent時要做的事寫在這裡
-        String profileJson = profileEvent.getProfileJson();
-        Log.d("rrrr", "onProfileEvent: " + profileJson);
+        String profileMsg = event.getMessage();
+        Log.d("rrrr", "onProfileEvent: " + profileMsg);
     }
-
-
 
     private NavigationBarView.OnItemSelectedListener NaviSelectedListener = new NavigationBarView.OnItemSelectedListener() {
         @Override

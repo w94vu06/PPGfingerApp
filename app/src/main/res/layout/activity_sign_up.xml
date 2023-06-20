@@ -171,7 +171,7 @@
                         android:textSize="@dimen/sp_18"
                         android:textColor="#707070"
                         android:hint="出生日期*"
-                        android:text="2023-6-13"
+                        android:text="2000-9-25"
                         android:maxLines="1"
                         android:fontFamily="@font/glowsanssc_condensed_book"/>
                 </com.google.android.material.textfield.TextInputLayout>
@@ -237,7 +237,7 @@
                         android:textSize="@dimen/sp_18"
                         android:textColor="#707070"
                         android:hint="體重(公斤kg)*"
-                        android:text="55"
+                        android:text="73"
                         android:maxLines="1"
                         android:fontFamily="@font/glowsanssc_condensed_book"
                         android:inputType="number"

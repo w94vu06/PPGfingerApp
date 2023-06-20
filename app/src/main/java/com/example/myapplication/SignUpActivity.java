@@ -1,5 +1,6 @@
 package com.example.myapplication;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.DatePickerDialog;
@@ -15,6 +16,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.myapplication.Util.CommonUtil;
+import com.example.myapplication.Util.FastClickUtil;
 import com.example.myapplication.Util.TextUtil;
 
 import org.greenrobot.eventbus.EventBus;
@@ -55,14 +57,12 @@ public class SignUpActivity extends AppCompatActivity {
 
     String userName, email, phone, birth, height, weight, checkedSex, checkedSmoke, checkedDia, checkedHbp = "";
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
         initWidget();
         ButterKnife.bind(SignUpActivity.this);
-        EventBus.getDefault().register(this);
     }
 
     private void initWidget() {
@@ -80,8 +80,6 @@ public class SignUpActivity extends AppCompatActivity {
         imgbtn_signUp.setImageResource(R.drawable.btn_signup);
         imgbtn_signUp.setOnClickListener(lis);
         showDateOnClick(edit_birth);
-
-
     }
 
     /**
@@ -159,6 +157,7 @@ public class SignUpActivity extends AppCompatActivity {
         }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
         datePickerDialog.show();
     }
+
     /**
      * 取欄位值
      **/
@@ -177,6 +176,7 @@ public class SignUpActivity extends AppCompatActivity {
         calAge();
         packedJson();
     }
+
     /**
      * 打包JSON
      **/
@@ -202,24 +202,78 @@ public class SignUpActivity extends AppCompatActivity {
         return profileJson;
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onMessageEvent(ControlMariaDB.MessageEvent event) {
-        String message = event.getMessage();
-        Log.d("eeee", "onMessageEvent: "+message);
+    /**
+     * 註冊
+     **/
+    View.OnClickListener lis = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            if (FastClickUtil.isFastDoubleClick()) {
+                Toast.makeText(SignUpActivity.this, "請勿快速點擊", Toast.LENGTH_SHORT).show();
+            } else {
+                try {
+                    //確認網路連線
+                    CheckInternetDialog checkInternetDialog = new CheckInternetDialog(SignUpActivity.this);
+                    checkInternetDialog.checkInternet();
+                    getValue();
+                    if (isValid) {
+                        /**註冊按鈕按下後，用UserRegister，會回傳事件代碼 */
+//                        controlMariaDB.UserRegister(profileJson);
+                        controlMariaDB.UserRegister(profileJson);
+
+                    }
+                } catch (Exception e) {
+                    System.out.println(e);
+                }
+            }
+        }
+    };
+
+    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
+    public void onCodeEvent(ControlMariaDB.CodeEvent event) {
+        // 收到MessageEvent時要做的事寫在這裡
+        String profileMsg = event.getCodeEvent();
+        Log.d("rrrr", "onProfileEvent: " + profileMsg);
+
+        Log.d("hhhh", "事件代號 " + profileMsg);
+//        judgeEventCode(registerRes);
+    }
+
+    /**
+     * 判斷事件代碼
+     *  */
+    public void judgeEventCode(int registerRes) {
+        if (registerRes == 1) {
+            Toast.makeText(SignUpActivity.this, "註冊成功", Toast.LENGTH_SHORT).show();
+
+            EventBus.getDefault().postSticky(new MessageEvent(profileJson));
+
+            Intent goHomePage = new Intent(SignUpActivity.this, MainActivity.class);
+            startActivity(goHomePage);
+        }
+        if (registerRes == 2) {
+            Toast.makeText(SignUpActivity.this, "帳戶已經存在", Toast.LENGTH_SHORT).show();
+        } else if (registerRes == 0) {
+            Toast.makeText(SignUpActivity.this, "註冊失敗", Toast.LENGTH_SHORT).show();
+        }
     }
 
 
-    public static class ProfileEvent {
-        private final String profileJson;
 
-        public String getProfileJson() {
-            return profileJson;
+    /**
+     * 註冊成功後傳profile到MainActivity
+     **/
+    public class MessageEvent {
+        private String message;
+
+        public MessageEvent(String message) {
+            this.message = message;
         }
-        public ProfileEvent(String profileJson) {
-            this.profileJson = profileJson;
+
+        public String getMessage() {
+            return message;
         }
     }
-
 
     /**
      * 算年齡
@@ -238,52 +292,6 @@ public class SignUpActivity extends AppCompatActivity {
         int howOldAreYou = currentYear - pastYear;
         old = String.valueOf(howOldAreYou);
     }
-
-    /**
-     * 註冊
-     **/
-    View.OnClickListener lis = new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-//            Intent goHomePage = new Intent(SignUpActivity.this, MainActivity.class);
-//            startActivity(goHomePage);
-
-            try {
-                CheckInternetDialog checkInternetDialog = new CheckInternetDialog(SignUpActivity.this);
-                checkInternetDialog.checkInternet();
-
-                getValue();
-
-                if (isValid) {
-//                    Toast.makeText(SignUpActivity.this, "success", Toast.LENGTH_SHORT).show();
-                    /**註冊按鈕按下後，用UserRegister，會回傳事件代碼 */
-                    controlMariaDB.UserRegister(profileJson);
-                    /**事件代碼 */
-                    String registerRes = controlMariaDB.registerRes;
-                    Log.d("hhhh", "SUA "+registerRes);
-                    /**判斷事件代碼 */
-                    if (registerRes == "0") {
-                        Toast.makeText(SignUpActivity.this, "註冊失敗", Toast.LENGTH_SHORT).show();
-                    }
-                    if (registerRes == "1") {
-                        Toast.makeText(SignUpActivity.this, "註冊成功", Toast.LENGTH_SHORT).show();
-
-                        ProfileEvent profileEvent = new ProfileEvent(profileJson);
-                        profileEvent.getProfileJson();
-                        EventBus.getDefault().postSticky(profileEvent);
-                        Log.d("eeee", "SUA: "+profileJson);
-
-                        Intent goHomePage = new Intent(SignUpActivity.this, MainActivity.class);
-                        startActivity(goHomePage);
-                    } else {
-                        Toast.makeText(SignUpActivity.this, "帳戶已經存在", Toast.LENGTH_SHORT).show();
-                    }
-                }
-            } catch (Exception e) {
-                System.out.println(e);
-            }
-        }
-    };
 
     /**
      * 判斷輸入欄是否空白
@@ -339,9 +347,18 @@ public class SignUpActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        /** 只有要使用EventBus的activity才能打開*/
+        EventBus.getDefault().register(this);
+
+    }
+
+    @Override
     protected void onStop() {
         super.onStop();
         EventBus.getDefault().unregister(this);
+        controlMariaDB.unregisterEventBus();
     }
 
     @Override
