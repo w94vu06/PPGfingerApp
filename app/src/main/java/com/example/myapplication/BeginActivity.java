@@ -36,6 +36,10 @@ public class BeginActivity extends AppCompatActivity {
         checkInternetDialog.checkInternet();
     }
 
+    public void rememberAccount() {
+
+    }
+
 
 
     public void initParameter(){

@@ -39,77 +39,87 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/dp_30"
-            android:text="量測登入以繼續"
+            android:text="登入以繼續"
             android:fontFamily="@font/jf_openhuninn"/>
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
 
-            <com.github.mikephil.charting.charts.LineChart
-                android:id="@+id/lineChart"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/dp_250"
-                android:layout_gravity="center"
-                android:layout_marginTop="@dimen/dp_20"/>
-
-            <FrameLayout
-                android:layout_width="@dimen/dp_80"
-                android:layout_height="@dimen/dp_80"
-                android:layout_alignBottom="@id/lineChart"
-                android:layout_alignEnd="@id/lineChart">
-
-                <TextureView
-                    android:id="@+id/texture"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center"
-                    android:screenOrientation="portrait" />
-
-                <View
-                    android:id="@+id/overlay"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@drawable/shape_oval"/>
-                <ProgressBar
-                    android:id="@+id/progressBar_Circle"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:indeterminateOnly="false"
-                    android:progressDrawable="@drawable/progress_bar"/>
-                <TextView
-                    android:id="@+id/progress_text"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:text=""
-                    android:textSize="@dimen/dp_20"
-                    android:gravity="center"
-                    android:fontFamily="@font/jf_openhuninn"/>
-            </FrameLayout>
-
-        </RelativeLayout>
-        <TextView
-            android:id="@+id/heartBeatCount"
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:id="@+id/input_userName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="@string/warn"
-            android:fontFamily="@font/jf_openhuninn"
-            android:textSize="@dimen/dp_20"
-            android:textAlignment="center"
-            android:padding="@dimen/dp_5"/>
+            android:layout_marginStart="@dimen/dp_55"
+            android:layout_marginEnd="@dimen/dp_55"
+            android:textColorHint="#C9C9C9"
+            android:ellipsize="end"
+            android:lines="1"
+            android:layout_marginTop="@dimen/dp_40">
+
+            <EditText
+                android:id="@+id/edit_userName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/dp_5"
+                android:textSize="@dimen/sp_18"
+                android:textColor="#707070"
+                android:hint="姓名"
+                android:text=""
+                android:inputType="text"
+                android:maxLines="1"
+                android:fontFamily="@font/glowsanssc_condensed_book"/>
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:id="@+id/input_phone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_20"
+            android:layout_marginStart="@dimen/dp_55"
+            android:layout_marginEnd="@dimen/dp_55"
+            android:textColorHint="#C9C9C9"
+            android:layout_below="@+id/input_email">
+
+            <EditText
+                android:id="@+id/edit_phone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/dp_5"
+                android:textSize="@dimen/sp_18"
+                android:textColor="#707070"
+                android:hint="手機號碼"
+                android:text=""
+                android:maxLines="1"
+                android:maxLength="10"
+                android:fontFamily="@font/glowsanssc_condensed_book"
+                android:ellipsize="end"
+                android:lines="1"/>
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <CheckBox
+            android:id="@+id/rememberMe"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/sp_18"
+            android:layout_marginLeft="@dimen/dp_50"
+            android:text="記住密碼"
+            android:fontFamily="@font/glowsanssc_condensed_book"
+            android:textColor="#707070"
+            android:textSize="@dimen/sp_15" />
 
         <Button
-            android:id="@+id/btn_restart"
+            android:id="@+id/btn_login"
             android:layout_width="@dimen/dp_120"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:padding="5dp"
-            android:layout_marginTop="@dimen/dp_60"
-            android:text="重新量測"
-            android:textSize="@dimen/sp_22"
-            android:textColor="@color/sign_color"
+            android:layout_marginTop="@dimen/dp_100"
+            android:background="@drawable/background_button"
             android:fontFamily="@font/rajdhani_bold"
-            android:background="@drawable/background_button"/>
+            android:padding="5dp"
+            android:text="登    入"
+            android:textColor="@color/sign_color"
+            android:textSize="@dimen/sp_22" />
     </LinearLayout>
 
 </RelativeLayout>
