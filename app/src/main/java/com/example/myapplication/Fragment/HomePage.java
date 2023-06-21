@@ -244,7 +244,6 @@ public class HomePage extends Fragment {
         if (checkFeature.size()==0) {
             featureList.add(new DataFeature("無資料", 0.0));
         }
-
         adapter_feature = new FeatureAdapter(featureList);
         recycler_feature.setAdapter(adapter_feature);
     }

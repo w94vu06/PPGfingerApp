@@ -103,7 +103,7 @@ public class SignInActivity extends AppCompatActivity {
     ProgressBar progressBar;
     TextView progressBar_text;
 
-    ControlMariaDB controlMariaDB = new ControlMariaDB((MariaDBCallback) this);
+    ControlMariaDB controlMariaDB ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -245,7 +245,7 @@ public class SignInActivity extends AppCompatActivity {
             fullAvgGreen = fullScreenGreen / (height * width);
             fullAvgBlue = fullScreenBlue / (height * width);
 
-            Log.d("yyyy", "RED: " + averageRedThreshold + "\nGREEN: " + averageGreenThreshold + "\nBLUE: " + averageBlueThreshold);
+//            Log.d("yyyy", "RED: " + averageRedThreshold + "\nGREEN: " + averageGreenThreshold + "\nBLUE: " + averageBlueThreshold);
             if (fullAvgRed < 150) {
                 fixDarkRed = fullScreenRed * 2;
                 fixAvgRedThreshold = averageRedThreshold * 2;

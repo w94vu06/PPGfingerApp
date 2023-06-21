@@ -53,7 +53,7 @@ public class Profile extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
         recycler_profile = view.findViewById(R.id.recycler_profile);
-        RecyclerViewProfile();
+
         return view;
     }
 
@@ -113,9 +113,11 @@ public class Profile extends Fragment {
                 smokes = jsonObject.getInt("smokes");
                 diabetes = jsonObject.getInt("diabetes");
                 hbp = jsonObject.getInt("hbp");
+                Log.d("rrrr", "onProfilePage: " + userName+email+phone);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }).start();
+        RecyclerViewProfile();
     }
 }

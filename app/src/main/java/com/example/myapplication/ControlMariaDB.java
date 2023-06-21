@@ -38,8 +38,8 @@ public class ControlMariaDB {
     Handler mHandler = new MHandler();
 
     boolean uploadSuccess = true;
-    String serverUrl = "http://192.168.2.5:5000/"; //公司
-//    String serverUrl = "http://192.168.0.102:5000/"; //家裡
+//    String serverUrl = "http://192.168.2.5:5000/"; //公司
+    String serverUrl = "http://192.168.0.102:5000/"; //家裡
 
     String registerRes;
 

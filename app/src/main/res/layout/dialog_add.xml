@@ -49,37 +49,37 @@
             <CheckBox
                 android:id="@+id/check_dbp"
                 style="@style/select_flex_style"
-                android:tag="f1"
+                android:tag="舒張壓"
                 android:text="舒張壓 DBP" />
 
             <CheckBox
                 android:id="@+id/check_sbp"
                 style="@style/select_flex_style"
-                android:tag="f2"
+                android:tag="收縮壓"
                 android:text="收縮壓 SBP" />
 
             <CheckBox
                 android:id="@+id/check_bs"
                 style="@style/select_flex_style"
-                android:tag="f3"
+                android:tag="血糖"
                 android:text="血糖 BS-mg/dL" />
 
             <CheckBox
                 android:id="@+id/check_hr"
                 style="@style/select_flex_style"
-                android:tag="f4"
+                android:tag="心率"
                 android:text="心率 Heart Rate" />
 
             <CheckBox
                 android:id="@+id/check_sdnn"
                 style="@style/select_flex_style"
-                android:tag="f5"
+                android:tag="SDNN"
                 android:text="SDNN" />
 
             <CheckBox
                 android:id="@+id/check_rmssd"
                 style="@style/select_flex_style"
-                android:tag="f6"
+                android:tag="RMSSD"
                 android:text="RMSSD" />
 
         </com.google.android.flexbox.FlexboxLayout>

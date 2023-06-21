@@ -134,6 +134,22 @@
                     android:textColor="@color/green"
                     android:textSize="@dimen/sp_22"
                     android:textStyle="bold" />
+                <Button
+                    android:id="@+id/btn_detect"
+                    android:layout_width="@dimen/dp_70"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="@dimen/dp_5"
+                    android:layout_marginBottom="@dimen/dp_5"
+                    android:layout_marginEnd="@dimen/dp_10"
+                    android:layout_toLeftOf="@+id/imgbtn_add"
+                    android:text="量   測"
+                    android:gravity="center"
+                    android:textSize="@dimen/sp_12"
+                    android:textColor="@color/shironeri"
+                    android:fontFamily="@font/glowsanssc_condensed_book"
+                    android:background="@drawable/background_button2"
+                    android:minHeight="0dp"/>
+
 
                 <ImageButton
                     android:id="@+id/imgbtn_add"
