@@ -4,122 +4,145 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".SignInActivity"
-    android:background="@color/shironeri">
+    android:background="@color/shironeri"
+    tools:context=".SignInActivity">
 
     <ImageView
         android:id="@+id/img_signin"
         android:layout_width="@dimen/dp_198"
         android:layout_height="@dimen/dp_55"
         android:layout_marginTop="@dimen/dp_20"
-        android:src="@drawable/sign_in"
         android:scaleType="fitXY"
         android:layout_centerHorizontal="true"/>
 
-    <LinearLayout
-        android:id="@+id/linear_signin"
+    <ImageView
+        android:id="@+id/img_signInback"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="@dimen/dp_20"
-        android:background="@drawable/sign_background"
+        android:layout_marginTop="@dimen/dp_15"
         android:layout_below="@+id/img_signin"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:scaleType="fitXY"/>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/dp_35"
-            android:layout_marginStart="@dimen/dp_30"
-            android:text="歡迎回來！"
-            android:textSize="@dimen/sp_34"
-            android:textColor="@color/black"
-            android:fontFamily="@font/jf_openhuninn"/>
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignTop="@+id/img_signin"
+        android:layout_marginTop="@dimen/dp_10">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/dp_30"
-            android:text="登入以繼續"
-            android:fontFamily="@font/jf_openhuninn"/>
-
-        <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:id="@+id/input_userName"
+        <LinearLayout
+            android:id="@+id/linear_signin"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/dp_55"
-            android:layout_marginEnd="@dimen/dp_55"
-            android:textColorHint="#C9C9C9"
-            android:ellipsize="end"
-            android:lines="1"
-            android:layout_marginTop="@dimen/dp_40">
-
-            <EditText
-                android:id="@+id/edit_userName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="@dimen/dp_5"
-                android:textSize="@dimen/sp_18"
-                android:textColor="#707070"
-                android:hint="姓名"
-                android:text=""
-                android:inputType="text"
-                android:maxLines="1"
-                android:fontFamily="@font/glowsanssc_condensed_book"/>
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:id="@+id/input_phone"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/img_signin"
             android:layout_marginTop="@dimen/dp_20"
-            android:layout_marginStart="@dimen/dp_55"
-            android:layout_marginEnd="@dimen/dp_55"
-            android:textColorHint="#C9C9C9"
-            android:layout_below="@+id/input_email">
+            android:background="@drawable/sign_background"
+            android:orientation="vertical">
 
-            <EditText
-                android:id="@+id/edit_phone"
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/dp_30"
+                android:layout_marginTop="@dimen/dp_35"
+                android:fontFamily="@font/jf_openhuninn"
+                android:text="歡迎回來！"
+                android:textColor="@color/black"
+                android:textSize="@dimen/sp_34" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/dp_30"
+                android:fontFamily="@font/jf_openhuninn"
+                android:text="登入以繼續" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/input_userName"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="@dimen/dp_5"
-                android:textSize="@dimen/sp_18"
-                android:textColor="#707070"
-                android:hint="手機號碼"
-                android:text=""
-                android:maxLines="1"
-                android:maxLength="10"
-                android:fontFamily="@font/glowsanssc_condensed_book"
+                android:layout_marginStart="@dimen/dp_55"
+                android:layout_marginTop="@dimen/dp_40"
+                android:layout_marginEnd="@dimen/dp_55"
                 android:ellipsize="end"
-                android:lines="1"/>
+                android:lines="1"
+                android:textColorHint="#C9C9C9">
 
-        </com.google.android.material.textfield.TextInputLayout>
+                <EditText
+                    android:id="@+id/edit_userName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/glowsanssc_condensed_book"
+                    android:hint="姓名"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:padding="@dimen/dp_5"
+                    android:text=""
+                    android:textColor="#707070"
+                    android:textSize="@dimen/sp_18" />
 
-        <CheckBox
-            android:id="@+id/rememberMe"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/sp_18"
-            android:layout_marginLeft="@dimen/dp_50"
-            android:text="記住密碼"
-            android:fontFamily="@font/glowsanssc_condensed_book"
-            android:textColor="#707070"
-            android:textSize="@dimen/sp_15" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-        <Button
-            android:id="@+id/btn_login"
-            android:layout_width="@dimen/dp_120"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="@dimen/dp_100"
-            android:background="@drawable/background_button"
-            android:fontFamily="@font/rajdhani_bold"
-            android:padding="5dp"
-            android:text="登    入"
-            android:textColor="@color/sign_color"
-            android:textSize="@dimen/sp_22" />
-    </LinearLayout>
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/input_phone"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/input_email"
+                android:layout_marginStart="@dimen/dp_55"
+                android:layout_marginTop="@dimen/dp_20"
+                android:layout_marginEnd="@dimen/dp_55"
+                android:textColorHint="#C9C9C9">
 
+                <EditText
+                    android:id="@+id/edit_phone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:fontFamily="@font/glowsanssc_condensed_book"
+                    android:hint="手機號碼"
+                    android:lines="1"
+                    android:maxLength="10"
+                    android:maxLines="1"
+                    android:padding="@dimen/dp_5"
+                    android:text=""
+                    android:textColor="#707070"
+                    android:textSize="@dimen/sp_18" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_gravity="center">
+
+                <CheckBox
+                    android:id="@+id/rememberMe"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/sp_18"
+                    android:fontFamily="@font/glowsanssc_condensed_book"
+                    android:text="記住密碼"
+                    android:textColor="#707070"
+                    android:textSize="@dimen/sp_15" />
+
+                <Button
+                    android:id="@+id/btn_login"
+                    android:layout_width="@dimen/dp_100"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dp_15"
+                    android:layout_marginLeft="@dimen/dp_70"
+                    android:background="@drawable/background_button"
+                    android:fontFamily="@font/rajdhani_bold"
+                    android:padding="5dp"
+                    android:text="登    入"
+                    android:textColor="@color/sign_color"
+                    android:textSize="@dimen/sp_18" />
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+    </ScrollView>
 </RelativeLayout>

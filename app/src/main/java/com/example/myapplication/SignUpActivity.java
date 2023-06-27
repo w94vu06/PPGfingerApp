@@ -238,16 +238,16 @@ public class SignUpActivity extends AppCompatActivity implements MariaDBCallback
     /**
      * 判斷事件代碼
      */
-    public void judgeEventCode(int registerRes) {
-        if (registerRes == 1) {
+    public void judgeEventCode(int res) {
+        if (res == 1) {
             Toast.makeText(SignUpActivity.this, "註冊成功", Toast.LENGTH_SHORT).show();
             EventBus.getDefault().postSticky(new MessageEvent(profileJson));//把profile資料送去MainActivity
             Intent goHomePage = new Intent(SignUpActivity.this, MainActivity.class);
             startActivity(goHomePage);
         }
-        if (registerRes == 2) {
+        if (res == 2) {
             Toast.makeText(SignUpActivity.this, "帳戶已經存在", Toast.LENGTH_SHORT).show();
-        } else if (registerRes == 0) {
+        } else if (res == 0) {
             Toast.makeText(SignUpActivity.this, "註冊失敗", Toast.LENGTH_SHORT).show();
         }
     }

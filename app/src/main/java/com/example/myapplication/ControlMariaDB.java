@@ -38,16 +38,20 @@ public class ControlMariaDB {
     Handler mHandler = new MHandler();
 
     boolean uploadSuccess = true;
-//    String serverUrl = "http://192.168.2.5:5000/"; //公司
+    //    String serverUrl = "http://192.168.2.5:5000/"; //公司
     String serverUrl = "http://192.168.0.102:5000/"; //家裡
 
     String registerRes;
+    String loginRes;
 
     Handler resHandler = new ResHandler();
 
     private Context context;
 
     private MariaDBCallback mCallback;
+
+    private static final int MSG_REGISTER = 1;
+    private static final int MSG_LOGIN = 2;
 
     public ControlMariaDB(MariaDBCallback mCallback) {
         this.mCallback = mCallback;
@@ -75,6 +79,7 @@ public class ControlMariaDB {
                     if (loginResponse.isSuccessful()) {
                         // 登入回應
                         String loginRes = Objects.requireNonNull(loginResponse.body()).string();
+                        // 0:登入失敗、1:登入成功
                         Log.d("loginRes", "getLoginRes: " + loginRes);
                         Message resMsg = Message.obtain();
                         resMsg.obj = loginRes;
@@ -112,9 +117,10 @@ public class ControlMariaDB {
                         // 註冊回應
                         String registerRes = Objects.requireNonNull(registerResponse.body()).string();
                         // 0:註冊失敗、1:註冊成功、2:使用者已存在
-                        Message resMsg = Message.obtain();
-                        resMsg.obj = registerRes;
-                        resHandler.sendMessage(resMsg);
+                        Message registerMsg = Message.obtain();
+                        registerMsg.what = MSG_REGISTER;
+                        registerMsg.obj = registerRes;
+                        resHandler.sendMessage(registerMsg);
 
                     } else {
                         uploadSuccess = false;
@@ -131,9 +137,14 @@ public class ControlMariaDB {
         @Override
         public void handleMessage(@NonNull Message resMsg) {
             super.handleMessage(resMsg);
+
             registerRes = resMsg.obj.toString();
+            loginRes = resMsg.obj.toString();
+
             int intRegisterRes = Integer.parseInt(registerRes);
-            Log.d("hhhh", "before Int: "+intRegisterRes);
+            int intLoginRes = Integer.parseInt(loginRes);
+
+            Log.d("hhhh", "before Int: " + intRegisterRes);
             mCallback.onResult(registerRes);
 
 //            EventBus.getDefault().postSticky(new CodeEvent("Hi"));
@@ -146,6 +157,7 @@ public class ControlMariaDB {
         public CodeEvent(String message) {
             this.CodeMsg = CodeMsg;
         }
+
         public String getCodeEvent() {
             return CodeMsg;
         }
@@ -285,7 +297,6 @@ public class ControlMariaDB {
             }
         }).start();
     }
-
 
 
 }

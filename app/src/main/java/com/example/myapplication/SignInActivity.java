@@ -1,64 +1,21 @@
 package com.example.myapplication;
 
-import static com.example.myapplication.FilterAndIQR.findMedian;
-
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 
-import android.Manifest;
-import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.Outline;
-import android.graphics.SurfaceTexture;
-import android.graphics.drawable.GradientDrawable;
-import android.hardware.camera2.CameraAccessException;
-import android.hardware.camera2.CameraCaptureSession;
-import android.hardware.camera2.CameraCharacteristics;
-import android.hardware.camera2.CameraDevice;
-import android.hardware.camera2.CameraManager;
-import android.hardware.camera2.CameraMetadata;
-import android.hardware.camera2.CaptureRequest;
-import android.hardware.camera2.params.StreamConfigurationMap;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.HandlerThread;
-import android.util.Log;
-import android.util.Size;
-import android.view.Surface;
-import android.view.TextureView;
+import android.text.TextUtils;
 import android.view.View;
-import android.view.ViewOutlineProvider;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.components.Legend;
-import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.components.YAxis;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.data.LineData;
-import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
+public class SignInActivity extends AppCompatActivity implements MariaDBCallback {
 
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-
-public class SignInActivity extends AppCompatActivity {
-
-    ControlMariaDB controlMariaDB;
+    ControlMariaDB controlMariaDB = new ControlMariaDB(this);
     private SharedPreferences preferences;
     private SharedPreferences.Editor editor;
     private EditText edit_userName;
@@ -72,8 +29,55 @@ public class SignInActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
         closeTopBar();
+        loginObject();
 
+    }
 
+    public void loginObject() {
+//        preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        preferences = getSharedPreferences(getPackageName() + "_preferences", MODE_PRIVATE);
+        edit_userName = findViewById(R.id.edit_userName);
+        edit_phone = findViewById(R.id.edit_phone);
+        btn_login = findViewById(R.id.btn_login);
+        remember = findViewById(R.id.rememberMe);
+        setRememberAndLogin();
+    }
+
+    public void setRememberAndLogin() {
+        boolean isRemember = preferences.getBoolean("remember_phone", false);
+        if (isRemember) {
+            String name = preferences.getString("LoginName","");
+            String phone = preferences.getString("LoginPhone","");
+            edit_userName.setText(name);
+            edit_phone.setText(phone);
+            remember.setChecked(true);
+        }
+        btn_login.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //確認網路連線
+                CheckInternetDialog checkInternetDialog = new CheckInternetDialog(SignInActivity.this);
+                checkInternetDialog.checkInternet();
+
+                String name = edit_userName.getText().toString();
+                String phone = edit_phone.getText().toString();
+                if (TextUtils.isEmpty(edit_userName.getText().toString()) || TextUtils.isEmpty(edit_phone.getText().toString())) {
+                    Toast.makeText(SignInActivity.this, "欄位不得為空", Toast.LENGTH_SHORT).show();
+                } else {
+                    editor = preferences.edit();
+                    if (remember.isChecked()) {
+                        editor.putBoolean("remember_phone", true);
+                        editor.putString("LoginName", name);
+                        editor.putString("LoginPhone", phone);
+                    } else {
+                        editor.clear();
+                    }
+                    editor.apply();
+
+                }
+
+            }
+        });
     }
 
     /**
@@ -97,15 +101,19 @@ public class SignInActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    public void onResult(String result) {
+        int eventCode = Integer.parseInt(result);
+        judgeEventCode(eventCode);
+    }
 
-
-
-
-
-
-
-
-
-
-
+    public void judgeEventCode(int res) {
+        if (res == 1) {
+            Toast.makeText(SignInActivity.this, "登入成功", Toast.LENGTH_SHORT).show();
+            Intent goHomePage = new Intent(SignInActivity.this, MainActivity.class);
+            startActivity(goHomePage);
+        }else if (res == 0) {
+            Toast.makeText(SignInActivity.this, "登入失敗", Toast.LENGTH_SHORT).show();
+        }
+    }
 }
