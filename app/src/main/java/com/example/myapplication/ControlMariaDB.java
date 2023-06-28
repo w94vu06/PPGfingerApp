@@ -38,8 +38,8 @@ public class ControlMariaDB {
     Handler mHandler = new MHandler();
 
     boolean uploadSuccess = true;
-    //    String serverUrl = "http://192.168.2.5:5000/"; //公司
-    String serverUrl = "http://192.168.0.102:5000/"; //家裡
+        String serverUrl = "http://192.168.2.5:5000/"; //公司
+//    String serverUrl = "http://192.168.0.102:5000/"; //家裡
 
     String registerRes;
     String loginRes;
@@ -72,7 +72,6 @@ public class ControlMariaDB {
                         .url(serverUrl + "login")
                         .post(requestBody)
                         .build();
-
                 try {
                     // 發送登入請求
                     Response loginResponse = client.newCall(loginRequest).execute();
@@ -81,7 +80,9 @@ public class ControlMariaDB {
                         String loginRes = Objects.requireNonNull(loginResponse.body()).string();
                         // 0:登入失敗、1:登入成功
                         Log.d("loginRes", "getLoginRes: " + loginRes);
+
                         Message resMsg = Message.obtain();
+                        resMsg.what = MSG_LOGIN;
                         resMsg.obj = loginRes;
                         resHandler.sendMessage(resMsg);
                     } else {
@@ -117,11 +118,10 @@ public class ControlMariaDB {
                         // 註冊回應
                         String registerRes = Objects.requireNonNull(registerResponse.body()).string();
                         // 0:註冊失敗、1:註冊成功、2:使用者已存在
-                        Message registerMsg = Message.obtain();
-                        registerMsg.what = MSG_REGISTER;
-                        registerMsg.obj = registerRes;
-                        resHandler.sendMessage(registerMsg);
-
+                        Message resMsg = Message.obtain();
+                        resMsg.what = MSG_REGISTER;
+                        resMsg.obj = registerRes;
+                        resHandler.sendMessage(resMsg);
                     } else {
                         uploadSuccess = false;
                         throw new IOException("Unexpected code " + registerResponse);
@@ -138,16 +138,12 @@ public class ControlMariaDB {
         public void handleMessage(@NonNull Message resMsg) {
             super.handleMessage(resMsg);
 
-            registerRes = resMsg.obj.toString();
-            loginRes = resMsg.obj.toString();
-
-            int intRegisterRes = Integer.parseInt(registerRes);
-            int intLoginRes = Integer.parseInt(loginRes);
-
-            Log.d("hhhh", "before Int: " + intRegisterRes);
-            mCallback.onResult(registerRes);
-
-//            EventBus.getDefault().postSticky(new CodeEvent("Hi"));
+            switch (resMsg.what) {
+                case MSG_LOGIN:
+                case MSG_REGISTER:
+                    mCallback.onResult(resMsg.obj.toString());
+                    break;
+            }
         }
     }
 

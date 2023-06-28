@@ -1,5 +1,7 @@
 package com.example.myapplication.Fragment;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -11,16 +13,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
-import com.example.myapplication.Adapter.CategoryAdapter;
 import com.example.myapplication.Adapter.ProfileAdapter;
 import com.example.myapplication.Data.DataProfile;
 import com.example.myapplication.R;
-import com.example.myapplication.SignUpActivity;
 
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -31,21 +29,28 @@ public class Profile extends Fragment {
     private RecyclerView recycler_profile;
     private RecyclerView.Adapter adapter_profile;
 
-    private String userName;
-    private String email;
-    private String phone;
-    private String birth;
-    private int old;
-    private int height;
-    private int weight;
-    private int sex;
-    private int smokes;
-    private int diabetes;
-    private int hbp;
+    private String name, email, phone, birth;
+    private String old, height, weight, sex, smokes, diabetes, hbp;
+
+    private SharedPreferences preferences;
+
+    private SharedPreferences.Editor editor;
+
+    private TextView titleName;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        preferences = getActivity().getSharedPreferences("my_preferences", Context.MODE_PRIVATE);
+        editor = preferences.edit();
+
+        name = preferences.getString("ProfileName", "無資料");
+        phone = preferences.getString("ProfilePhone", "無資料");
+        email = preferences.getString("ProfileEmail", "無資料");
+        height = String.valueOf(preferences.getInt("ProfileHeight", 0));
+        weight = String.valueOf(preferences.getInt("ProfileWeight", 0));
+        old = String.valueOf(preferences.getInt("ProfileOld", 0));
+        Log.d("rrrr", "RecyclerViewProfile: " + name);
     }
 
     @Override
@@ -53,23 +58,28 @@ public class Profile extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
         recycler_profile = view.findViewById(R.id.recycler_profile);
-
+        titleName = view.findViewById(R.id.txt_name);
+        recyclerViewProfile();
         return view;
     }
 
-    public void RecyclerViewProfile(){
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity(),LinearLayoutManager.VERTICAL,false);
+    public void recyclerViewProfile() {
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
         recycler_profile.setLayoutManager(linearLayoutManager);
-        recycler_profile.addItemDecoration(new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL));
+        recycler_profile.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
 
         ArrayList<DataProfile> profileList = new ArrayList<>();
-        profileList.add(new DataProfile("姓名 Name",userName));
-        profileList.add(new DataProfile("手機 Phone",phone));
-        profileList.add(new DataProfile("信箱 Email",email));
-        profileList.add(new DataProfile("身高 Height",String.valueOf(height)));
-        profileList.add(new DataProfile("體重 Weight",String.valueOf(weight)));
-        profileList.add(new DataProfile("年齡 Age",String.valueOf(old)));
-
+        try {
+//            profileList.add(new DataProfile("姓名 Name", name));
+            titleName.setText(name);
+            profileList.add(new DataProfile("手機 Phone", phone));
+            profileList.add(new DataProfile("信箱 Email", email));
+            profileList.add(new DataProfile("身高 Height", height));
+            profileList.add(new DataProfile("體重 Weight", weight));
+            profileList.add(new DataProfile("年齡 Age", old));
+        } catch (Exception e) {
+            System.out.println(e);
+        }
         adapter_profile = new ProfileAdapter(profileList);
         recycler_profile.setAdapter(adapter_profile);
     }
@@ -78,46 +88,31 @@ public class Profile extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        EventBus.getDefault().register(this);
+
     }
 
     @Override
-    public void onStop() {
-        super.onStop();
-        EventBus.getDefault().unregister(this);
+    public void onResume() {
+        super.onResume();
+        recyclerViewProfile();
     }
 
-    /**
-     * 接收profile
-     **/
-    @Subscribe(sticky = true, threadMode = ThreadMode.ASYNC)
-    public void onMessageEvent(SignUpActivity.MessageEvent event) {
-        // 收到MessageEvent時要做的事寫在這裡
-        String profileMsg = event.getMessage();
-        Log.d("rrrr", "onProfilePage: " + profileMsg);
-        unpackJson(profileMsg);
-    }
+    //
+//    @Override
+//    public void onStop() {
+//        super.onStop();
+//        EventBus.getDefault().unregister(this);
+//    }
+//
+//    /**
+//     * 接收profile
+//     **/
+//    @Subscribe(sticky = true, threadMode = ThreadMode.ASYNC)
+//    public void onMessageEvent(SignUpActivity.MessageEvent event) {
+//        // 收到MessageEvent時要做的事寫在這裡
+//        String profileMsg = event.getMessage();
+//        Log.d("rrrr", "onProfilePage: " + profileMsg);
+//        unpackJson(profileMsg);
+//    }
 
-    private void unpackJson(String json) {
-        new Thread(() -> {
-            try {
-                JSONObject jsonObject = new JSONObject(json);
-                userName = jsonObject.getString("userName");
-                email = jsonObject.getString("email");
-                phone = jsonObject.getString("phone");
-                birth = jsonObject.getString("birth");
-                old = jsonObject.getInt("old");
-                height = jsonObject.getInt("height");
-                weight = jsonObject.getInt("weight");
-                sex = jsonObject.getInt("sex");
-                smokes = jsonObject.getInt("smokes");
-                diabetes = jsonObject.getInt("diabetes");
-                hbp = jsonObject.getInt("hbp");
-                Log.d("rrrr", "onProfilePage: " + userName+email+phone);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }).start();
-        RecyclerViewProfile();
-    }
 }

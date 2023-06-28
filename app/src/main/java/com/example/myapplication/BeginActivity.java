@@ -36,12 +36,6 @@ public class BeginActivity extends AppCompatActivity {
         checkInternetDialog.checkInternet();
     }
 
-    public void rememberAccount() {
-
-    }
-
-
-
     public void initParameter(){
         btn_signin = findViewById(R.id.btn_signin);
         btn_signup = findViewById(R.id.btn_signup);
@@ -57,11 +51,13 @@ public class BeginActivity extends AppCompatActivity {
                     Intent intent_IN = new Intent();
                     intent_IN.setClass(BeginActivity.this, SignInActivity.class);
                     startActivity(intent_IN);
+                    finish();
                     break;
                 case R.id.btn_signup:
                     Intent intent_UP = new Intent();
                     intent_UP.setClass(BeginActivity.this, SignUpActivity.class);
                     startActivity(intent_UP);
+                    finish();
                     break;
             }
         }

@@ -8,7 +8,7 @@
     android:background="@color/shironeri">
 
     <ImageView
-        android:id="@+id/img_signin"
+        android:id="@+id/img_detect"
         android:layout_width="@dimen/dp_198"
         android:layout_height="@dimen/dp_55"
         android:layout_marginTop="@dimen/dp_20"
@@ -22,7 +22,7 @@
         android:layout_height="match_parent"
         android:layout_marginTop="@dimen/dp_20"
         android:background="@drawable/sign_background"
-        android:layout_below="@+id/img_signin"
+        android:layout_below="@+id/img_detect"
         android:orientation="vertical">
 
         <TextView

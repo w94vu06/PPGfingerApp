@@ -5,8 +5,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -19,8 +19,6 @@ import com.example.myapplication.Util.FastClickUtil;
 import com.example.myapplication.Util.TextUtil;
 
 import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -61,6 +59,7 @@ public class SignUpActivity extends AppCompatActivity implements MariaDBCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
         initWidget();
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN); //禁止自動彈出虛擬鍵盤
         ButterKnife.bind(SignUpActivity.this);
     }
 
@@ -72,7 +71,7 @@ public class SignUpActivity extends AppCompatActivity implements MariaDBCallback
         edit_height = findViewById(R.id.edit_height);
         edit_weight = findViewById(R.id.edit_weight);
         img_signup = findViewById(R.id.img_signup);
-        img_signUpback = findViewById(R.id.img_signUpback);
+        img_signUpback = findViewById(R.id.img_signUpBack);
         imgbtn_signUp = findViewById(R.id.imgbtn_signUp);
         img_signup.setImageResource(R.drawable.sign_up2);
         img_signUpback.setImageResource(R.drawable.sign_background2);
@@ -240,10 +239,11 @@ public class SignUpActivity extends AppCompatActivity implements MariaDBCallback
      */
     public void judgeEventCode(int res) {
         if (res == 1) {
-            Toast.makeText(SignUpActivity.this, "註冊成功", Toast.LENGTH_SHORT).show();
+            Toast.makeText(SignUpActivity.this, "註冊成功，頁面跳轉中...", Toast.LENGTH_SHORT).show();
             EventBus.getDefault().postSticky(new MessageEvent(profileJson));//把profile資料送去MainActivity
             Intent goHomePage = new Intent(SignUpActivity.this, MainActivity.class);
             startActivity(goHomePage);
+            finish();
         }
         if (res == 2) {
             Toast.makeText(SignUpActivity.this, "帳戶已經存在", Toast.LENGTH_SHORT).show();

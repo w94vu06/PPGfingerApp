@@ -8,10 +8,18 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Toast;
+
+import com.example.myapplication.Util.TextUtil;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class SignInActivity extends AppCompatActivity implements MariaDBCallback {
 
@@ -22,20 +30,21 @@ public class SignInActivity extends AppCompatActivity implements MariaDBCallback
     private EditText edit_phone;
     private Button btn_login;
     private CheckBox remember;
+    String profileJson;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        setTheme(R.style.AppTheme);
+//        setTheme(R.style.AppTheme);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
         closeTopBar();
         loginObject();
-
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN); //禁止自動彈出虛擬鍵盤
     }
 
     public void loginObject() {
 //        preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        preferences = getSharedPreferences(getPackageName() + "_preferences", MODE_PRIVATE);
+        preferences = getSharedPreferences("my_preferences", MODE_PRIVATE);
         edit_userName = findViewById(R.id.edit_userName);
         edit_phone = findViewById(R.id.edit_phone);
         btn_login = findViewById(R.id.btn_login);
@@ -63,6 +72,9 @@ public class SignInActivity extends AppCompatActivity implements MariaDBCallback
                 String phone = edit_phone.getText().toString();
                 if (TextUtils.isEmpty(edit_userName.getText().toString()) || TextUtils.isEmpty(edit_phone.getText().toString())) {
                     Toast.makeText(SignInActivity.this, "欄位不得為空", Toast.LENGTH_SHORT).show();
+                    if (!TextUtil.isPhoneLegal(phone)) {
+                        Toast.makeText(SignInActivity.this, "手機號碼格式錯誤", Toast.LENGTH_SHORT).show();
+                    }
                 } else {
                     editor = preferences.edit();
                     if (remember.isChecked()) {
@@ -73,11 +85,22 @@ public class SignInActivity extends AppCompatActivity implements MariaDBCallback
                         editor.clear();
                     }
                     editor.apply();
-
                 }
-
+                packedJson();
+                controlMariaDB.userLogin(profileJson);
             }
         });
+    }
+
+    public void packedJson() {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("userName", edit_userName.getText().toString());
+            jsonObject.put("phone", edit_phone.getText().toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        profileJson = String.valueOf(jsonObject);
     }
 
     /**
@@ -109,11 +132,20 @@ public class SignInActivity extends AppCompatActivity implements MariaDBCallback
 
     public void judgeEventCode(int res) {
         if (res == 1) {
-            Toast.makeText(SignInActivity.this, "登入成功", Toast.LENGTH_SHORT).show();
+            Toast.makeText(SignInActivity.this, "登入成功，頁面跳轉中...", Toast.LENGTH_SHORT).show();
+            recordAccount();
             Intent goHomePage = new Intent(SignInActivity.this, MainActivity.class);
             startActivity(goHomePage);
+            finish();
         }else if (res == 0) {
             Toast.makeText(SignInActivity.this, "登入失敗", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public void recordAccount() {
+        String name = edit_userName.getText().toString();
+        String phone = edit_phone.getText().toString();
+        editor.putString("LoginName", name);
+        editor.putString("LoginPhone", phone);
     }
 }
