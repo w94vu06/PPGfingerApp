@@ -46,12 +46,12 @@ public class ControlMariaDB {
 
     Handler resHandler = new ResHandler();
 
-    private Context context;
-
     private MariaDBCallback mCallback;
 
     private static final int MSG_REGISTER = 1;
     private static final int MSG_LOGIN = 2;
+    private static final int MSG_READ = 3;
+    private static final int MSG_DELETE = 4;
 
     public ControlMariaDB(MariaDBCallback mCallback) {
         this.mCallback = mCallback;
@@ -133,6 +133,80 @@ public class ControlMariaDB {
         }).start();
     }
 
+    /**
+     * 讀取
+     **/
+    public void userRead(String jsonObject) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                MediaType mediaType = MediaType.parse("application/json; charset=utf-8");
+                RequestBody requestBody = RequestBody.create(mediaType, jsonObject);
+
+                // 註冊
+                Request readRequest = new Request.Builder()
+                        .url(serverUrl + "read")
+                        .post(requestBody)
+                        .build();
+                try {
+                    // 發送讀取請求
+                    Response readResponse = client.newCall(readRequest).execute();
+                    if (readResponse.isSuccessful()) {
+                        // 讀取回應
+                        String readRes = Objects.requireNonNull(readResponse.body()).string();
+                        // 0:讀取失敗
+                        Message resMsg = Message.obtain();
+                        resMsg.what = MSG_READ;
+                        resMsg.obj = readRes;
+                        resHandler.sendMessage(resMsg);
+                    } else {
+                        uploadSuccess = false;
+                        throw new IOException("Unexpected code " + readResponse);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
+    /**
+     * 刪除
+     **/
+    public void userDelete(String jsonObject) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                MediaType mediaType = MediaType.parse("application/json; charset=utf-8");
+                RequestBody requestBody = RequestBody.create(mediaType, jsonObject);
+
+                // 註冊
+                Request deleteRequest = new Request.Builder()
+                        .url(serverUrl + "read")
+                        .post(requestBody)
+                        .build();
+                try {
+                    // 發送註冊請求
+                    Response deleteResponse = client.newCall(deleteRequest).execute();
+                    if (deleteResponse.isSuccessful()) {
+                        // 註冊回應
+                        String registerRes = Objects.requireNonNull(deleteResponse.body()).string();
+                        // 0:註冊失敗、1:註冊成功、2:使用者已存在
+                        Message resMsg = Message.obtain();
+                        resMsg.what = MSG_REGISTER;
+                        resMsg.obj = registerRes;
+                        resHandler.sendMessage(resMsg);
+                    } else {
+                        uploadSuccess = false;
+                        throw new IOException("Unexpected code " + deleteResponse);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
     class ResHandler extends Handler {
         @Override
         public void handleMessage(@NonNull Message resMsg) {
@@ -141,6 +215,8 @@ public class ControlMariaDB {
             switch (resMsg.what) {
                 case MSG_LOGIN:
                 case MSG_REGISTER:
+                case MSG_READ:
+                case MSG_DELETE:
                     mCallback.onResult(resMsg.obj.toString());
                     break;
             }

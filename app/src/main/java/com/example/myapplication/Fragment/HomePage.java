@@ -1,18 +1,10 @@
 package com.example.myapplication.Fragment;
 
-import android.Manifest;
-import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
-import android.content.pm.CapabilityParams;
-import android.content.pm.PackageManager;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.os.Build;
+import android.content.Intent;
 import android.os.Bundle;
 
-import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -24,22 +16,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.AdapterView;
-import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.myapplication.CameraActivity;
 import com.example.myapplication.Data.DataFeature;
 import com.example.myapplication.Data.DataImage;
 import com.example.myapplication.Adapter.FeatureAdapter;
 import com.example.myapplication.Adapter.ImageNetAdapter;
-import com.example.myapplication.MainActivity;
 import com.example.myapplication.R;
 import com.example.myapplication.Util.CommonUtil;
 import com.example.myapplication.WrapContentLinearLayoutManager;
@@ -49,9 +36,7 @@ import com.youth.banner.indicator.CircleIndicator;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 import butterknife.BindViews;
@@ -65,7 +50,7 @@ public class HomePage extends Fragment {
     private View view;
     private Banner banner;
     private TextView txt_filename;
-    private Button btn_choose,btn_count,btn_dialogCancel,btn_dialogSure;
+    private Button btn_choose,btn_count,btn_dialogCancel,btn_dialogSure,btn_detect;
     private ImageButton imgbtn_add,imgbtn_close;
     private RecyclerView recycler_feature;
     private RecyclerView.Adapter adapter_feature;
@@ -90,6 +75,7 @@ public class HomePage extends Fragment {
         view = inflater.inflate(R.layout.fragment_home_page,container,false);
         initParameter();
         initChooser();
+        enterPPG();
         return view;
     }
 
@@ -259,6 +245,17 @@ public class HomePage extends Fragment {
             }
             adapter_feature.notifyItemRangeInserted(0,checkFeature.size());
         }
+    }
+
+    public void enterPPG() {
+        btn_detect = view.findViewById(R.id.btn_detect);
+        btn_detect.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intentPPG = new Intent(getActivity(), CameraActivity.class);
+                startActivity(intentPPG);
+            }
+        });
     }
     
 }

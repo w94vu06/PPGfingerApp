@@ -8,8 +8,8 @@ android {
 
     defaultConfig {
         applicationId "com.example.myapplication"
-        minSdk 23
-        targetSdk 33
+        minSdkVersion 22
+        targetSdkVersion 33
         versionCode 1
         versionName "1.0"
 
@@ -60,5 +60,8 @@ dependencies {
     implementation("org.greenrobot:eventbus:3.3.1")
 
     implementation 'com.android.volley:volley:1.1.1'
+    //解碼 Unicode 轉義字符
+    implementation 'org.apache.commons:commons-text:1.9'
+
 
 }

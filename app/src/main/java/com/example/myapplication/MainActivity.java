@@ -38,6 +38,7 @@ import com.youth.banner.indicator.RectangleIndicator;
 import com.youth.banner.util.BannerUtils;
 import com.youth.banner.util.LogUtils;
 
+import org.apache.commons.text.StringEscapeUtils;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -49,7 +50,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements MariaDBCallback {
 
     private FrameLayout fragmentContainer;
     private BottomNavigationView navigationView;
@@ -57,8 +58,11 @@ public class MainActivity extends AppCompatActivity {
     private static Boolean isExit = false;
     private static Boolean hasTask = false;
 
+    private String loginName, loginPhone;
     private String userName, email, phone, birth;
     private int old, height, weight, sex, smokes, diabetes, hbp;
+
+    ControlMariaDB controlMariaDB = new ControlMariaDB(this);
 
     private SharedPreferences preferences;
 
@@ -77,7 +81,9 @@ public class MainActivity extends AppCompatActivity {
         navigationView.setOnItemSelectedListener(NaviSelectedListener);
         preferences = getSharedPreferences( "my_preferences", MODE_PRIVATE);
         editor = preferences.edit();
+
     }
+
 
     /**
      * 返回鍵退出程式
@@ -134,6 +140,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onStart() {
         super.onStart();
+        readProfile();
         EventBus.getDefault().register(this);
     }
 
@@ -151,15 +158,38 @@ public class MainActivity extends AppCompatActivity {
         // 收到MessageEvent時要做的事寫在這裡
         String profileMsg = event.getMessage();
         Log.d("rrrr", "onProfilePage: " + profileMsg);
-        unpackJson(profileMsg);
+//        unpackJson(profileMsg);
+    }
 
+    /**
+     * 透過preference裡的資料到資料庫查詢profile
+     **/
+
+    public void readProfile() {
+        loginName = preferences.getString("LoginName", "null");
+        loginPhone = preferences.getString("LoginPhone", "null");
+        JSONObject jsonData = new JSONObject();
+        try {
+            jsonData.put("userName", loginName);
+            jsonData.put("phone", loginPhone);
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+        String jsonString = jsonData.toString();
+        controlMariaDB.userRead(jsonString);
+    }
+
+    @Override
+    public void onResult(String result) {
+        Log.d("resultLONG", "onResult: "+result);
+        unpackJson(result);
     }
 
     private void unpackJson(String json) {
         new Thread(() -> {
             try {
                 JSONObject jsonObject = new JSONObject(json);
-                userName = jsonObject.getString("userName");
+                userName = jsonObject.getString("name");
                 email = jsonObject.getString("email");
                 phone = jsonObject.getString("phone");
                 birth = jsonObject.getString("birth");
@@ -221,4 +251,27 @@ public class MainActivity extends AppCompatActivity {
     private void setMain() {
         this.getSupportFragmentManager().beginTransaction().add(R.id.fragmentContainer, new HomePage()).commit();
     }
+
+    private String decodeUnicode(String unicodeString) {
+        StringBuilder sb = new StringBuilder();
+        int length = unicodeString.length();
+        for (int i = 0; i < length; i++) {
+            char c = unicodeString.charAt(i);
+            if (c == '\\' && i + 1 < length && unicodeString.charAt(i + 1) == 'u') {
+                String hex = unicodeString.substring(i + 2, i + 6);
+                try {
+                    int code = Integer.parseInt(hex, 16);
+                    sb.append((char) code);
+                    i += 5; // 跳過已處理的字符
+                } catch (NumberFormatException e) {
+                    // 忽略解析失敗的情況
+                }
+            } else {
+                sb.append(c);
+            }
+        }
+        return sb.toString();
+    }
+
+
 }

@@ -1,14 +1,8 @@
 package com.example.myapplication;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityOptionsCompat;
 
-import android.app.DatePickerDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
@@ -51,13 +45,11 @@ public class BeginActivity extends AppCompatActivity {
                     Intent intent_IN = new Intent();
                     intent_IN.setClass(BeginActivity.this, SignInActivity.class);
                     startActivity(intent_IN);
-                    finish();
                     break;
                 case R.id.btn_signup:
                     Intent intent_UP = new Intent();
                     intent_UP.setClass(BeginActivity.this, SignUpActivity.class);
                     startActivity(intent_UP);
-                    finish();
                     break;
             }
         }

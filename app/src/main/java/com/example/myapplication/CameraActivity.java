@@ -3,7 +3,9 @@ package com.example.myapplication;
 import static com.example.myapplication.FilterAndIQR.findMedian;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -22,8 +24,10 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.os.PersistableBundle;
+import android.util.Log;
 import android.util.Size;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
@@ -35,7 +39,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -54,7 +57,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
-public class PPGActivity extends AppCompatActivity {
+
+public class CameraActivity extends AppCompatActivity {
     private TextureView CameraView;
     protected CameraDevice cameraDevice;
     protected CameraCaptureSession cameraCaptureSessions;
@@ -91,28 +95,32 @@ public class PPGActivity extends AppCompatActivity {
     private Thread chartThread;
     //IQR
     private FilterAndIQR filterAndIQR;
+
     long[] nonZeroValuesAPI23;
+    private ControlMariaDB controlMariaDB;
     long[] outlierRRI;
     int fullAvgRed, fullAvgGreen, fullAvgBlue;
     int fixDarkRed;
     int fixAvgRedThreshold;
+
     ProgressBar progressBar;
     TextView progressBar_text;
-    ControlMariaDB controlMariaDB;
 
-
+    @SuppressLint("MissingInflatedId")
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState, @Nullable PersistableBundle persistentState) {
+    protected void onCreate(Bundle savedInstanceState) {
         setTheme(R.style.AppTheme);
-        super.onCreate(savedInstanceState, persistentState);
+        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ppg);
 
-        mTimeArray = new long[captureRate];
         CameraView = findViewById(R.id.texture);
+        CameraView.setSurfaceTextureListener(textureListener);
+
+        mTimeArray = new long[captureRate];
+
         btn_restart = findViewById(R.id.btn_restart);
         heartBeatCount = findViewById(R.id.heartBeatCount);
 
-        CameraView.setSurfaceTextureListener(textureListener);
         filterAndIQR = new FilterAndIQR();
 
         progressBar = findViewById(R.id.progressBar_Circle);
@@ -122,18 +130,25 @@ public class PPGActivity extends AppCompatActivity {
         closeTopBar();
         restartBtn();
         setCameraShape();
-
-
     }
 
     /**
-     * 關閉標題列
+     * //關閉標題列
      */
     public void closeTopBar() {
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.hide();
         }
+    }
+
+    /**
+     * //初始化量測用數值
+     */
+    public void initValue() {
+        numCaptures = 0;
+        prevNumBeats = 0;
+        mNumBeats = 0;
     }
 
     /**
@@ -155,15 +170,6 @@ public class PPGActivity extends AppCompatActivity {
             }
         });
         CameraView.setClipToOutline(true);
-    }
-
-    /**
-     * 初始化量測用數值
-     */
-    public void initValue() {
-        numCaptures = 0;
-        prevNumBeats = 0;
-        mNumBeats = 0;
     }
 
     /**
@@ -300,9 +306,6 @@ public class PPGActivity extends AppCompatActivity {
                 // Save previous two values
                 mLastLastRollingAverage = mLastRollingAverage;
                 mLastRollingAverage = mCurrentRollingAverage;
-//            } else if (averageBlueThreshold != 0 && averageGreenThreshold != 0) {
-//                idleHandler.postDelayed(idleRunnable, 15000);
-//                qualityHandler.postDelayed(qualityRunnable, 5000);
             } else {
                 qualityHandler.postDelayed(qualityRunnable, 5000);
                 idleHandler.postDelayed(idleRunnable, 15000);
@@ -422,7 +425,6 @@ public class PPGActivity extends AppCompatActivity {
         } else {
 
         }
-
     }
 
     /**
@@ -438,7 +440,7 @@ public class PPGActivity extends AppCompatActivity {
      * 上傳量測結果至伺服器
      */
     private void uploadResult() {
-        controlMariaDB.jsonUploadToServer(outlierRRI); //上傳完成的RRI
+//        controlMariaDB.jsonUploadToServer(outlierRRI); //上傳完成的RRI
     }
 
     /**
@@ -469,7 +471,7 @@ public class PPGActivity extends AppCompatActivity {
 
                 @Override
                 public void onConfigureFailed(@NonNull CameraCaptureSession cameraCaptureSession) {
-                    Toast.makeText(PPGActivity.this, "Configuration change", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(CameraActivity.this, "Configuration change", Toast.LENGTH_SHORT).show();
                 }
             }, null);
         } catch (CameraAccessException e) {
@@ -487,8 +489,8 @@ public class PPGActivity extends AppCompatActivity {
             assert map != null;
             imageDimension = map.getOutputSizes(SurfaceTexture.class)[0];
             //check Permission
-            if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(PPGActivity.this, new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(CameraActivity.this, new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
                 return;
             }
             manager.openCamera(cameraId, stateCallback, null);
@@ -526,7 +528,7 @@ public class PPGActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_CAMERA_PERMISSION) {
             if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
-                Toast.makeText(PPGActivity.this, "Please Grant Permissions", Toast.LENGTH_LONG).show();
+                Toast.makeText(CameraActivity.this, "Please Grant Permissions", Toast.LENGTH_LONG).show();
                 recreate();
             }
         }
@@ -619,7 +621,7 @@ public class PPGActivity extends AppCompatActivity {
         Legend l = chart.getLegend();
         l.setEnabled(false);
 
-        //設置Ｘ軸
+        //設置X軸
         XAxis x = chart.getXAxis();
         x.setTextColor(Color.parseColor("#F2E5CC"));
         x.setDrawLabels(false);//去掉X軸標籤
@@ -666,7 +668,7 @@ public class PPGActivity extends AppCompatActivity {
     private LineDataSet createSet() {
         LineDataSet set = new LineDataSet(null, "");
         set.setAxisDependency(YAxis.AxisDependency.LEFT);
-        set.setColor(Color.parseColor("#6D8B75"));//線的顏色
+        set.setColor(Color.parseColor("#6D8B75"));
         set.setLineWidth(2);
         set.setDrawCircles(false);
         set.setDrawFilled(false);
@@ -685,7 +687,7 @@ public class PPGActivity extends AppCompatActivity {
             @Override
             public void run() {
                 if (mNumBeats <= 35) {
-                    int progress = (int) (mNumBeats / 35.0 * 100); // 计算当前进度的百分比
+                    int progress = (int) (mNumBeats / 35.0 * 100);
                     progressBar_text.setText(progress + "%");
                     progressBar.setProgress(progress);
                 }
@@ -730,9 +732,26 @@ public class PPGActivity extends AppCompatActivity {
         }
         return nonZeroValuesAPI23;
     }
+
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        getMenuInflater().inflate(R.menu.menu_main, menu);
+//        return super.onCreateOptionsMenu(menu);
+//    }
+//
 //    @Override
 //    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
 //        startActivity(new Intent(this, AboutActivity.class));
 //        return super.onOptionsItemSelected(item);
 //    }
 }
+
+
+
+
+
+
+
+
+
+
