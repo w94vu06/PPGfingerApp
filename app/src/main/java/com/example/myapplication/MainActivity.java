@@ -55,8 +55,7 @@ public class MainActivity extends AppCompatActivity implements MariaDBCallback {
     private FrameLayout fragmentContainer;
     private BottomNavigationView navigationView;
 
-    private static Boolean isExit = false;
-    private static Boolean hasTask = false;
+
 
     private String loginName, loginPhone;
     private String userName, email, phone, birth;
@@ -81,13 +80,16 @@ public class MainActivity extends AppCompatActivity implements MariaDBCallback {
         navigationView.setOnItemSelectedListener(NaviSelectedListener);
         preferences = getSharedPreferences( "my_preferences", MODE_PRIVATE);
         editor = preferences.edit();
+        CheckInternetDialog checkInternetDialog = new CheckInternetDialog(MainActivity.this);
+        checkInternetDialog.checkInternet();
 
     }
-
 
     /**
      * 返回鍵退出程式
      **/
+    private static Boolean isExit = false;
+    private static Boolean hasTask = false;
     Timer timerExit = new Timer();
     TimerTask task = new TimerTask() {
         public void run() {
@@ -201,7 +203,6 @@ public class MainActivity extends AppCompatActivity implements MariaDBCallback {
                 diabetes = jsonObject.getInt("diabetes");
                 hbp = jsonObject.getInt("hbp");
                 setProfile();
-                Log.d("rrrr", "onMain: " + userName + email + phone);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -221,9 +222,6 @@ public class MainActivity extends AppCompatActivity implements MariaDBCallback {
         editor.putInt("ProfileDiabetes", diabetes);
         editor.putInt("ProfileHbp", hbp);
         editor.apply();
-
-        String name = preferences.getString("ProfileName", "無資料");
-        Log.d("rrrr", "checkEditor: "+name);
     }
 
 

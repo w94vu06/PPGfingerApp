@@ -43,14 +43,12 @@ public class Profile extends Fragment {
         super.onCreate(savedInstanceState);
         preferences = getActivity().getSharedPreferences("my_preferences", Context.MODE_PRIVATE);
         editor = preferences.edit();
-
-        name = preferences.getString("ProfileName", "無資料");
+        name = preferences.getString("ProfileName", null);
         phone = preferences.getString("ProfilePhone", "無資料");
         email = preferences.getString("ProfileEmail", "無資料");
         height = String.valueOf(preferences.getInt("ProfileHeight", 0));
         weight = String.valueOf(preferences.getInt("ProfileWeight", 0));
         old = String.valueOf(preferences.getInt("ProfileOld", 0));
-        Log.d("rrrr", "RecyclerViewProfile: " + name);
     }
 
     @Override
@@ -94,7 +92,9 @@ public class Profile extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        recyclerViewProfile();
+        if (name == null) {
+            recyclerViewProfile();
+        }
     }
 
     //

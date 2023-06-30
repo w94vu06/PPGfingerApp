@@ -49,7 +49,7 @@ public class FilterAndIQR {
                 nonZeroValues[i] = clearArrayList.get(i);
             }
         }
-        Log.d("tttt", "IQR: "+nonZeroValues);
+        Log.d("tttt", "IQR: " + nonZeroValues);
         return nonZeroValues;
     }
 
@@ -78,15 +78,14 @@ public class FilterAndIQR {
     // 計算RMSSD
     public double calculateRMSSD(long[] rrIntervals) {
         int n = rrIntervals.length;
-        long[] rrIntervalsNoTail = Arrays.copyOfRange(rrIntervals, 0, n - 1);
 
         double sumOfDifferencesSquared = 0.0;
-        for (int i = 1; i < rrIntervalsNoTail.length; i++) {
-            double difference = rrIntervalsNoTail[i] - rrIntervalsNoTail[i - 1];
+        for (int i = 1; i < n - 1; i++) {
+            double difference = rrIntervals[i] - rrIntervals[i - 1];
             sumOfDifferencesSquared += difference * difference;
         }
 
-        rmssd = sumOfDifferencesSquared / (rrIntervals.length - 1);
+        double rmssd = sumOfDifferencesSquared / (n - 1);
         return Math.sqrt(rmssd);
     }
 

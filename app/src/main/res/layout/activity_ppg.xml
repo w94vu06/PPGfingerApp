@@ -103,7 +103,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:padding="5dp"
-            android:layout_marginTop="@dimen/dp_60"
+            android:layout_marginTop="@dimen/dp_20"
             android:text="重新量測"
             android:textSize="@dimen/sp_22"
             android:textColor="@color/sign_color"

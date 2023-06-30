@@ -24,30 +24,12 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class ControlMariaDB {
-    private Double AF_Similarity, AI_Depression, AI_Heart_age, AI_bshl, AI_dis,
-            AI_medic, BMI, BPc_dia, BPc_sys, BSc, Excellent_no, Lf_Hf, RMSSD, Shannon_h,
-            Total_Power, ULF, Unacceptable_no, VHF, VLF, dis0bs1_0, dis0bs1_1, dis1bs1_0,
-            dis1bs1_1, ecg_Arr, ecg_PVC, ecg_QTc, ecg_hr_max, ecg_hr_mean, ecg_hr_min, ecg_rsp,
-            hbp, hr_rsp_rate, meanNN, miny, miny_local_total, mood_state, pNN50, sdNN,
-            sym_score_shift066, t_error, total_scores, unhrv, way_eat, way_eat_pa, waybp1_0_dia,
-            waybp1_0_sys, waybp1_1_dia, year10scores;
-
-    //    private static final MediaType MEDIA_TYPE_JSON = MediaType.parse("application/json");
     private static final OkHttpClient client = new OkHttpClient();
-    private static String json;
     Handler mHandler = new MHandler();
-
-    boolean uploadSuccess = true;
-        String serverUrl = "http://192.168.2.5:5000/"; //公司
-//    String serverUrl = "http://192.168.0.102:5000/"; //家裡
-
-    String registerRes;
-    String loginRes;
-
     Handler resHandler = new ResHandler();
-
+    String serverUrl = "http://192.168.2.5:5000/"; //公司
+//    String serverUrl = "http://192.168.0.102:5000/"; //家裡
     private MariaDBCallback mCallback;
-
     private static final int MSG_REGISTER = 1;
     private static final int MSG_LOGIN = 2;
     private static final int MSG_READ = 3;
@@ -86,7 +68,6 @@ public class ControlMariaDB {
                         resMsg.obj = loginRes;
                         resHandler.sendMessage(resMsg);
                     } else {
-                        uploadSuccess = false;
                         throw new IOException("Unexpected code " + loginResponse);
                     }
                 } catch (IOException e) {
@@ -123,7 +104,6 @@ public class ControlMariaDB {
                         resMsg.obj = registerRes;
                         resHandler.sendMessage(resMsg);
                     } else {
-                        uploadSuccess = false;
                         throw new IOException("Unexpected code " + registerResponse);
                     }
                 } catch (IOException e) {
@@ -160,7 +140,6 @@ public class ControlMariaDB {
                         resMsg.obj = readRes;
                         resHandler.sendMessage(resMsg);
                     } else {
-                        uploadSuccess = false;
                         throw new IOException("Unexpected code " + readResponse);
                     }
                 } catch (IOException e) {
@@ -197,7 +176,6 @@ public class ControlMariaDB {
                         resMsg.obj = registerRes;
                         resHandler.sendMessage(resMsg);
                     } else {
-                        uploadSuccess = false;
                         throw new IOException("Unexpected code " + deleteResponse);
                     }
                 } catch (IOException e) {
@@ -207,6 +185,9 @@ public class ControlMariaDB {
         }).start();
     }
 
+    /**
+     * CRUD訊息回傳
+     **/
     class ResHandler extends Handler {
         @Override
         public void handleMessage(@NonNull Message resMsg) {
@@ -223,18 +204,6 @@ public class ControlMariaDB {
         }
     }
 
-    public class CodeEvent {
-        private String CodeMsg;
-
-        public CodeEvent(String message) {
-            this.CodeMsg = CodeMsg;
-        }
-
-        public String getCodeEvent() {
-            return CodeMsg;
-        }
-    }
-
     public void jsonUploadToServer(long[] time_dist) {
 
         JSONArray jsonTimeDist = new JSONArray();
@@ -244,9 +213,10 @@ public class ControlMariaDB {
         JSONObject jsonData = new JSONObject();
         String date = new SimpleDateFormat("yyyyMMddHHmmss",
                 Locale.getDefault()).format(System.currentTimeMillis());
-
+        String id = "888889";
         try {
-            jsonData.put("filename", date);
+//            jsonData.put("filename", date+"_888889");
+            jsonData.put("filename", date + "_" + id);
             jsonData.put("id_num", "888889");
             jsonData.put("chaurl", "-1");
             //proFile
@@ -273,20 +243,22 @@ public class ControlMariaDB {
         }
         String jsonString = jsonData.toString();
 
+        /**
+         * 連接伺服器運算
+         **/
         new Thread() {
             @Override
             public void run() {
                 MediaType mediaType = MediaType.parse("application/json; charset=utf-8");
                 RequestBody requestBody = RequestBody.create(mediaType, jsonString);
                 Request request = new Request.Builder()
-                        .url("http://192.168.2.11:8090")//伺服器
+                        .url("http://192.168.2.97:8090")//伺服器
 //                        .url("http://192.168.2.110:5000")//測試服
                         .post(requestBody)
                         .build();
 
                 try (Response response = client.newCall(request).execute()) {
                     if (!response.isSuccessful()) {
-                        uploadSuccess = false;
                         throw new IOException("Unexpected code " + response);
                     }
                     Message msg = Message.obtain();
@@ -301,75 +273,15 @@ public class ControlMariaDB {
         }.start();
     }
 
-
+    /**
+     * 運算結果回傳
+     **/
     class MHandler extends Handler {
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
-            json = msg.obj.toString();
-            unpackJson();
+            mCallback.onResult(msg.obj.toString());
         }
     }
-
-    private void unpackJson() {
-        new Thread(() -> {
-            try {
-                JSONObject jsonObject = new JSONObject(json);
-                AF_Similarity = jsonObject.getDouble("AF_Similarity");
-                AI_Depression = jsonObject.getDouble("AI_Depression");
-                AI_Heart_age = jsonObject.getDouble("AI_Heart_age");
-                AI_bshl = jsonObject.getDouble("AI_bshl");
-                AI_dis = jsonObject.getDouble("AI_dis");
-                AI_medic = jsonObject.getDouble("AI_medic");
-                BMI = jsonObject.getDouble("BMI");
-                BPc_dia = jsonObject.getDouble("BPc_dia");
-                BPc_sys = jsonObject.getDouble("BPc_sys");
-                BSc = jsonObject.getDouble("BSc");
-                Excellent_no = jsonObject.getDouble("Excellent_no");
-                Lf_Hf = jsonObject.getDouble("Lf_Hf");
-                RMSSD = jsonObject.getDouble("RMSSD");
-                Shannon_h = jsonObject.getDouble("Shannon_h");
-                Total_Power = jsonObject.getDouble("Total_Power");
-                ULF = jsonObject.getDouble("ULF");
-                Unacceptable_no = jsonObject.getDouble("Unacceptable_no");
-                VHF = jsonObject.getDouble("VHF");
-                VLF = jsonObject.getDouble("VLF");
-                dis0bs1_0 = jsonObject.getDouble("dis0bs1_0");
-                dis0bs1_1 = jsonObject.getDouble("dis0bs1_1");
-                dis1bs1_0 = jsonObject.getDouble("dis1bs1_0");
-                dis1bs1_1 = jsonObject.getDouble("dis1bs1_1");
-                ecg_Arr = jsonObject.getDouble("ecg_Arr");
-                ecg_PVC = jsonObject.getDouble("ecg_PVC");
-                ecg_QTc = jsonObject.getDouble("ecg_QTc");
-                ecg_hr_max = jsonObject.getDouble("ecg_hr_max");
-                ecg_hr_mean = jsonObject.getDouble("ecg_hr_mean");
-                ecg_hr_min = jsonObject.getDouble("ecg_hr_min");
-                ecg_rsp = jsonObject.getDouble("ecg_rsp");
-                hbp = jsonObject.getDouble("hbp");
-                hr_rsp_rate = jsonObject.getDouble("hr_rsp_rate");
-                meanNN = jsonObject.getDouble("meanNN");
-                miny = jsonObject.getDouble("miny");
-                miny_local_total = jsonObject.getDouble("miny_local_total");
-                mood_state = jsonObject.getDouble("mood_state");
-                pNN50 = jsonObject.getDouble("pNN50");
-                sdNN = jsonObject.getDouble("sdNN");
-                sym_score_shift066 = jsonObject.getDouble("sym_score_shift066");
-                t_error = jsonObject.getDouble("t_error");
-                total_scores = jsonObject.getDouble("total_scores");
-                unhrv = jsonObject.getDouble("unhrv");
-                way_eat = jsonObject.getDouble("way_eat");
-                way_eat_pa = jsonObject.getDouble("way_eat_pa");
-                waybp1_0_dia = jsonObject.getDouble("waybp1_0_dia");
-                waybp1_0_sys = jsonObject.getDouble("waybp1_0_sys");
-                waybp1_1_dia = jsonObject.getDouble("waybp1_1_dia");
-                year10scores = jsonObject.getDouble("year10scores");
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }).start();
-    }
-
-
 }
 

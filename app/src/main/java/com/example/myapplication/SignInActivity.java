@@ -145,7 +145,9 @@ public class SignInActivity extends AppCompatActivity implements MariaDBCallback
     public void recordAccount() {
         String name = edit_userName.getText().toString();
         String phone = edit_phone.getText().toString();
+        editor.putBoolean("isLoggedIn", true);
         editor.putString("LoginName", name);
         editor.putString("LoginPhone", phone);
+        editor.apply();
     }
 }

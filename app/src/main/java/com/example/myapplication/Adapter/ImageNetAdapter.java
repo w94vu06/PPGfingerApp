@@ -32,12 +32,17 @@ public class ImageNetAdapter  extends BannerAdapter<DataImage, ImageHolder> {
 
     @Override
     public void onBindView(ImageHolder holder, DataImage data, int position, int size) {
-        Glide.with(holder.itemView)
-                .load(data.url)
-                .apply(RequestOptions.bitmapTransform(new RoundedCorners(30)))
-                .into(holder.imageView);
+        try {
+            Glide.with(holder.itemView)
+                    .load(data.url)
+                    .apply(RequestOptions.bitmapTransform(new RoundedCorners(30)))
+                    .into(holder.imageView);
 //                .thumbnail(Glide.with(holder.itemView).load(R.drawable.images))
 //                .skipMemoryCache(true)
 //                .diskCacheStrategy(DiskCacheStrategy.NONE)
+        } catch (Exception e) {
+
+        }
+
     }
 }

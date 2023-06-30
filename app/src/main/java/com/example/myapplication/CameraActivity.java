@@ -52,13 +52,17 @@ import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
 
-public class CameraActivity extends AppCompatActivity {
+public class CameraActivity extends AppCompatActivity implements MariaDBCallback {
+    ControlMariaDB controlMariaDB = new ControlMariaDB(this);
     private TextureView CameraView;
     protected CameraDevice cameraDevice;
     protected CameraCaptureSession cameraCaptureSessions;
@@ -95,16 +99,22 @@ public class CameraActivity extends AppCompatActivity {
     private Thread chartThread;
     //IQR
     private FilterAndIQR filterAndIQR;
-
     long[] nonZeroValuesAPI23;
-    private ControlMariaDB controlMariaDB;
     long[] outlierRRI;
     int fullAvgRed, fullAvgGreen, fullAvgBlue;
     int fixDarkRed;
     int fixAvgRedThreshold;
-
     ProgressBar progressBar;
     TextView progressBar_text;
+    String phoneRMSSD;
+    String phoneSDNN;
+    private Double AF_Similarity, AI_Depression, AI_Heart_age, AI_bshl, AI_dis,
+            AI_medic, BMI, BPc_dia, BPc_sys, BSc, Excellent_no, Lf_Hf, RMSSD, Shannon_h,
+            Total_Power, ULF, Unacceptable_no, VHF, VLF, dis0bs1_0, dis0bs1_1, dis1bs1_0,
+            dis1bs1_1, ecg_Arr, ecg_PVC, ecg_QTc, ecg_hr_max, ecg_hr_mean, ecg_hr_min, ecg_rsp,
+            hbp, hr_rsp_rate, meanNN, miny, miny_local_total, mood_state, pNN50, sdNN,
+            sym_score_shift066, t_error, total_scores, unhrv, way_eat, way_eat_pa, waybp1_0_dia,
+            waybp1_0_sys, waybp1_1_dia, year10scores;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -297,7 +307,6 @@ public class CameraActivity extends AppCompatActivity {
                             setScreenOff();
                             calcBPM_RMMSD_SDNN();
                             showInfoOnScrollView();
-                            uploadResult();
                         }
                     }
                 }
@@ -392,7 +401,8 @@ public class CameraActivity extends AppCompatActivity {
 
     private void calcBPM_RMMSD_SDNN() {
         int med;
-        long[] time_dist = new long[captureRate];
+        long[] time_dist = new long[mTimeArray.length - 1];
+        Log.d("rrrr", "calcBPM_RMMSD_SDNN: "+mTimeArray.length);
         //calcRRI
         for (int i = 5; i < time_dist.length - 1; i++) {
             time_dist[i] = mTimeArray[i + 1] - mTimeArray[i];
@@ -404,26 +414,21 @@ public class CameraActivity extends AppCompatActivity {
         }
         //calcBPM
         long[] getBPMOutlier = outlierRRI;
-        if (getBPMOutlier != null) {
-            try {
-                Arrays.sort(getBPMOutlier);
-                med = (int) outlierRRI[outlierRRI.length / 2];
-                heart_rate_bpm = 60000 / med;
+        uploadResult(getBPMOutlier);
+        try {
+            Arrays.sort(getBPMOutlier);
+            med = (int) outlierRRI[outlierRRI.length / 2];
+            heart_rate_bpm = 60000 / med;
 
-                //calcRMSSD_SDNN
-                double rmssd = filterAndIQR.calculateRMSSD(outlierRRI);
-                double sdnn = filterAndIQR.calculateSDNN(outlierRRI);
-                DecimalFormat df = new DecimalFormat("#.##");//設定輸出格式
-                String RMSSD = df.format(rmssd);
-                String SDNN = df.format(sdnn);
+            //calcRMSSD_SDNN
+            DecimalFormat df = new DecimalFormat("#.##");//設定輸出格式
+            phoneRMSSD = df.format(filterAndIQR.calculateRMSSD(outlierRRI));
+            phoneSDNN = df.format(filterAndIQR.calculateSDNN(outlierRRI));
 
-                heartBeatCount.setText("RMSSD：" + RMSSD + "\n" + "SDNN：" + SDNN + "\n" + "BPM：" + heart_rate_bpm);
-                onPause();
-            } catch (Exception e) {
-                System.out.println(e);
-            }
-        } else {
 
+            onPause();
+        } catch (Exception e) {
+            System.out.println(e);
         }
     }
 
@@ -439,8 +444,19 @@ public class CameraActivity extends AppCompatActivity {
     /**
      * 上傳量測結果至伺服器
      */
-    private void uploadResult() {
-//        controlMariaDB.jsonUploadToServer(outlierRRI); //上傳完成的RRI
+    private void uploadResult(long[] profileAndRRI) {
+        if (outlierRRI != null) {
+            controlMariaDB.jsonUploadToServer(profileAndRRI); //上傳完成的RRI
+        }
+    }
+
+    /**
+     * 量測結果
+     */
+    @Override
+    public void onResult(String result) {
+        unpackJson(result);
+
     }
 
     /**
@@ -520,7 +536,6 @@ public class CameraActivity extends AppCompatActivity {
             cameraDevice = null;
         }
     }
-
 
     //check Permission
     @Override
@@ -731,6 +746,74 @@ public class CameraActivity extends AppCompatActivity {
             nonZeroValuesAPI23[i] = clearArrayList.get(i);
         }
         return nonZeroValuesAPI23;
+    }
+
+    private void unpackJson(String json) {
+        json = json.replaceAll("NaN", "null");
+        String finalJson = json;
+        new Thread(() -> {
+            try {
+                JSONObject jsonObject = new JSONObject(finalJson);
+                AF_Similarity = jsonObject.getDouble("AF_Similarity");
+                AI_Depression = jsonObject.getDouble("AI_Depression");
+                AI_Heart_age = jsonObject.getDouble("AI_Heart_age");
+                AI_bshl = jsonObject.getDouble("AI_bshl");
+                AI_dis = jsonObject.getDouble("AI_dis");
+                AI_medic = jsonObject.getDouble("AI_medic");
+                BMI = jsonObject.getDouble("BMI");
+                BPc_dia = jsonObject.getDouble("BPc_dia");
+                BPc_sys = jsonObject.getDouble("BPc_sys");
+                BSc = jsonObject.getDouble("BSc");
+                Excellent_no = jsonObject.getDouble("Excellent_no");
+//                Lf_Hf = jsonObject.getDouble("Lf_Hf");
+                RMSSD = jsonObject.getDouble("RMSSD");
+                Shannon_h = jsonObject.getDouble("Shannon_h");
+                Total_Power = jsonObject.getDouble("Total_Power");
+//                ULF = jsonObject.getDouble("ULF");
+                Unacceptable_no = jsonObject.getDouble("Unacceptable_no");
+//                VHF = jsonObject.getDouble("VHF");
+//                VLF = jsonObject.getDouble("VLF");
+                dis0bs1_0 = jsonObject.getDouble("dis0bs1_0");
+                dis0bs1_1 = jsonObject.getDouble("dis0bs1_1");
+                dis1bs1_0 = jsonObject.getDouble("dis1bs1_0");
+                dis1bs1_1 = jsonObject.getDouble("dis1bs1_1");
+                ecg_Arr = jsonObject.getDouble("ecg_Arr");
+                ecg_PVC = jsonObject.getDouble("ecg_PVC");
+                ecg_QTc = jsonObject.getDouble("ecg_QTc");
+                ecg_hr_max = jsonObject.getDouble("ecg_hr_max");
+                ecg_hr_mean = jsonObject.getDouble("ecg_hr_mean");
+                ecg_hr_min = jsonObject.getDouble("ecg_hr_min");
+                ecg_rsp = jsonObject.getDouble("ecg_rsp");
+                hbp = jsonObject.getDouble("hbp");
+                hr_rsp_rate = jsonObject.getDouble("hr_rsp_rate");
+                meanNN = jsonObject.getDouble("meanNN");
+                miny = jsonObject.getDouble("miny");
+                miny_local_total = jsonObject.getDouble("miny_local_total");
+                mood_state = jsonObject.getDouble("mood_state");
+                pNN50 = jsonObject.getDouble("pNN50");
+                sdNN = jsonObject.getDouble("sdNN");
+                sym_score_shift066 = jsonObject.getDouble("sym_score_shift066");
+                t_error = jsonObject.getDouble("t_error");
+                total_scores = jsonObject.getDouble("total_scores");
+                unhrv = jsonObject.getDouble("unhrv");
+                way_eat = jsonObject.getDouble("way_eat");
+                way_eat_pa = jsonObject.getDouble("way_eat_pa");
+                waybp1_0_dia = jsonObject.getDouble("waybp1_0_dia");
+                waybp1_0_sys = jsonObject.getDouble("waybp1_0_sys");
+                waybp1_1_dia = jsonObject.getDouble("waybp1_1_dia");
+                year10scores = jsonObject.getDouble("year10scores");
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        DecimalFormat df = new DecimalFormat("#.##");//設定輸出格式
+                        heartBeatCount.setText("手機端：RMSSD：" + phoneRMSSD + "\nSDNN：" + phoneSDNN + "\nBPM：" + heart_rate_bpm + "\n伺服端-RMSSD：" + df.format(RMSSD) + "\nSDNN：" + df.format(sdNN) + "\nBPM：" + df.format(ecg_hr_mean));
+                    }
+                });
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }).start();
+
     }
 
 //    @Override
