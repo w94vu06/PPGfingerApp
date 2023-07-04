@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".BeginActivity"
+    android:orientation="vertical"
+    android:background="@drawable/begin">
+
+    <ImageView
+        android:id="@+id/img_revlis"
+        android:layout_width="@dimen/dp_250"
+        android:layout_height="@dimen/dp_90"
+        android:src="@drawable/revlis"
+        android:scaleType="fitXY"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="@dimen/dp_50"/>
+
+    <ImageView
+        android:id="@+id/img_post"
+        android:layout_width="@dimen/dp_295"
+        android:layout_height="@dimen/dp_280"
+        android:layout_centerInParent="true"
+        android:scaleType="fitXY"
+        android:src="@drawable/data" />
+
+    <LinearLayout
+        android:id="@+id/linear_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:gravity="center"
+        android:layout_marginBottom="@dimen/dp_50">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="一句話代表這個程式，\n但我想不到有哪句話可以代表這個程式。"
+            android:textColor="@color/green"
+            android:textSize="@dimen/sp_20"
+            android:fontFamily="@font/glowsanssc_condensed_book"
+            android:layout_above="@+id/linear_button"
+            android:layout_centerHorizontal="true" />
+    </LinearLayout>
+
+</RelativeLayout>

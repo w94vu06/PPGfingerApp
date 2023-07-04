@@ -23,6 +23,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class Profile extends Fragment {
 
@@ -41,7 +42,7 @@ public class Profile extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        preferences = getActivity().getSharedPreferences("my_preferences", Context.MODE_PRIVATE);
+        preferences = requireActivity().getSharedPreferences("my_preferences", Context.MODE_PRIVATE);
         editor = preferences.edit();
         name = preferences.getString("ProfileName", null);
         phone = preferences.getString("ProfilePhone", "無資料");
@@ -68,7 +69,6 @@ public class Profile extends Fragment {
 
         ArrayList<DataProfile> profileList = new ArrayList<>();
         try {
-//            profileList.add(new DataProfile("姓名 Name", name));
             titleName.setText(name);
             profileList.add(new DataProfile("手機 Phone", phone));
             profileList.add(new DataProfile("信箱 Email", email));
@@ -96,23 +96,4 @@ public class Profile extends Fragment {
             recyclerViewProfile();
         }
     }
-
-    //
-//    @Override
-//    public void onStop() {
-//        super.onStop();
-//        EventBus.getDefault().unregister(this);
-//    }
-//
-//    /**
-//     * 接收profile
-//     **/
-//    @Subscribe(sticky = true, threadMode = ThreadMode.ASYNC)
-//    public void onMessageEvent(SignUpActivity.MessageEvent event) {
-//        // 收到MessageEvent時要做的事寫在這裡
-//        String profileMsg = event.getMessage();
-//        Log.d("rrrr", "onProfilePage: " + profileMsg);
-//        unpackJson(profileMsg);
-//    }
-
 }

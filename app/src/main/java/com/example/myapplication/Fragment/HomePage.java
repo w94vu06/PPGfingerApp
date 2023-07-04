@@ -166,7 +166,7 @@ public class HomePage extends Fragment {
 
         /** 宣告UI參數 **/
         imgbtn_close = dialogView.findViewById(R.id.imgbtn_close);
-        btn_dialogCancel = dialogView.findViewById(R.id.btn_dialogCancel);
+//        btn_dialogCancel = dialogView.findViewById(R.id.btn_dialogCancel);
         btn_dialogSure = dialogView.findViewById(R.id.btn_dialogSure);
         unbinder = ButterKnife.bind(this,dialogView);
         dialog.show();
@@ -180,7 +180,7 @@ public class HomePage extends Fragment {
         dialog.setCancelable(false);
         imgbtn_close.setOnClickListener(lis);
         btn_dialogSure.setOnClickListener(lis);
-        btn_dialogCancel.setOnClickListener(lis);
+//        btn_dialogCancel.setOnClickListener(lis);
     }
 
     @OnClick({R.id.check_dbp, R.id.check_sbp, R.id.check_bs, R.id.check_hr, R.id.check_sdnn, R.id.check_rmssd})
@@ -211,10 +211,10 @@ public class HomePage extends Fragment {
                 case R.id.imgbtn_close:
                     dialog.dismiss();
                     break;
-                case R.id.btn_dialogCancel:
-                    break;
+//                case R.id.btn_dialogCancel:
+//                    break;
                 case R.id.btn_dialogSure:
-                    Toast.makeText(getContext(),checkFeature.toString(),Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(getContext(),checkFeature.toString(),Toast.LENGTH_SHORT).show();
                     notifyDataChanged();
                     dialog.dismiss();
                     break;
@@ -227,7 +227,7 @@ public class HomePage extends Fragment {
         recycler_feature.setLayoutManager(new WrapContentLinearLayoutManager(getActivity(),LinearLayoutManager.HORIZONTAL,false));
 
         featureList = new ArrayList<>();
-        if (checkFeature.size()==0) {
+        if (checkFeature.size() == 0) {
             featureList.add(new DataFeature("無資料", 0.0));
         }
         adapter_feature = new FeatureAdapter(featureList);
@@ -238,11 +238,18 @@ public class HomePage extends Fragment {
         if (featureList != null){
             featureList.clear();
             adapter_feature.notifyItemRangeRemoved(0,featureList.size());
-            Random x = new Random();
-            for (int i=0; i<checkFeature.size(); i++){
-                Double y = (double)Math.round((x.nextDouble()*100.0)/100.0);
-                featureList.add(new DataFeature(checkFeature.get(i),y));
-            }
+            //舒張壓:0、收縮壓:1、血糖:2、心率:3、SDNN:4、RMSSD:5
+            featureList.add(new DataFeature(checkFeature.get(0),12.0));
+            featureList.add(new DataFeature(checkFeature.get(1),12.0));
+            featureList.add(new DataFeature(checkFeature.get(2),12.0));
+            featureList.add(new DataFeature(checkFeature.get(3),12.0));
+            featureList.add(new DataFeature(checkFeature.get(4),12.0));
+            featureList.add(new DataFeature(checkFeature.get(5),12.0));
+//            Random x = new Random();
+//            for (int i=0; i<checkFeature.size(); i++){
+//                Double y = (double)Math.round((x.nextDouble()*100.0)/100.0);
+//                featureList.add(new DataFeature(checkFeature.get(i),y));
+//            }
             adapter_feature.notifyItemRangeInserted(0,checkFeature.size());
         }
     }

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<set xmlns:android="http://schemas.android.com/apk/res/android">
+    <rotate
+        android:duration="2000"
+        android:fromDegrees="0"
+        android:toDegrees="3600"
+        android:pivotX="50%"
+        android:pivotY="50%"
+        />
+
+    <!--
+        duration 動畫執行時間
+        fromDegrees 動畫開始時物件的角度
+        toDegrees 動畫結束時物件的角度
+        pivotX、pivotY 代表旋轉的中心點
+        50%、50%表示中心旋轉
+    -->
+</set>

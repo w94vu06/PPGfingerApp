@@ -26,17 +26,6 @@ public class BeginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        Window window = getWindow();
-        if(window != null){
-            window.requestFeature(Window.FEATURE_ACTIVITY_TRANSITIONS);
-            window.setEnterTransition(new android.transition.Slide(Gravity.BOTTOM));
-            window.setExitTransition(new android.transition.Slide(Gravity.TOP));
-            window.setReenterTransition(new android.transition.Slide(Gravity.BOTTOM));
-            window.setReturnTransition(new android.transition.Slide(Gravity.TOP));
-        }
-        setContentView(R.layout.activity_begin);
-        initParameter();
         preferences = getSharedPreferences("my_preferences", MODE_PRIVATE);
         isLoggedIn();
     }
@@ -50,11 +39,22 @@ public class BeginActivity extends AppCompatActivity {
 
     private void isLoggedIn() {
         boolean isLoggedIn = preferences.getBoolean("isLoggedIn", false);
-        Log.d("llll", "isLoggedIn: "+isLoggedIn);
         if (isLoggedIn) {
             Intent intent_IN = new Intent();
             intent_IN.setClass(BeginActivity.this, MainActivity.class);
             startActivity(intent_IN);
+            finish();
+        } else {
+            Window window = getWindow();
+            if(window != null){
+                window.requestFeature(Window.FEATURE_ACTIVITY_TRANSITIONS);
+                window.setEnterTransition(new android.transition.Slide(Gravity.BOTTOM));
+                window.setExitTransition(new android.transition.Slide(Gravity.TOP));
+                window.setReenterTransition(new android.transition.Slide(Gravity.BOTTOM));
+                window.setReturnTransition(new android.transition.Slide(Gravity.TOP));
+            }
+            setContentView(R.layout.activity_begin);
+            initParameter();
         }
     }
 

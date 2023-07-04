@@ -34,7 +34,7 @@
         android:textSize="@dimen/sp_20"
         android:fontFamily="@font/glowsanssc_condensed_book"
         android:layout_above="@+id/linear_button"
-        android:layout_centerHorizontal="true"/>
+        android:layout_centerHorizontal="true" />
 
     <LinearLayout
         android:id="@+id/linear_button"
