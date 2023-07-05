@@ -130,6 +130,11 @@ public class SignInActivity extends AppCompatActivity implements MariaDBCallback
         judgeEventCode(eventCode);
     }
 
+    @Override
+    public void onSave(String result) {
+
+    }
+
     public void judgeEventCode(int res) {
         if (res == 1) {
             Toast.makeText(SignInActivity.this, "登入成功，頁面跳轉中...", Toast.LENGTH_SHORT).show();

@@ -1,6 +1,7 @@
 package com.example.myapplication;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -29,12 +30,14 @@ public class ControlMariaDB {
     Handler resHandler = new ResHandler();
     String serverUrl = "http://192.168.2.104:5000/"; //公司
 //    String serverUrl = "http://192.168.0.102:5000/"; //家裡
+    String calServerUrl = "http://192.168.2.97:8090";//計算用server
     private MariaDBCallback mCallback;
     private static final int MSG_REGISTER = 1;
     private static final int MSG_LOGIN = 2;
     private static final int MSG_READ = 3;
     private static final int MSG_DELETE = 4;
-
+    private static final int MSG_ID_SAVE = 5;
+    private static final int MSG_ID_READ = 6;
     public ControlMariaDB(MariaDBCallback mCallback) {
         this.mCallback = mCallback;
     }
@@ -150,9 +153,9 @@ public class ControlMariaDB {
     }
 
     /**
-     * 刪除
+     * 用userId存
      **/
-    public void userDelete(String jsonObject) {
+    public void userIdSave(String jsonObject) {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -160,23 +163,59 @@ public class ControlMariaDB {
                 RequestBody requestBody = RequestBody.create(mediaType, jsonObject);
 
                 // 註冊
-                Request deleteRequest = new Request.Builder()
+                Request readRequest = new Request.Builder()
+                        .url(serverUrl + "save")
+                        .post(requestBody)
+                        .build();
+                try {
+                    // 發送讀取請求
+                    Response readResponse = client.newCall(readRequest).execute();
+                    if (readResponse.isSuccessful()) {
+                        // 讀取回應
+                        String readRes = Objects.requireNonNull(readResponse.body()).string();
+                        // 0:讀取失敗
+                        Message resMsg = Message.obtain();
+                        resMsg.what = MSG_ID_SAVE;
+                        resMsg.obj = readRes;
+                        resHandler.sendMessage(resMsg);
+                    } else {
+                        throw new IOException("Unexpected code " + readResponse);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
+    /**
+     * 用userId讀
+     **/
+    public void userIdRead(String jsonObject) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                MediaType mediaType = MediaType.parse("application/json; charset=utf-8");
+                RequestBody requestBody = RequestBody.create(mediaType, jsonObject);
+
+                // 註冊
+                Request readRequest = new Request.Builder()
                         .url(serverUrl + "read")
                         .post(requestBody)
                         .build();
                 try {
-                    // 發送註冊請求
-                    Response deleteResponse = client.newCall(deleteRequest).execute();
-                    if (deleteResponse.isSuccessful()) {
-                        // 註冊回應
-                        String registerRes = Objects.requireNonNull(deleteResponse.body()).string();
-                        // 0:註冊失敗、1:註冊成功、2:使用者已存在
+                    // 發送讀取請求
+                    Response readResponse = client.newCall(readRequest).execute();
+                    if (readResponse.isSuccessful()) {
+                        // 讀取回應
+                        String readRes = Objects.requireNonNull(readResponse.body()).string();
+                        // 0:讀取失敗
                         Message resMsg = Message.obtain();
-                        resMsg.what = MSG_REGISTER;
-                        resMsg.obj = registerRes;
+                        resMsg.what = MSG_ID_READ;
+                        resMsg.obj = readRes;
                         resHandler.sendMessage(resMsg);
                     } else {
-                        throw new IOException("Unexpected code " + deleteResponse);
+                        throw new IOException("Unexpected code " + readResponse);
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -198,51 +237,18 @@ public class ControlMariaDB {
                 case MSG_REGISTER:
                 case MSG_READ:
                 case MSG_DELETE:
+                case MSG_ID_READ:
                     mCallback.onResult(resMsg.obj.toString());
                     break;
+                case MSG_ID_SAVE:
+                    mCallback.onSave(resMsg.obj.toString());
+                    break;
+
             }
         }
     }
 
-    public void jsonUploadToServer(long[] time_dist) {
-
-        JSONArray jsonTimeDist = new JSONArray();
-        for (int i = 0; i < time_dist.length; i++) {
-            jsonTimeDist.put(time_dist[i]);
-        }
-        JSONObject jsonData = new JSONObject();
-        String date = new SimpleDateFormat("yyyyMMddHHmmss",
-                Locale.getDefault()).format(System.currentTimeMillis());
-        String id = "888889";
-        try {
-//            jsonData.put("filename", date+"_888889");
-            jsonData.put("filename", date + "_" + id);
-            jsonData.put("id_num", "888889");
-            jsonData.put("chaurl", "-1");
-            //proFile
-            jsonData.put("old", "-1");
-            jsonData.put("sex", "-1");
-            jsonData.put("height", "-1");
-            jsonData.put("weight", "-1");
-            jsonData.put("sys", "-1");
-            jsonData.put("diabetes", "-1");
-            jsonData.put("smokes", "-1");
-            jsonData.put("hbp", "-1");
-            jsonData.put("morningdiabetes", "-1");
-            jsonData.put("aftermealdiabetes", "-1");
-            jsonData.put("userstatus", "-1");
-            jsonData.put("mealstatus", "-1");
-            jsonData.put("medicationstatus", "-1");
-            jsonData.put("hbpSBp", "-1");
-            jsonData.put("hbpDBp", "-1");
-            jsonData.put("md_num", "-1");
-
-            jsonData.put("rri", jsonTimeDist);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        String jsonString = jsonData.toString();
-
+    public void jsonUploadToServer(String jsonString) {
         /**
          * 連接伺服器運算
          **/
@@ -252,7 +258,7 @@ public class ControlMariaDB {
                 MediaType mediaType = MediaType.parse("application/json; charset=utf-8");
                 RequestBody requestBody = RequestBody.create(mediaType, jsonString);
                 Request request = new Request.Builder()
-                        .url("http://192.168.2.97:8090")//伺服器
+                        .url(calServerUrl)//伺服器
 //                        .url("http://192.168.2.110:5000")//測試服
                         .post(requestBody)
                         .build();

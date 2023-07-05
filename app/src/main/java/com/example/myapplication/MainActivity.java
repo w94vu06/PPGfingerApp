@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements MariaDBCallback {
 
 
     private String loginName, loginPhone;
-    private String userName, email, phone, birth;
+    private String userId,userName, email, phone, birth;
     private int old, height, weight, sex, smokes, diabetes, hbp;
 
     ControlMariaDB controlMariaDB = new ControlMariaDB(this);
@@ -178,7 +178,9 @@ public class MainActivity extends AppCompatActivity implements MariaDBCallback {
             throw new RuntimeException(e);
         }
         String jsonString = jsonData.toString();
-        controlMariaDB.userRead(jsonString);
+        if (userId == null) {
+            controlMariaDB.userRead(jsonString);
+        }
     }
 
     @Override
@@ -187,10 +189,16 @@ public class MainActivity extends AppCompatActivity implements MariaDBCallback {
         unpackJson(result);
     }
 
+    @Override
+    public void onSave(String result) {
+
+    }
+
     private void unpackJson(String json) {
         new Thread(() -> {
             try {
                 JSONObject jsonObject = new JSONObject(json);
+                userId = jsonObject.getString("userId");
                 userName = jsonObject.getString("name");
                 email = jsonObject.getString("email");
                 phone = jsonObject.getString("phone");
@@ -210,16 +218,17 @@ public class MainActivity extends AppCompatActivity implements MariaDBCallback {
     }
 
     private void setProfile() {
+        editor.putString("ProfileId", userId);
         editor.putString("ProfileName", userName);
         editor.putString("ProfileEmail", email);
         editor.putString("ProfilePhone", phone);
         editor.putString("ProfileBirth", birth);
         editor.putInt("ProfileOld", old);
+        editor.putInt("ProfileSex", sex);
         editor.putInt("ProfileHeight", height);
         editor.putInt("ProfileWeight", weight);
-        editor.putInt("ProfileSex", sex);
-        editor.putInt("ProfileSmokes", smokes);
         editor.putInt("ProfileDiabetes", diabetes);
+        editor.putInt("ProfileSmokes", smokes);
         editor.putInt("ProfileHbp", hbp);
         editor.apply();
     }

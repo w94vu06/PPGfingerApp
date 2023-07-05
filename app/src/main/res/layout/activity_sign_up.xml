@@ -88,7 +88,6 @@
                         android:textSize="@dimen/sp_18"
                         android:textColor="#707070"
                         android:hint="用戶名稱*"
-                        android:text="王禹翔"
                         android:inputType="text"
                         android:maxLines="1"
                         android:fontFamily="@font/glowsanssc_condensed_book"/>
@@ -113,13 +112,11 @@
                         android:padding="@dimen/dp_5"
                         android:textSize="@dimen/sp_18"
                         android:textColor="#707070"
-                        android:hint="E-mail"
+                        android:hint="E-mail*(將會作為帳號使用)"
                         android:maxLines="1"
                         android:fontFamily="@font/glowsanssc_condensed_book"
                         android:inputType="textEmailAddress"
                         android:ellipsize="end"
-                        android:text="doob925@gmail.com"
-
                         android:lines="1"/>
 
                 </com.google.android.material.textfield.TextInputLayout>
@@ -142,8 +139,7 @@
                         android:padding="@dimen/dp_5"
                         android:textSize="@dimen/sp_18"
                         android:textColor="#707070"
-                        android:hint="手機號碼"
-                        android:text="0939907010"
+                        android:hint="手機號碼*(將作為預設密碼)"
                         android:maxLines="1"
                         android:maxLength="10"
                         android:fontFamily="@font/glowsanssc_condensed_book"
@@ -171,7 +167,6 @@
                         android:textSize="@dimen/sp_18"
                         android:textColor="#707070"
                         android:hint="出生日期*"
-                        android:text="2000-9-25"
                         android:maxLines="1"
                         android:fontFamily="@font/glowsanssc_condensed_book"/>
                 </com.google.android.material.textfield.TextInputLayout>
@@ -205,7 +200,6 @@
                         android:textSize="@dimen/sp_18"
                         android:textColor="#707070"
                         android:hint="身高(公分cm)*"
-                        android:text="173"
                         android:maxLines="1"
                         android:fontFamily="@font/glowsanssc_condensed_book"
                         android:inputType="number"
@@ -237,7 +231,6 @@
                         android:textSize="@dimen/sp_18"
                         android:textColor="#707070"
                         android:hint="體重(公斤kg)*"
-                        android:text="73"
                         android:maxLines="1"
                         android:fontFamily="@font/glowsanssc_condensed_book"
                         android:inputType="number"

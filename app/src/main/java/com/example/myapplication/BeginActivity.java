@@ -23,11 +23,46 @@ public class BeginActivity extends AppCompatActivity {
 
     Button btn_signin,btn_signup;
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         preferences = getSharedPreferences("my_preferences", MODE_PRIVATE);
         isLoggedIn();
+    }
+
+    /**
+     * 返回鍵退出程式
+     **/
+    private static Boolean isExit = false;
+    private static Boolean hasTask = false;
+    Timer timerExit = new Timer();
+    TimerTask task = new TimerTask() {
+        public void run() {
+            isExit = false;
+            hasTask = true;
+        }
+    };
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        // 判斷是否按下Back
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            // 是否要退出
+            if (isExit == false) {
+                isExit = true; //記錄下一次要退出
+                Toast.makeText(this, "再按一次退出APP"
+                        , Toast.LENGTH_SHORT).show();
+
+                // 如果超過兩秒則恢復預設值
+                if (!hasTask) {
+                    timerExit.schedule(task, 2000);
+                }
+            } else {
+                finish(); // 離開程式
+                System.exit(0);
+            }
+        }
+        return false;
     }
 
     public void initParameter(){

@@ -16,14 +16,14 @@ import java.util.ArrayList;
 public class FeatureAdapter extends RecyclerView.Adapter<FeatureAdapter.ViewHolder> {
     ArrayList<DataFeature> featureList;
 
-    public FeatureAdapter(ArrayList<DataFeature> featureList){
+    public FeatureAdapter(ArrayList<DataFeature> featureList) {
         this.featureList = featureList;
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View inflate  = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_feature,parent,false);
+        View inflate = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_feature, parent, false);
         return new ViewHolder(inflate);
     }
 
@@ -41,6 +41,7 @@ public class FeatureAdapter extends RecyclerView.Adapter<FeatureAdapter.ViewHold
     public class ViewHolder extends RecyclerView.ViewHolder {
         TextView txt_feature;
         TextView txt_val;
+
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             txt_feature = itemView.findViewById(R.id.txt_feature);

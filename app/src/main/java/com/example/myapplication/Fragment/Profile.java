@@ -34,7 +34,6 @@ public class Profile extends Fragment {
     private String old, height, weight, sex, smokes, diabetes, hbp;
 
     private SharedPreferences preferences;
-
     private SharedPreferences.Editor editor;
 
     private TextView titleName;

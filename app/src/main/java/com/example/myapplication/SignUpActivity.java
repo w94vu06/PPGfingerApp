@@ -234,6 +234,11 @@ public class SignUpActivity extends AppCompatActivity implements MariaDBCallback
         judgeEventCode(eventCode);
     }
 
+    @Override
+    public void onSave(String result) {
+
+    }
+
     /**
      * 判斷事件代碼
      */

@@ -215,6 +215,9 @@ public class HomePage extends Fragment {
 //                    break;
                 case R.id.btn_dialogSure:
 //                    Toast.makeText(getContext(),checkFeature.toString(),Toast.LENGTH_SHORT).show();
+                    if (checkFeature.size() == 0) {
+                        dialog.dismiss();
+                    }
                     notifyDataChanged();
                     dialog.dismiss();
                     break;
@@ -225,13 +228,13 @@ public class HomePage extends Fragment {
     private void RecyclerViewFeature(){
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity(),LinearLayoutManager.HORIZONTAL,false);
         recycler_feature.setLayoutManager(new WrapContentLinearLayoutManager(getActivity(),LinearLayoutManager.HORIZONTAL,false));
-
         featureList = new ArrayList<>();
         if (checkFeature.size() == 0) {
             featureList.add(new DataFeature("無資料", 0.0));
         }
         adapter_feature = new FeatureAdapter(featureList);
         recycler_feature.setAdapter(adapter_feature);
+
     }
 
     private void notifyDataChanged(){
@@ -239,17 +242,11 @@ public class HomePage extends Fragment {
             featureList.clear();
             adapter_feature.notifyItemRangeRemoved(0,featureList.size());
             //舒張壓:0、收縮壓:1、血糖:2、心率:3、SDNN:4、RMSSD:5
-            featureList.add(new DataFeature(checkFeature.get(0),12.0));
-            featureList.add(new DataFeature(checkFeature.get(1),12.0));
-            featureList.add(new DataFeature(checkFeature.get(2),12.0));
-            featureList.add(new DataFeature(checkFeature.get(3),12.0));
-            featureList.add(new DataFeature(checkFeature.get(4),12.0));
-            featureList.add(new DataFeature(checkFeature.get(5),12.0));
-//            Random x = new Random();
-//            for (int i=0; i<checkFeature.size(); i++){
-//                Double y = (double)Math.round((x.nextDouble()*100.0)/100.0);
-//                featureList.add(new DataFeature(checkFeature.get(i),y));
-//            }
+            Random x = new Random();
+            for (int i=0; i<checkFeature.size(); i++){
+                Double y = (double)Math.round((x.nextDouble()*100.0)/100.0);
+                featureList.add(new DataFeature(checkFeature.get(i),y));
+            }
             adapter_feature.notifyItemRangeInserted(0,checkFeature.size());
         }
     }
@@ -264,5 +261,5 @@ public class HomePage extends Fragment {
             }
         });
     }
-    
+
 }

@@ -88,9 +88,11 @@ public class Setting extends Fragment {
             @Override
             public void onClick(View view) {
                 editor.putBoolean("isLoggedIn", false);
+                editor.clear();
                 editor.apply();
                 Intent signOutIntent = new Intent(getActivity(), BeginActivity.class);
                 startActivity(signOutIntent);
+                getActivity().getSupportFragmentManager().popBackStack();
             }
         });
 

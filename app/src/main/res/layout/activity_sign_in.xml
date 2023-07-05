@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".SignInActivity"
     android:background="@color/shironeri">
 
     <ImageView
@@ -12,8 +10,8 @@
         android:layout_width="@dimen/dp_198"
         android:layout_height="@dimen/dp_55"
         android:layout_marginTop="@dimen/dp_20"
-        android:scaleType="fitXY"
         android:src="@drawable/sign_in"
+        android:scaleType="fitXY"
         android:layout_centerHorizontal="true"/>
 
     <ImageView
