@@ -191,7 +191,6 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
      */
     public void restartBtn() {
         btn_restart.setOnClickListener(v -> {
-            heartBeatCount.setText("量測準備中...");
             initProgressBar();
             shoutDownDetect();
             onResume();
@@ -320,7 +319,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
                 mLastLastRollingAverage = mLastRollingAverage;
                 mLastRollingAverage = mCurrentRollingAverage;
             } else {
-                qualityHandler.postDelayed(qualityRunnable, 5000);
+                qualityHandler.postDelayed(qualityRunnable, 3000);
                 idleHandler.postDelayed(idleRunnable, 15000);
             }
         }
@@ -404,12 +403,13 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
     }
 
     private void calcBPM_RMMSD_SDNN() {
-        int med;
+
         long[] time_dist = new long[mTimeArray.length - 1];
-        Log.d("rrrr", "calcBPM_RMMSD_SDNN: " + mTimeArray.length);
         //calcRRI
-        for (int i = 5; i < time_dist.length - 1; i++) {
+        for (int i = 0; i < time_dist.length - 1; i++) {
             time_dist[i] = mTimeArray[i + 1] - mTimeArray[i];
+
+            Log.d("rrrr", "RRi: " + time_dist[i]);
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             outlierRRI = filterAndIQR.IQR(time_dist);//去掉離群值
@@ -418,22 +418,25 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         }
         //calcBPM
         long[] getBPMOutlier = outlierRRI;
+        //calcRMSSD_SDNN
+        DecimalFormat df = new DecimalFormat("#.##");//設定輸出格式
+        phoneRMSSD = df.format(filterAndIQR.calculateRMSSD(getBPMOutlier));
+        phoneSDNN = df.format(filterAndIQR.calculateSDNN(getBPMOutlier));
         uploadResult(getBPMOutlier);
+
         try {
-            Arrays.sort(getBPMOutlier);
-            med = (int) outlierRRI[outlierRRI.length / 2];
-            heart_rate_bpm = 60000 / med;
-
-            //calcRMSSD_SDNN
-            DecimalFormat df = new DecimalFormat("#.##");//設定輸出格式
-            phoneRMSSD = df.format(filterAndIQR.calculateRMSSD(outlierRRI));
-            phoneSDNN = df.format(filterAndIQR.calculateSDNN(outlierRRI));
-
-
+            calBPM(outlierRRI);
             onPause();
         } catch (Exception e) {
             System.out.println(e);
         }
+    }
+
+    public void calBPM(long[] rri) {
+        int med;
+        Arrays.sort(rri);
+        med = (int) rri[rri.length / 2];
+        heart_rate_bpm = 60000 / med;
     }
 
     /**
@@ -522,7 +525,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
 
     @Override
     public void onSave(String result) {
-        Log.d("eeee", "onSave: "+result);
+        Log.d("eeee", "onSave: " + result);
     }
 
     public void judgeEventCode(int res) {

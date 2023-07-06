@@ -38,7 +38,6 @@ import com.youth.banner.indicator.RectangleIndicator;
 import com.youth.banner.util.BannerUtils;
 import com.youth.banner.util.LogUtils;
 
-import org.apache.commons.text.StringEscapeUtils;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;

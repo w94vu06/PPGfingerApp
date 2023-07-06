@@ -78,7 +78,7 @@
                     android:id="@+id/progress_text"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:text=""
+                    android:text="0%"
                     android:textColor="@color/white"
                     android:textSize="@dimen/dp_20"
                     android:gravity="center"
