@@ -19,6 +19,8 @@ import com.example.myapplication.BeginActivity;
 import com.example.myapplication.MainActivity;
 import com.example.myapplication.R;
 
+import java.util.Objects;
+
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link Setting#newInstance} factory method to
@@ -92,7 +94,7 @@ public class Setting extends Fragment {
                 editor.apply();
                 Intent signOutIntent = new Intent(getActivity(), BeginActivity.class);
                 startActivity(signOutIntent);
-                getActivity().getSupportFragmentManager().popBackStack();
+                requireActivity().finish();
             }
         });
 

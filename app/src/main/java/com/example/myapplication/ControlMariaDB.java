@@ -200,7 +200,7 @@ public class ControlMariaDB {
 
                 // 註冊
                 Request readRequest = new Request.Builder()
-                        .url(serverUrl + "read")
+                        .url(serverUrl + "readData")
                         .post(requestBody)
                         .build();
                 try {
@@ -243,7 +243,6 @@ public class ControlMariaDB {
                 case MSG_ID_SAVE:
                     mCallback.onSave(resMsg.obj.toString());
                     break;
-
             }
         }
     }
@@ -264,16 +263,55 @@ public class ControlMariaDB {
                         .build();
 
                 try (Response response = client.newCall(request).execute()) {
-                    if (!response.isSuccessful()) {
-                        throw new IOException("Unexpected code " + response);
-                    }
                     Message msg = Message.obtain();
-                    String res = Objects.requireNonNull(response.body()).string();
+                    String res;
+                    if (!response.isSuccessful()) {
+                        res = "fail";
+                    } else {
+                        res = Objects.requireNonNull(response.body()).string();
+                    }
                     msg.obj = res;
                     Log.d("serverRes", "getServerRes: " + res);
                     mHandler.sendMessage(msg);
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    String res = "fail";
+                    Message msg = Message.obtain();
+                    msg.obj = res;
+                    Log.d("serverRes", "getServerRes: " + res);
+                    mHandler.sendMessage(msg);
+                }
+            }
+        }.start();
+    }
+
+    public void testServer(String jsonString) {
+        /**
+         * 連接伺服器運算
+         **/
+        new Thread() {
+            @Override
+            public void run() {
+                MediaType mediaType = MediaType.parse("application/json; charset=utf-8");
+                RequestBody requestBody = RequestBody.create(mediaType, jsonString);
+                Request request = new Request.Builder()
+                        .url(calServerUrl)//伺服器
+//                        .url("http://192.168.2.110:5000")//測試服
+                        .post(requestBody)
+                        .build();
+
+                try (Response response = client.newCall(request).execute()) {
+                    Message msg = Message.obtain();
+                    if (!response.isSuccessful()) {
+                        String res;
+                        res = "open";
+                        msg.obj = res;
+                        mHandler.sendMessage(msg);
+                    }
+                } catch (IOException e) {
+                    String res = "fail";
+                    Message msg = Message.obtain();
+                    msg.obj = res;
+                    mHandler.sendMessage(msg);
                 }
             }
         }.start();

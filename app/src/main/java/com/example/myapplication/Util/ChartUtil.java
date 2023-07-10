@@ -8,6 +8,7 @@ import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.listener.BarLineChartTouchListener;
 
 public class ChartUtil {
 
@@ -46,10 +47,19 @@ public class ChartUtil {
         y.setGranularity(0.2f);
 
         y.setAxisMaximum(80);//最高100
-        y.setAxisMinimum(30);//最低0
+        y.setAxisMinimum(20);//最低0
 
         chart.getAxisRight().setEnabled(false);//右邊Y軸不可視
 //        chart.setVisibleXRange(0,60);//設置顯示範圍
+
+        float scaleX = chart.getScaleX();
+        if (scaleX == 1)
+            chart.zoomToCenter(5, 1f);
+        else {
+            BarLineChartTouchListener barLineChartTouchListener = (BarLineChartTouchListener) chart.getOnTouchListener();
+            barLineChartTouchListener.stopDeceleration();
+            chart.fitScreen();
+        }
     }
 
     /**

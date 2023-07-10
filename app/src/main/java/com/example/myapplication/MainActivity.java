@@ -81,7 +81,6 @@ public class MainActivity extends AppCompatActivity implements MariaDBCallback {
         editor = preferences.edit();
         CheckInternetDialog checkInternetDialog = new CheckInternetDialog(MainActivity.this);
         checkInternetDialog.checkInternet();
-
     }
 
     /**

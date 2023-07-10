@@ -46,6 +46,7 @@ import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -57,6 +58,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Locale;
+import java.util.Objects;
 
 
 public class CameraActivity extends AppCompatActivity implements MariaDBCallback {
@@ -92,8 +94,8 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
     private int numCaptures = 0;
     private int mNumBeats = 0;
     private int prevNumBeats = 0;
-    private TextView heartBeatCount;
-    private Button btn_restart;
+    private TextView txt_phoneMarquee, txt_serverMarquee,txt_serverInfo;
+    private Button btn_restart, btn_detailed;
     //chart
     private boolean chartIsRunning = false;
     private ChartUtil chartUtil;
@@ -110,11 +112,8 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
     TextView progressBar_text;
     String phoneRMSSD;
     String phoneSDNN;
-
     String time = new SimpleDateFormat("yyyyMMddHHmmss",
             Locale.getDefault()).format(System.currentTimeMillis());
-
-
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -131,7 +130,10 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         mTimeArray = new long[captureRate];
 
         btn_restart = findViewById(R.id.btn_restart);
-        heartBeatCount = findViewById(R.id.heartBeatCount);
+        btn_detailed = findViewById(R.id.btn_detailed);
+        txt_phoneMarquee = findViewById(R.id.txt_phoneMarquee);
+        txt_serverMarquee= findViewById(R.id.txt_serverMarquee);
+        txt_serverInfo= findViewById(R.id.txt_serverInfo);
 
         filterAndIQR = new FilterAndIQR();
 
@@ -144,6 +146,8 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         closeTopBar();
         restartBtn();
         setCameraShape();
+
+        controlMariaDB.testServer("test");
     }
 
     /**
@@ -193,6 +197,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         btn_restart.setOnClickListener(v -> {
             initProgressBar();
             shoutDownDetect();
+            txt_serverMarquee.setText("");
             onResume();
         });
     }
@@ -336,7 +341,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
             disableSomeFunction();
             qualityHandler.removeCallbacks(qualityRunnable);
             chartIsRunning = false;//關閉畫圖
-            heartBeatCount.setText("訊號過差，量測失敗");
+            txt_phoneMarquee.setText("訊號過差，量測失敗");
         }
     };
 
@@ -355,7 +360,8 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
     private Runnable qualityRunnable = new Runnable() {
         @Override
         public void run() {
-            heartBeatCount.setText("把手指靠近相機鏡頭，調整直到畫面充滿紅色，然後保持靜止。");
+            txt_phoneMarquee.setText("把手指靠近相機鏡頭，調整直到畫面充滿紅色，然後保持靜止。");
+
         }
     };
 
@@ -426,6 +432,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
 
         try {
             calBPM(outlierRRI);
+            txt_phoneMarquee.setText("手機端：RMSSD：" + phoneRMSSD + "\nSDNN：" + phoneSDNN + "\nBPM：" + heart_rate_bpm);
             onPause();
         } catch (Exception e) {
             System.out.println(e);
@@ -458,7 +465,6 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
                 jsonTimeDist.put(time_dist[i]);
             }
             JSONObject jsonData = new JSONObject();
-
 
             String userId = preferences.getString("ProfileId", "888889");
             String old = String.valueOf(preferences.getInt("ProfileOld", -1));
@@ -520,22 +526,25 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
      */
     @Override
     public void onResult(String result) {
-        unpackJsonAndSave(result);
+        Log.d("eeee", "onResult: "+result);
+        if (Objects.equals(result, "open")) {
+            txt_serverInfo.setText("ai伺服器已開啟");
+        }
+        if (Objects.equals(result, "fail")) {
+            txt_serverInfo.setText("伺服器未開啟或發生錯誤");
+        } else {
+            unpackJsonAndSave(result);
+        }
+
     }
 
     @Override
     public void onSave(String result) {
-        Log.d("eeee", "onSave: " + result);
-    }
-
-    public void judgeEventCode(int res) {
-        if (res == 1) {
-            Toast.makeText(CameraActivity.this, "登入成功，頁面跳轉中...", Toast.LENGTH_SHORT).show();
-        } else if (res == 0) {
-            Toast.makeText(CameraActivity.this, "登入失敗", Toast.LENGTH_SHORT).show();
+        int errorCode = Integer.parseInt(result);
+        if (errorCode == 0) {
+           txt_serverMarquee.setText("伺服器發生錯誤");
         }
     }
-
     protected void createCameraPreview() {
         try {
             SurfaceTexture texture = CameraView.getSurfaceTexture();
@@ -693,8 +702,8 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         data.notifyDataChanged();
         data.setDrawValues(false);//是否繪製線條上的文字
         chart.notifyDataSetChanged();
-        chart.setVisibleXRange(0, 60);//設置可見範圍
-        chart.moveViewToX(data.getEntryCount() + 3);//將可視焦點放在最新一個數據，使圖表可移動
+        chart.setVisibleXRange(0,100);//設置可見範圍 預設0-60
+        chart.moveViewToX(data.getEntryCount());//將可視焦點放在最新一個數據，使圖表可移動
     }
 
     /**
@@ -828,20 +837,23 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
                 jsonObject.put("time", time);
 
                 String jsonString = jsonObject.toString();
-                Log.d("eeee", "JsonAndSave: " + jsonString);
+
                 controlMariaDB.userIdSave(jsonString);
 
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         DecimalFormat df = new DecimalFormat("#.##");//設定輸出格式
-                        heartBeatCount.setText("手機端：RMSSD：" + phoneRMSSD + "\nSDNN：" + phoneSDNN + "\nBPM：" + heart_rate_bpm + "\n伺服端-RMSSD：" + df.format(RMSSD) + "\nSDNN：" + df.format(sdNN) + "\nBPM：" + df.format(ecg_hr_mean));
+                        txt_serverMarquee.setText("\n伺服端-RMSSD：" + df.format(RMSSD) + "\nSDNN：" + df.format(sdNN) + "\nBPM：" + df.format(ecg_hr_mean));
                     }
                 });
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }).start();
+    }
+    private void showJsonResultDialog() {
+
     }
 }
 

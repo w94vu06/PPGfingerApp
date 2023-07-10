@@ -32,8 +32,8 @@ import java.util.List;
 
 public class Category extends Fragment implements CategoryAdapter.OnItemListener, MariaDBCallback {
 
-    private RecyclerView recycler_category,recycler_detail;
-    private RecyclerView.Adapter adapter_category,adapter_detail;
+    private RecyclerView recycler_category, recycler_detail;
+    private RecyclerView.Adapter adapter_category, adapter_detail;
     private View view;
 
     ControlMariaDB controlMariaDB = new ControlMariaDB(this);
@@ -41,15 +41,11 @@ public class Category extends Fragment implements CategoryAdapter.OnItemListener
     private SharedPreferences.Editor editor;
 
 
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         preferences = requireActivity().getSharedPreferences("my_preferences", Context.MODE_PRIVATE);
         editor = preferences.edit();
-
-
     }
 
     @Override
@@ -59,24 +55,29 @@ public class Category extends Fragment implements CategoryAdapter.OnItemListener
         recycler_category = view.findViewById(R.id.recycler_category);
         recycler_detail = view.findViewById(R.id.recycler_detail);
 
-        setCategoryData();
+        try {
+            setCategoryData();
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
         return view;
     }
 
-    public void setCategoryData() {
+    public void setCategoryData() throws JSONException {
         JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("userId", preferences.getString("ProfileId", "888889"));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+
+        String userId = preferences.getString("ProfileId", null);
+        jsonObject.put("userId", userId);
+
         String json = jsonObject.toString();
-        controlMariaDB.userIdRead(json);
+        if (userId == null) {
+            controlMariaDB.userIdRead(json);
+        }
     }
 
     @Override
     public void onResult(String result) {
-        Log.d("rrrr", "IdDataBack: "+result);
+        Log.d("rrrr", "IdDataBack: " + result);
         RecyclerViewCategory();
         RecyclerViewDetail();
     }
@@ -86,27 +87,27 @@ public class Category extends Fragment implements CategoryAdapter.OnItemListener
 
     }
 
-    private void RecyclerViewCategory(){
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity(),LinearLayoutManager.HORIZONTAL,false);
+    private void RecyclerViewCategory() {
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
         recycler_category.setLayoutManager(linearLayoutManager);
 
         ArrayList<DataCategory> categoryList = new ArrayList<>();
-        categoryList.add(new DataCategory("ai","AI"));
-        categoryList.add(new DataCategory("emotional","情緒"));
-        categoryList.add(new DataCategory("body_ai","生理AI"));
-        categoryList.add(new DataCategory("rsp","呼吸"));
-        categoryList.add(new DataCategory("disease","疾病"));
-        categoryList.add(new DataCategory("body_index","生理指數"));
-        categoryList.add(new DataCategory("hrv","HRV"));
-        categoryList.add(new DataCategory("heartbeat","心率"));
-        categoryList.add(new DataCategory("signal","訊號"));
+        categoryList.add(new DataCategory("ai", "AI"));
+        categoryList.add(new DataCategory("emotional", "情緒"));
+        categoryList.add(new DataCategory("body_ai", "生理AI"));
+        categoryList.add(new DataCategory("rsp", "呼吸"));
+        categoryList.add(new DataCategory("disease", "疾病"));
+        categoryList.add(new DataCategory("body_index", "生理指數"));
+        categoryList.add(new DataCategory("hrv", "HRV"));
+        categoryList.add(new DataCategory("heartbeat", "心率"));
+        categoryList.add(new DataCategory("signal", "訊號"));
 
-        adapter_category = new CategoryAdapter(categoryList,this);
+        adapter_category = new CategoryAdapter(categoryList, this);
         recycler_category.setAdapter(adapter_category);
     }
 
-    private void RecyclerViewDetail(){
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity(),LinearLayoutManager.VERTICAL,false);
+    private void RecyclerViewDetail() {
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
         recycler_detail.setLayoutManager(linearLayoutManager);
 
         ArrayList<DataDetail> dataDetails = DataDetail.getList_AI();
@@ -119,7 +120,7 @@ public class Category extends Fragment implements CategoryAdapter.OnItemListener
 
     @Override
     public void onItemClick(int position) {
-        switch (position){
+        switch (position) {
             case 0:
                 ArrayList<DataDetail> dataDetails_AI = DataDetail.getList_AI();
                 dataDetails_AI.add(new DataDetail("心臟年紀 Heart Age", "35"));
