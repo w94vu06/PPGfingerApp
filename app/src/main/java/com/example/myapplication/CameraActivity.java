@@ -475,7 +475,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         try {
             calBPM(outlierRRI);
             txt_phoneMarquee.setText("手機端：RMSSD：" + phoneRMSSD + "\nSDNN：" + phoneSDNN + "\nBPM：" + heart_rate_bpm);
-
+            Log.d("rrrr", "RMSSD："+phoneRMSSD + "\nSDNN：" + phoneSDNN + "\necg_hr_mean：" + heart_rate_bpm+ "\nMedianNN：" + phoneMedianNN+ "\npNN50：" + phonePNN50+ "\nminNN：" + phoneMinNN+ "\nmaxNN：" + phoneMaxNN);
             onPause();
         } catch (Exception e) {
             System.out.println(e);
@@ -686,6 +686,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
 
     @Override
     protected void onPause() {
+        finish();
         closeCamera();
         setScreenOff();
         stopBackgroundThread();

@@ -97,7 +97,7 @@
             android:fontFamily="@font/jf_openhuninn"
             android:textSize="@dimen/dp_20"
             android:textAlignment="center"
-            android:padding="@dimen/dp_5"/>
+            />
         <TextView
             android:id="@+id/txt_serverMarquee"
             android:layout_width="match_parent"
@@ -106,9 +106,7 @@
             android:text=""
             android:fontFamily="@font/jf_openhuninn"
             android:textSize="@dimen/dp_20"
-            android:textAlignment="center"
-            android:padding="@dimen/dp_5"/>
-
+            android:textAlignment="center"/>
 
         <LinearLayout
             android:layout_width="match_parent"

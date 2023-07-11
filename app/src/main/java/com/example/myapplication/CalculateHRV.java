@@ -80,8 +80,6 @@ public class CalculateHRV {
         double sumOfDifferencesSquared = 0.0;
         for (int i = 0; i < rrIntervals.length - 1; i++) {
             double difference = rrIntervals[i + 1] - rrIntervals[i];
-            Log.d("yyyy", "rrIntervals[i]: "+rrIntervals[i]);
-            Log.d("nnnn", "difference: "+difference);
             sumOfDifferencesSquared += difference * difference;
         }
         double rmssd = sumOfDifferencesSquared / (rrIntervals.length - 1);

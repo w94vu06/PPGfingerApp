@@ -50,7 +50,7 @@ public class ChartUtil {
         y.setAxisMinimum(20);//最低0
 
         chart.getAxisRight().setEnabled(false);//右邊Y軸不可視
-//        chart.setVisibleXRange(0,60);//設置顯示範圍
+        chart.setVisibleXRange(0,60);//設置顯示範圍
 
         float scaleX = chart.getScaleX();
         if (scaleX == 1)
