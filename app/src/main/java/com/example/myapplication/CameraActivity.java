@@ -1,16 +1,17 @@
 package com.example.myapplication;
 
-import static com.example.myapplication.FilterAndIQR.findMedian;
+import static com.example.myapplication.CalculateHRV.findMedian;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Outline;
 import android.graphics.SurfaceTexture;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
@@ -30,6 +31,7 @@ import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewOutlineProvider;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ProgressBar;
@@ -40,13 +42,13 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.example.myapplication.Util.ChartUtil;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
-import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -94,7 +96,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
     private int numCaptures = 0;
     private int mNumBeats = 0;
     private int prevNumBeats = 0;
-    private TextView txt_phoneMarquee, txt_serverMarquee,txt_serverInfo;
+    private TextView txt_phoneMarquee, txt_serverMarquee, txt_serverInfo;
     private Button btn_restart, btn_detailed;
     //chart
     private boolean chartIsRunning = false;
@@ -102,7 +104,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
     private LineChart chart;
     private Thread chartThread;
     //IQR
-    private FilterAndIQR filterAndIQR;
+    private CalculateHRV calculateHRV;
     long[] nonZeroValuesAPI23;
     long[] outlierRRI;
     int fullAvgRed, fullAvgGreen, fullAvgBlue;
@@ -110,10 +112,13 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
     int fixAvgRedThreshold;
     ProgressBar progressBar;
     TextView progressBar_text;
-    String phoneRMSSD;
-    String phoneSDNN;
+    String phoneRMSSD,phoneSDNN,phoneMedianNN,phonePNN50,phoneMinNN,phoneMaxNN;
     String time = new SimpleDateFormat("yyyyMMddHHmmss",
             Locale.getDefault()).format(System.currentTimeMillis());
+    Dialog dialog;
+    TextView txt_phoneCal;
+    TextView txt_aiCal;
+
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -132,10 +137,10 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         btn_restart = findViewById(R.id.btn_restart);
         btn_detailed = findViewById(R.id.btn_detailed);
         txt_phoneMarquee = findViewById(R.id.txt_phoneMarquee);
-        txt_serverMarquee= findViewById(R.id.txt_serverMarquee);
-        txt_serverInfo= findViewById(R.id.txt_serverInfo);
+        txt_serverMarquee = findViewById(R.id.txt_serverMarquee);
+        txt_serverInfo = findViewById(R.id.txt_serverInfo);
 
-        filterAndIQR = new FilterAndIQR();
+        calculateHRV = new CalculateHRV();
 
         progressBar = findViewById(R.id.progressBar_Circle);
         progressBar_text = findViewById(R.id.progress_text);
@@ -146,8 +151,11 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         closeTopBar();
         restartBtn();
         setCameraShape();
-
         controlMariaDB.testServer("test");
+        dialog = new Dialog(CameraActivity.this);
+        dialog.setContentView(R.layout.detail_sheet);
+        txt_phoneCal = dialog.findViewById(R.id.txt_phoneCal);
+        txt_aiCal = dialog.findViewById(R.id.txt_aiCal);
     }
 
     /**
@@ -174,8 +182,11 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
      */
     public void setCameraShape() {
         View overlay = findViewById(R.id.overlay);
-        GradientDrawable circleDrawable = (GradientDrawable) getResources().getDrawable(R.drawable.shape_oval);
-        overlay.setBackground(circleDrawable);
+        Drawable circleDrawable = ContextCompat.getDrawable(this, R.drawable.shape_oval);
+        if (circleDrawable instanceof GradientDrawable) {
+            GradientDrawable gradientDrawable = (GradientDrawable) circleDrawable;
+            overlay.setBackground(gradientDrawable);
+        }
         CameraView.setOutlineProvider(new ViewOutlineProvider() {
             @Override
             public void getOutline(View view, Outline outline) {
@@ -190,6 +201,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         CameraView.setClipToOutline(true);
     }
 
+
     /**
      * 重新量測-按鈕
      */
@@ -197,9 +209,36 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         btn_restart.setOnClickListener(v -> {
             initProgressBar();
             shoutDownDetect();
-            txt_serverMarquee.setText("");
+            txt_phoneMarquee.setText("把手指靠近相機鏡頭，調整直到畫面\n充滿紅色，然後保持靜止。");
             onResume();
         });
+        btn_detailed.setOnClickListener(v -> {
+            detailDialog();
+        });
+    }
+
+    public void detailDialog() {
+//        dialog.setCancelable(true);
+        Window window = dialog.getWindow();
+
+        if (window != null) {
+            WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
+            layoutParams.copyFrom(window.getAttributes());
+
+            // 設置對話框的寬度和高度
+            layoutParams.width = WindowManager.LayoutParams.MATCH_PARENT;
+            layoutParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
+
+            window.setAttributes(layoutParams);
+        }
+        Button btn_closeDialog = dialog.findViewById(R.id.btn_closeDialog);
+        btn_closeDialog.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
     }
 
     public void shoutDownDetect() {
@@ -314,7 +353,6 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
                             closeCamera();
                             setScreenOff();
                             calcBPM_RMMSD_SDNN();
-                            showInfoOnScrollView();
                         }
                     }
                 }
@@ -324,7 +362,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
                 mLastLastRollingAverage = mLastRollingAverage;
                 mLastRollingAverage = mCurrentRollingAverage;
             } else {
-                qualityHandler.postDelayed(qualityRunnable, 3000);
+                qualityHandler.postDelayed(qualityRunnable, 5000);
                 idleHandler.postDelayed(idleRunnable, 15000);
             }
         }
@@ -360,8 +398,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
     private Runnable qualityRunnable = new Runnable() {
         @Override
         public void run() {
-            txt_phoneMarquee.setText("把手指靠近相機鏡頭，調整直到畫面充滿紅色，然後保持靜止。");
-
+            txt_phoneMarquee.setText("把手指靠近相機鏡頭，調整直到畫面\n充滿紅色，然後保持靜止。");
         }
     };
 
@@ -415,24 +452,30 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         for (int i = 0; i < time_dist.length - 1; i++) {
             time_dist[i] = mTimeArray[i + 1] - mTimeArray[i];
 
-            Log.d("rrrr", "RRi: " + time_dist[i]);
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            outlierRRI = filterAndIQR.IQR(time_dist);//去掉離群值
+            outlierRRI = calculateHRV.IQR(time_dist);//去掉離群值
         } else {
             outlierRRI = IQRForAPI23(time_dist);//去掉離群值
         }
         //calcBPM
         long[] getBPMOutlier = outlierRRI;
         //calcRMSSD_SDNN
-        DecimalFormat df = new DecimalFormat("#.##");//設定輸出格式
-        phoneRMSSD = df.format(filterAndIQR.calculateRMSSD(getBPMOutlier));
-        phoneSDNN = df.format(filterAndIQR.calculateSDNN(getBPMOutlier));
         uploadResult(getBPMOutlier);
+
+        DecimalFormat df = new DecimalFormat("#.##");//設定輸出格式
+        phoneRMSSD = df.format(calculateHRV.calculateRMSSD(getBPMOutlier));
+        phoneSDNN = df.format(calculateHRV.calculateSDNN(getBPMOutlier));
+        phoneMedianNN = df.format(calculateHRV.calculateMedianNN(getBPMOutlier));
+        phonePNN50 = df.format(calculateHRV.calculatePNN50(getBPMOutlier));
+        phoneMaxNN = df.format(calculateHRV.calculateMaxNN(getBPMOutlier));
+        phoneMinNN = df.format(calculateHRV.calculateMinNN(getBPMOutlier));
+
 
         try {
             calBPM(outlierRRI);
             txt_phoneMarquee.setText("手機端：RMSSD：" + phoneRMSSD + "\nSDNN：" + phoneSDNN + "\nBPM：" + heart_rate_bpm);
+
             onPause();
         } catch (Exception e) {
             System.out.println(e);
@@ -444,15 +487,6 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         Arrays.sort(rri);
         med = (int) rri[rri.length / 2];
         heart_rate_bpm = 60000 / med;
-    }
-
-    /**
-     * 顯示結果在ScrollView
-     */
-    private void showInfoOnScrollView() {
-        for (int i = 0; i < outlierRRI.length; i++) {
-//            scv_text.append("RRi：" + outlierRRI[i] + " / " + "紅色色素：" + fullAvgRed + "\n");
-        }
     }
 
     /**
@@ -526,25 +560,35 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
      */
     @Override
     public void onResult(String result) {
-        Log.d("eeee", "onResult: "+result);
-        if (Objects.equals(result, "open")) {
-            txt_serverInfo.setText("ai伺服器已開啟");
-        }
-        if (Objects.equals(result, "fail")) {
-            txt_serverInfo.setText("伺服器未開啟或發生錯誤");
-        } else {
-            unpackJsonAndSave(result);
-        }
+        Log.d("eeee", "onResult: " + result);
+        unpackJsonAndSave(result);
 
     }
 
+    /**
+     * 儲存量測資料到資料庫
+     */
     @Override
     public void onSave(String result) {
         int errorCode = Integer.parseInt(result);
+        //如果儲存失敗會顯示伺服器發生錯誤
         if (errorCode == 0) {
-           txt_serverMarquee.setText("伺服器發生錯誤");
+            txt_serverMarquee.setText("伺服器發生錯誤");
         }
     }
+
+    /**
+     * 判斷AI伺服器狀態
+     */
+    @Override
+    public void onTest(String result) {
+        if (Objects.equals(result, "open")) {
+            txt_serverInfo.setText("ai伺服器已開啟");
+        } else if (Objects.equals(result, "fail")) {
+            txt_serverInfo.setText("伺服器未開啟或發生錯誤");
+        }
+    }
+
     protected void createCameraPreview() {
         try {
             SurfaceTexture texture = CameraView.getSurfaceTexture();
@@ -702,7 +746,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         data.notifyDataChanged();
         data.setDrawValues(false);//是否繪製線條上的文字
         chart.notifyDataSetChanged();
-        chart.setVisibleXRange(0,100);//設置可見範圍 預設0-60
+        chart.setVisibleXRange(0, 100);//設置可見範圍 預設0-60
         chart.moveViewToX(data.getEntryCount());//將可視焦點放在最新一個數據，使圖表可移動
     }
 
@@ -845,6 +889,11 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
                     public void run() {
                         DecimalFormat df = new DecimalFormat("#.##");//設定輸出格式
                         txt_serverMarquee.setText("\n伺服端-RMSSD：" + df.format(RMSSD) + "\nSDNN：" + df.format(sdNN) + "\nBPM：" + df.format(ecg_hr_mean));
+                        String trimmedJsonString = jsonString.substring(1, jsonString.length() - 1);
+                        String[] lines = trimmedJsonString.split(",");
+                        for (String line : lines) {
+                            txt_aiCal.append(line + "\n");
+                        }
                     }
                 });
             } catch (JSONException e) {
@@ -852,9 +901,8 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
             }
         }).start();
     }
-    private void showJsonResultDialog() {
 
-    }
+
 }
 
 

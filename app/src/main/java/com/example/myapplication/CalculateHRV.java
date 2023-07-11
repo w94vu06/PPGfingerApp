@@ -6,7 +6,7 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class FilterAndIQR {
+public class CalculateHRV {
     double rmssd;
     double sdnn;
     long[] nonZeroValues;
@@ -47,7 +47,6 @@ public class FilterAndIQR {
             nonZeroValues = new long[clearArrayList.size()];
             for (int i = 0; i < clearArrayList.size(); i++) {
                 nonZeroValues[i] = clearArrayList.get(i);
-                Log.d("tttt", "IQR: " + nonZeroValues[i]);
             }
         }
 
@@ -78,9 +77,6 @@ public class FilterAndIQR {
 
     // 計算RMSSD
     public double calculateRMSSD(long[] rrIntervals) {
-        int n = rrIntervals.length;
-        Log.d("nnnn", "RRI: "+n);
-
         double sumOfDifferencesSquared = 0.0;
         for (int i = 0; i < rrIntervals.length - 1; i++) {
             double difference = rrIntervals[i + 1] - rrIntervals[i];
@@ -91,6 +87,57 @@ public class FilterAndIQR {
         double rmssd = sumOfDifferencesSquared / (rrIntervals.length - 1);
 
         return Math.sqrt(rmssd);
+    }
+
+    // 計算MedianNN
+    public double calculateMedianNN(long[] rrIntervals) {
+        Arrays.sort(rrIntervals);
+        int length = rrIntervals.length;
+        if (length % 2 == 0) {
+            return (rrIntervals[length / 2 - 1] + rrIntervals[length / 2]) / 2.0;
+        } else {
+            return rrIntervals[length / 2];
+        }
+    }
+
+    // 計算pNN50
+    public double calculatePNN50(long[] rrIntervals) {
+        int nn50 = 0;
+        long[] diff_rri = new long[rrIntervals.length - 1];
+
+        for (int i = 0; i < rrIntervals.length - 1; i++) {
+            diff_rri[i] = rrIntervals[i + 1] - rrIntervals[i];
+        }
+        for (long diff : diff_rri) {
+            if (Math.abs(diff) > 50) {
+                nn50++;
+            }
+        }
+        int totalIntervals = diff_rri.length + 1;
+        return nn50 / (double) totalIntervals * 100.0;
+    }
+
+
+    // 計算MinNN
+    public double calculateMinNN(long[] rrIntervals) {
+        double minNN = Double.POSITIVE_INFINITY;
+        for (double value : rrIntervals) {
+            if (!Double.isNaN(value) && value < minNN) {
+                minNN = value;
+            }
+        }
+        return minNN;
+    }
+
+    // 計算MaxNN
+    public double calculateMaxNN(long[] rrIntervals) {
+        double maxNN = Double.NEGATIVE_INFINITY;
+        for (double value : rrIntervals) {
+            if (!Double.isNaN(value) && value > maxNN) {
+                maxNN = value;
+            }
+        }
+        return maxNN;
     }
 
     // 計算平均值

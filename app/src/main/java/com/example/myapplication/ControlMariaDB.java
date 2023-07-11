@@ -38,6 +38,8 @@ public class ControlMariaDB {
     private static final int MSG_DELETE = 4;
     private static final int MSG_ID_SAVE = 5;
     private static final int MSG_ID_READ = 6;
+    private static final int MSG_AI_CAL = 7;
+    private static final int MSG_TEST = 8;
     public ControlMariaDB(MariaDBCallback mCallback) {
         this.mCallback = mCallback;
     }
@@ -237,53 +239,46 @@ public class ControlMariaDB {
                 case MSG_REGISTER:
                 case MSG_READ:
                 case MSG_DELETE:
-                case MSG_ID_READ:
+                case MSG_ID_READ: //讀取資料庫裡符合ID的資料
                     mCallback.onResult(resMsg.obj.toString());
                     break;
-                case MSG_ID_SAVE:
+                case MSG_ID_SAVE: //儲存量測資料到資料庫
                     mCallback.onSave(resMsg.obj.toString());
                     break;
             }
         }
     }
 
+    /**
+     * AI伺服器
+     */
     public void jsonUploadToServer(String jsonString) {
-        /**
-         * 連接伺服器運算
-         **/
-        new Thread() {
-            @Override
-            public void run() {
+        new Thread(() -> {
+            try {
                 MediaType mediaType = MediaType.parse("application/json; charset=utf-8");
                 RequestBody requestBody = RequestBody.create(mediaType, jsonString);
                 Request request = new Request.Builder()
-                        .url(calServerUrl)//伺服器
-//                        .url("http://192.168.2.110:5000")//測試服
+                        .url(calServerUrl)
                         .post(requestBody)
                         .build();
 
                 try (Response response = client.newCall(request).execute()) {
+                    String res = response.isSuccessful() ? Objects.requireNonNull(response.body()).string(): "fail";
                     Message msg = Message.obtain();
-                    String res;
-                    if (!response.isSuccessful()) {
-                        res = "fail";
-                    } else {
-                        res = Objects.requireNonNull(response.body()).string();
-                    }
-                    msg.obj = res;
-                    Log.d("serverRes", "getServerRes: " + res);
-                    mHandler.sendMessage(msg);
-                } catch (IOException e) {
-                    String res = "fail";
-                    Message msg = Message.obtain();
+                    msg.what = MSG_AI_CAL;
                     msg.obj = res;
                     Log.d("serverRes", "getServerRes: " + res);
                     mHandler.sendMessage(msg);
                 }
+            } catch (IOException e) {
+                String res = "fail";
+                Message msg = Message.obtain();
+                msg.what = MSG_AI_CAL;
+                msg.obj = res;
+                mHandler.sendMessage(msg);
             }
-        }.start();
+        }).start();
     }
-
     public void testServer(String jsonString) {
         /**
          * 連接伺服器運算
@@ -302,15 +297,14 @@ public class ControlMariaDB {
                 try (Response response = client.newCall(request).execute()) {
                     Message msg = Message.obtain();
                     if (!response.isSuccessful()) {
-                        String res;
-                        res = "open";
-                        msg.obj = res;
+                        msg.what = MSG_TEST;
+                        msg.obj = "open";
                         mHandler.sendMessage(msg);
                     }
                 } catch (IOException e) {
-                    String res = "fail";
                     Message msg = Message.obtain();
-                    msg.obj = res;
+                    msg.what = MSG_TEST;
+                    msg.obj = "fail";
                     mHandler.sendMessage(msg);
                 }
             }
@@ -324,7 +318,14 @@ public class ControlMariaDB {
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
-            mCallback.onResult(msg.obj.toString());
+            switch (msg.what) {
+                case MSG_AI_CAL:
+                    mCallback.onResult(msg.obj.toString());
+                    break;
+                case MSG_TEST:
+                    mCallback.onTest(msg.obj.toString());
+                    break;
+            }
         }
     }
 }

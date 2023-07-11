@@ -18,8 +18,8 @@ public class ChartUtil {
     public void initChart(LineChart chart) {
         chart.getDescription().setEnabled(false);//設置不要圖表標籤
         chart.setBackgroundColor(Color.parseColor("#FFFFFFFF"));//畫布顏色
-        chart.setTouchEnabled(false);//設置不可觸碰
-        chart.setDragEnabled(false);//設置不可互動
+//        chart.setTouchEnabled(false);//設置不可觸碰
+//        chart.setDragEnabled(false);//設置不可互動
         chart.setDrawBorders(true);  // 啟用畫布的外框線
         chart.setBorderWidth(1.5f);   // 設置外框線的寬度
         chart.setBorderColor(Color.BLACK);  // 設置外框線的顏色

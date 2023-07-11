@@ -77,13 +77,17 @@ public class Category extends Fragment implements CategoryAdapter.OnItemListener
 
     @Override
     public void onResult(String result) {
-        Log.d("rrrr", "IdDataBack: " + result);
         RecyclerViewCategory();
         RecyclerViewDetail();
     }
 
     @Override
     public void onSave(String result) {
+
+    }
+
+    @Override
+    public void onTest(String result) {
 
     }
 

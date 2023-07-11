@@ -4,43 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center_horizontal"
-    android:orientation="vertical"
-    android:padding="@dimen/dp_16">
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="手機端"
-            android:textSize="@dimen/sp_18"
-            android:textStyle="bold"/>
-
-        <Space
-            android:layout_width="@dimen/dp_170"
-            android:layout_height="match_parent"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Ai端"
-            android:textSize="@dimen/sp_18"
-            android:textStyle="bold" />
-    </LinearLayout>
-
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-
-        android:orientation="horizontal">
-
+        android:orientation="horizontal"
+        android:layout_weight="1">
         <ScrollView
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:fillViewport="true">
@@ -48,17 +20,24 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="手機端"
+                    android:textSize="@dimen/sp_18"
+                    android:textStyle="bold"/>
+
                 <TextView
                     android:id="@+id/txt_phoneCal"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:text="123"
-                    android:textSize="@dimen/dp_20"/>
+                    android:text=""
+                    android:textSize="@dimen/dp_12"/>
             </LinearLayout>
         </ScrollView>
 
         <ScrollView
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:fillViewport="true">
@@ -66,13 +45,35 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="Ai端"
+                    android:textSize="@dimen/sp_18"
+                    android:textStyle="bold" />
+
                 <TextView
                     android:id="@+id/txt_aiCal"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:text="123"
-                    android:textSize="@dimen/dp_20"/>
+                    android:text=""
+                    android:textSize="@dimen/dp_12"/>
             </LinearLayout>
         </ScrollView>
     </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <Button
+            android:id="@+id/btn_closeDialog"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="關閉"
+            android:layout_alignParentBottom="true" />
+
+    </LinearLayout>
+
+
 </LinearLayout>

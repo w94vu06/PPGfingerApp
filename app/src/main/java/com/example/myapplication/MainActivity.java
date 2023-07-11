@@ -157,7 +157,6 @@ public class MainActivity extends AppCompatActivity implements MariaDBCallback {
     public void onMessageEvent(SignUpActivity.MessageEvent event) {
         // 收到MessageEvent時要做的事寫在這裡
         String profileMsg = event.getMessage();
-        Log.d("rrrr", "onProfilePage: " + profileMsg);
 //        unpackJson(profileMsg);
     }
 
@@ -189,6 +188,11 @@ public class MainActivity extends AppCompatActivity implements MariaDBCallback {
 
     @Override
     public void onSave(String result) {
+
+    }
+
+    @Override
+    public void onTest(String result) {
 
     }
 
