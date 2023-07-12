@@ -89,29 +89,34 @@ public class CalculateHRV {
 
     // 計算MedianNN
     public double calculateMedianNN(long[] rrIntervals) {
-        Arrays.sort(rrIntervals);
-        int length = rrIntervals.length;
+        long[] extendRRI = rrIntervals;
+        Arrays.sort(extendRRI);
+        int length = extendRRI.length;
+        double medianNN;
         if (length % 2 == 0) {
-            return (rrIntervals[length / 2 - 1] + rrIntervals[length / 2]) / 2.0;
+            medianNN = (extendRRI[length / 2 - 1] + extendRRI[length / 2]) / 2.0;
         } else {
-            return rrIntervals[length / 2];
+            medianNN = extendRRI[length / 2];
         }
+        return 60000/medianNN;
     }
 
     // 計算pNN50
     public double calculatePNN50(long[] rrIntervals) {
         int nn50 = 0;
         long[] diff_rri = new long[rrIntervals.length - 1];
-
         for (int i = 0; i < rrIntervals.length - 1; i++) {
             diff_rri[i] = rrIntervals[i + 1] - rrIntervals[i];
+            Log.d("dddd", "diff_rri[i]: "+diff_rri[i]);
+            Log.d("xxxx", "rrIntervals[i]: "+rrIntervals[i]);
         }
         for (long diff : diff_rri) {
             if (Math.abs(diff) > 50) {
                 nn50++;
             }
         }
-        int totalIntervals = diff_rri.length + 1;
+        int totalIntervals = diff_rri.length;
+
         return nn50 / (double) totalIntervals * 100.0;
     }
 
@@ -124,7 +129,7 @@ public class CalculateHRV {
                 minNN = value;
             }
         }
-        return minNN;
+        return 60000/minNN;
     }
 
     // 計算MaxNN
@@ -135,7 +140,7 @@ public class CalculateHRV {
                 maxNN = value;
             }
         }
-        return maxNN;
+        return 60000/maxNN;
     }
 
     // 計算平均值
@@ -146,5 +151,12 @@ public class CalculateHRV {
         }
         double mean = sum / values.length;
         return mean;
+    }
+
+    public double calBPM(long[] rri) {
+        int med;
+        Arrays.sort(rri);
+        med = (int) rri[rri.length / 2];
+        return 60000 / med;
     }
 }

@@ -80,13 +80,12 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
     private HandlerThread mBackgroundThread;
 
     //Heart rate detector member variables
-    public static int heart_rate_bpm;
     /**
      * 總共要抓的心跳數
      */
-    private final int captureRate = 35;
+    private final int captureRate = 36;
     // detectTime
-    private final int setHeartDetectTime = 40;
+    private final int setHeartDetectTime = 30;
     private final int rollAvgStandard = setHeartDetectTime + 29;
     private int mCurrentRollingAverage;
     private int mLastRollingAverage;
@@ -105,16 +104,22 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
     private Thread chartThread;
     //IQR
     private CalculateHRV calculateHRV;
+    //API23
     long[] nonZeroValuesAPI23;
     long[] outlierRRI;
+
+    static long[] getBPMOutlier;
+    //抓色素
     int fullAvgRed, fullAvgGreen, fullAvgBlue;
     int fixDarkRed;
     int fixAvgRedThreshold;
+    //進度條
     ProgressBar progressBar;
     TextView progressBar_text;
-    String phoneRMSSD,phoneSDNN,phoneMedianNN,phonePNN50,phoneMinNN,phoneMaxNN;
+    String phoneRMSSD, phoneSDNN, phoneMedianNN, phonePNN50, phoneMinNN, phoneMaxNN,phoneBPM;
     String time = new SimpleDateFormat("yyyyMMddHHmmss",
             Locale.getDefault()).format(System.currentTimeMillis());
+    //dialog
     Dialog dialog;
     TextView txt_phoneCal;
     TextView txt_aiCal;
@@ -151,11 +156,8 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         closeTopBar();
         restartBtn();
         setCameraShape();
+        initDialog();
         controlMariaDB.testServer("test");
-        dialog = new Dialog(CameraActivity.this);
-        dialog.setContentView(R.layout.detail_sheet);
-        txt_phoneCal = dialog.findViewById(R.id.txt_phoneCal);
-        txt_aiCal = dialog.findViewById(R.id.txt_aiCal);
     }
 
     /**
@@ -169,12 +171,22 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
     }
 
     /**
-     * //初始化量測用數值
+     * 初始化量測用數值
      */
     public void initValue() {
         numCaptures = 0;
         prevNumBeats = 0;
         mNumBeats = 0;
+    }
+    /**
+     * 初始化dialog
+     */
+    public void initDialog() {
+        dialog = new Dialog(CameraActivity.this);
+        dialog.setContentView(R.layout.detail_sheet);
+
+        txt_phoneCal = dialog.findViewById(R.id.txt_phoneCal);
+        txt_aiCal = dialog.findViewById(R.id.txt_aiCal);
     }
 
     /**
@@ -401,8 +413,6 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
             txt_phoneMarquee.setText("把手指靠近相機鏡頭，調整直到畫面\n充滿紅色，然後保持靜止。");
         }
     };
-
-
     /**
      * 開啟相機服務
      */
@@ -451,43 +461,37 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         //calcRRI
         for (int i = 0; i < time_dist.length - 1; i++) {
             time_dist[i] = mTimeArray[i + 1] - mTimeArray[i];
-
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             outlierRRI = calculateHRV.IQR(time_dist);//去掉離群值
-        } else {
-            outlierRRI = IQRForAPI23(time_dist);//去掉離群值
         }
+//        else {
+//            outlierRRI = IQRForAPI23(time_dist);//去掉離群值
+//        }
         //calcBPM
-        long[] getBPMOutlier = outlierRRI;
+        getBPMOutlier = outlierRRI;
         //calcRMSSD_SDNN
         uploadResult(getBPMOutlier);
 
         DecimalFormat df = new DecimalFormat("#.##");//設定輸出格式
         phoneRMSSD = df.format(calculateHRV.calculateRMSSD(getBPMOutlier));
         phoneSDNN = df.format(calculateHRV.calculateSDNN(getBPMOutlier));
-        phoneMedianNN = df.format(calculateHRV.calculateMedianNN(getBPMOutlier));
         phonePNN50 = df.format(calculateHRV.calculatePNN50(getBPMOutlier));
         phoneMaxNN = df.format(calculateHRV.calculateMaxNN(getBPMOutlier));
         phoneMinNN = df.format(calculateHRV.calculateMinNN(getBPMOutlier));
-
-
+        //會排序到RRI
+        phoneBPM = df.format(calculateHRV.calBPM(getBPMOutlier));
+        phoneMedianNN = df.format(calculateHRV.calculateMedianNN(getBPMOutlier));
         try {
-            calBPM(outlierRRI);
-            txt_phoneMarquee.setText("手機端：RMSSD：" + phoneRMSSD + "\nSDNN：" + phoneSDNN + "\nBPM：" + heart_rate_bpm);
-            Log.d("rrrr", "RMSSD："+phoneRMSSD + "\nSDNN：" + phoneSDNN + "\necg_hr_mean：" + heart_rate_bpm+ "\nMedianNN：" + phoneMedianNN+ "\npNN50：" + phonePNN50+ "\nminNN：" + phoneMinNN+ "\nmaxNN：" + phoneMaxNN);
+            txt_phoneMarquee.setText("手機端：RMSSD：" + phoneRMSSD + "\nSDNN：" + phoneSDNN + "\nBPM：" + phoneBPM);
+//            Log.d("rrrr", "RMSSD：" + phoneRMSSD + "\nSDNN：" + phoneSDNN + "\necg_hr_mean：" + heart_rate_bpm + "\nMedianNN：" + phoneMedianNN + "\npNN50：" + phonePNN50 + "\nminNN：" + phoneMinNN + "\nmaxNN：" + phoneMaxNN);
             onPause();
         } catch (Exception e) {
             System.out.println(e);
         }
     }
 
-    public void calBPM(long[] rri) {
-        int med;
-        Arrays.sort(rri);
-        med = (int) rri[rri.length / 2];
-        heart_rate_bpm = 60000 / med;
-    }
+
 
     /**
      * 上傳量測結果至伺服器
@@ -508,7 +512,6 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
             String diabetes = String.valueOf(preferences.getInt("ProfileDiabetes", -1));
             String smokes = String.valueOf(preferences.getInt("ProfileSmokes", -1));
             String hbp = String.valueOf(preferences.getInt("ProfileHbp", -1));
-
 //            String sys = String.valueOf(preferences.getInt("ProfileOld", 0));
 //            String morningdiabetes = String.valueOf(preferences.getInt("ProfileOld", 0));
 //            String aftermealdiabetes = String.valueOf(preferences.getInt("ProfileOld", 0));
@@ -518,7 +521,6 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
 //            String hbpSBp = String.valueOf(preferences.getInt("ProfileOld", 0));
 //            String hbpDBp = String.valueOf(preferences.getInt("ProfileOld", 0));
 //            String md_num = String.valueOf(preferences.getInt("ProfileOld", 0));
-
             try {
                 //proFile
                 jsonData.put("filename", time + "_" + userId);
@@ -562,7 +564,6 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
     public void onResult(String result) {
         Log.d("eeee", "onResult: " + result);
         unpackJsonAndSave(result);
-
     }
 
     /**
@@ -587,6 +588,30 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         } else if (Objects.equals(result, "fail")) {
             txt_serverInfo.setText("伺服器未開啟或發生錯誤");
         }
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        startBackgroundThread();
+        setScreenOn();
+        idleHandler.removeCallbacks(idleRunnable);
+        if (CameraView.isAvailable()) {
+            openCamera();
+        } else {
+            CameraView.setSurfaceTextureListener(textureListener);
+        }
+    }
+    @Override
+    protected void onPause() {
+        closeCamera();
+        setScreenOff();
+        stopBackgroundThread();
+        super.onPause();
+    }
+    @Override
+    protected void onStop() {
+        super.onStop();
+        finish();
     }
 
     protected void createCameraPreview() {
@@ -671,27 +696,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         }
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        startBackgroundThread();
-        setScreenOn();
-        idleHandler.removeCallbacks(idleRunnable);
-        if (CameraView.isAvailable()) {
-            openCamera();
-        } else {
-            CameraView.setSurfaceTextureListener(textureListener);
-        }
-    }
 
-    @Override
-    protected void onPause() {
-        finish();
-        closeCamera();
-        setScreenOff();
-        stopBackgroundThread();
-        super.onPause();
-    }
 
     /**
      * keep screen open
@@ -873,6 +878,29 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
                 double waybp1_1_dia = jsonObject.getDouble("waybp1_1_dia");
                 double year10scores = jsonObject.getDouble("year10scores");
 
+                String jsonString = jsonObject.toString();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        DecimalFormat df = new DecimalFormat("#.##");//設定輸出格式
+                        txt_serverMarquee.setText("\n伺服端-RMSSD：" + df.format(RMSSD) + "\nSDNN：" + df.format(sdNN) + "\nBPM：" + df.format(ecg_hr_mean));
+                        txt_aiCal.setText("");
+                        txt_phoneCal.setText("");
+
+                        String trimmedJsonString = jsonString.substring(1, jsonString.length() - 1);
+                        String[] lines = trimmedJsonString.split(",");
+                        for (String line : lines) {
+                            txt_aiCal.append(line + "\n");
+                        }
+
+                        String show = "RMSSD：" + phoneRMSSD + ",SDNN：" + phoneSDNN + ",ecg_hr_mean：" + phoneBPM + ",MedianNN：" + phoneMedianNN + ",pNN50：" + phonePNN50 + ",minNN：" + phoneMinNN + ",maxNN：" + phoneMaxNN;
+                        String[] phone = show.split(",");
+                        for (String s : phone) {
+                            txt_phoneCal.append(s + "\n");
+                        }
+                    }
+                });
+
                 String time = new SimpleDateFormat("yyyyMMddHHmmss",
                         Locale.getDefault()).format(System.currentTimeMillis());
 
@@ -881,22 +909,8 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
 
                 jsonObject.put("time", time);
 
-                String jsonString = jsonObject.toString();
 
                 controlMariaDB.userIdSave(jsonString);
-
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        DecimalFormat df = new DecimalFormat("#.##");//設定輸出格式
-                        txt_serverMarquee.setText("\n伺服端-RMSSD：" + df.format(RMSSD) + "\nSDNN：" + df.format(sdNN) + "\nBPM：" + df.format(ecg_hr_mean));
-                        String trimmedJsonString = jsonString.substring(1, jsonString.length() - 1);
-                        String[] lines = trimmedJsonString.split(",");
-                        for (String line : lines) {
-                            txt_aiCal.append(line + "\n");
-                        }
-                    }
-                });
             } catch (JSONException e) {
                 e.printStackTrace();
             }

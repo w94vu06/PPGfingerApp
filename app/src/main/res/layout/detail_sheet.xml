@@ -8,9 +8,10 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
         android:orientation="horizontal"
         android:layout_weight="1">
+
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -20,19 +21,20 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
+
                 <TextView
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:text="手機端"
                     android:textSize="@dimen/sp_18"
-                    android:textStyle="bold"/>
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/txt_phoneCal"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:text=""
-                    android:textSize="@dimen/dp_12"/>
+                    android:textSize="@dimen/sp_12"/>
             </LinearLayout>
         </ScrollView>
 
@@ -48,7 +50,7 @@
 
                 <TextView
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:text="Ai端"
                     android:textSize="@dimen/sp_18"
                     android:textStyle="bold" />
@@ -58,7 +60,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:text=""
-                    android:textSize="@dimen/dp_12"/>
+                    android:textSize="@dimen/sp_12"/>
             </LinearLayout>
         </ScrollView>
     </LinearLayout>
