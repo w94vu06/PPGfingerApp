@@ -140,7 +140,10 @@ public class MainActivity extends AppCompatActivity implements MariaDBCallback {
     @Override
     public void onStart() {
         super.onStart();
-        readProfile();
+        String name = preferences.getString("userName", null);
+        if (name == null) {
+            readProfile();
+        }
         EventBus.getDefault().register(this);
     }
 
@@ -175,9 +178,7 @@ public class MainActivity extends AppCompatActivity implements MariaDBCallback {
             throw new RuntimeException(e);
         }
         String jsonString = jsonData.toString();
-        if (userId == null) {
-            controlMariaDB.userRead(jsonString);
-        }
+        controlMariaDB.userRead(jsonString);
     }
 
     @Override

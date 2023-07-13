@@ -72,10 +72,7 @@
             android:id="@+id/btn_closeDialog"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="關閉"
-            android:layout_alignParentBottom="true" />
+            android:text="關閉"/>
 
     </LinearLayout>
-
-
 </LinearLayout>

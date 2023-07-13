@@ -28,7 +28,7 @@ public class ControlMariaDB {
     private static final OkHttpClient client = new OkHttpClient();
     Handler mHandler = new MHandler();
     Handler resHandler = new ResHandler();
-    String serverUrl = "http://192.168.2.104:5000/"; //公司
+    String serverUrl = "http://192.168.2.12:5000/"; //公司
 //    String serverUrl = "http://192.168.0.102:5000/"; //家裡
     String calServerUrl = "http://192.168.2.97:8090";//計算用server
     private MariaDBCallback mCallback;

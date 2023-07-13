@@ -11,4 +11,10 @@
     <string name="good_heart_rate">良好</string>
     <string name="warning_light_red">警告</string>
     <string name="danger">危險</string>
+
+    <string-array name="beats_array">
+        <item>35</item>
+        <item>45</item>
+        <item>55</item>
+    </string-array>
 </resources>

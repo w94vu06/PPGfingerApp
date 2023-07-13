@@ -78,6 +78,7 @@ public class CalculateHRV {
     // 計算RMSSD
     public double calculateRMSSD(long[] rrIntervals) {
         double sumOfDifferencesSquared = 0.0;
+
         for (int i = 0; i < rrIntervals.length - 1; i++) {
             double difference = rrIntervals[i + 1] - rrIntervals[i];
             sumOfDifferencesSquared += difference * difference;
@@ -89,7 +90,10 @@ public class CalculateHRV {
 
     // 計算MedianNN
     public double calculateMedianNN(long[] rrIntervals) {
-        long[] extendRRI = rrIntervals;
+        long[] extendRRI = new long[rrIntervals.length];
+        for (int i = 0; i < rrIntervals.length; i++) {
+            extendRRI[i] = rrIntervals[i];
+        }
         Arrays.sort(extendRRI);
         int length = extendRRI.length;
         double medianNN;
@@ -107,8 +111,6 @@ public class CalculateHRV {
         long[] diff_rri = new long[rrIntervals.length - 1];
         for (int i = 0; i < rrIntervals.length - 1; i++) {
             diff_rri[i] = rrIntervals[i + 1] - rrIntervals[i];
-            Log.d("dddd", "diff_rri[i]: "+diff_rri[i]);
-            Log.d("xxxx", "rrIntervals[i]: "+rrIntervals[i]);
         }
         for (long diff : diff_rri) {
             if (Math.abs(diff) > 50) {
@@ -121,8 +123,8 @@ public class CalculateHRV {
     }
 
 
-    // 計算MinNN
-    public double calculateMinNN(long[] rrIntervals) {
+    // 計算MaxNN
+    public double calMaxNN(long[] rrIntervals) {
         double minNN = Double.POSITIVE_INFINITY;
         for (double value : rrIntervals) {
             if (!Double.isNaN(value) && value < minNN) {
@@ -132,8 +134,8 @@ public class CalculateHRV {
         return 60000/minNN;
     }
 
-    // 計算MaxNN
-    public double calculateMaxNN(long[] rrIntervals) {
+    // 計算MinNN
+    public double calMinNN(long[] rrIntervals) {
         double maxNN = Double.NEGATIVE_INFINITY;
         for (double value : rrIntervals) {
             if (!Double.isNaN(value) && value > maxNN) {
