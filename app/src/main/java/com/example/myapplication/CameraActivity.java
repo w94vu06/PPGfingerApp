@@ -125,7 +125,6 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
     Dialog dialog;
     TextView txt_phoneCal;
     TextView txt_aiCal;
-
     Spinner spinner_beats;
 
     @SuppressLint("MissingInflatedId")
@@ -570,7 +569,6 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
             String diabetes = String.valueOf(preferences.getInt("ProfileDiabetes", -1));
             String smokes = String.valueOf(preferences.getInt("ProfileSmokes", -1));
             String hbp = String.valueOf(preferences.getInt("ProfileHbp", -1));
-//            String sys = String.valueOf(preferences.getInt("ProfileOld", 0));
 //            String morningdiabetes = String.valueOf(preferences.getInt("ProfileOld", 0));
 //            String aftermealdiabetes = String.valueOf(preferences.getInt("ProfileOld", 0));
 //            String userstatus = String.valueOf(preferences.getInt("ProfileOld", 0));
@@ -596,7 +594,6 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
                 jsonData.put("hbp", hbp);
 
                 //not yet
-                jsonData.put("sys", "-1");
                 jsonData.put("morningdiabetes", "-1");
                 jsonData.put("aftermealdiabetes", "-1");
                 jsonData.put("userstatus", "-1");
@@ -835,11 +832,9 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
             public void run() {
                 if (mNumBeats <= captureRate) {
                     int progress = (int) (mNumBeats / (float)captureRate * 100);
-                    Log.d("ssss", "run: "+progress);
                     progressBar_text.setText(progress + "%");
                     progressBar.setProgress(progress);
                 }
-                Log.d("ssss", "run: "+mNumBeats+"///"+captureRate+"///");
             }
         }, 200);
     }
@@ -933,7 +928,6 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-
                         DecimalFormat df = new DecimalFormat("#.##");//設定輸出格式
                         txt_phoneMarquee.append("\n伺服端：RMSSD：" + df.format(RMSSD) + "\nSDNN：" + df.format(sdNN) + "\nBPM：" + df.format(ecg_hr_mean));
                         txt_aiCal.setText("");
@@ -950,10 +944,12 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
 
                 //做成JSON送去儲存(包含ID與時間)
                 jsonObject.put("userId", userId);
-
                 jsonObject.put("time", time);
 
-                controlMariaDB.userIdSave(jsonString);
+                String jsonString2 = jsonObject.toString();
+
+                controlMariaDB.userIdSave(jsonString2);
+
             } catch (JSONException e) {
                 e.printStackTrace();
             }

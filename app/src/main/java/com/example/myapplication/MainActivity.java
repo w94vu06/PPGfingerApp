@@ -66,8 +66,6 @@ public class MainActivity extends AppCompatActivity implements MariaDBCallback {
 
     private SharedPreferences.Editor editor;
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

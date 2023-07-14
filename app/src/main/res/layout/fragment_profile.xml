@@ -4,13 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Fragment.Profile"
     android:background="@color/shironeri"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:context=".Fragment.Profile">
 
     <Space
         android:layout_width="match_parent"
-        android:layout_height="@dimen/dp_80"/>
+        android:layout_height="@dimen/dp_80" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -20,9 +20,9 @@
         <ImageView
             android:layout_width="0dp"
             android:layout_height="@dimen/dp_150"
-            android:layout_weight="1"
             android:layout_marginStart="@dimen/dp_5"
-            android:src="@drawable/lucci"/>
+            android:layout_weight="1"
+            android:src="@drawable/lucci" />
 
         <RelativeLayout
             android:layout_width="0dp"
@@ -34,34 +34,34 @@
                 android:id="@+id/txt_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="羅布·路基"
-                android:textSize="@dimen/sp_25"
-                android:textColor="@color/black"
-                android:fontFamily="@font/shipporimincho_bold"
                 android:layout_centerHorizontal="true"
-                android:layout_marginTop="@dimen/dp_40" />
+                android:layout_marginTop="@dimen/dp_40"
+                android:fontFamily="@font/shipporimincho_bold"
+                android:text="羅布·路基"
+                android:textColor="@color/black"
+                android:textSize="@dimen/sp_25" />
 
             <TextView
                 android:id="@+id/txt_amount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="15"
-                android:textSize="@dimen/sp_25"
-                android:textColor="@color/green"
-                android:fontFamily="@font/corporate_logo_rounded"
+                android:layout_above="@+id/txt_amountText"
                 android:layout_centerHorizontal="true"
-                android:layout_above="@+id/txt_amountText"/>
+                android:fontFamily="@font/corporate_logo_rounded"
+                android:text="15"
+                android:textColor="@color/green"
+                android:textSize="@dimen/sp_25" />
 
             <TextView
                 android:id="@+id/txt_amountText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="測量筆數"
-                android:textColor="@color/black"
-                android:fontFamily="@font/shipporimincho_bold"
-                android:layout_marginBottom="@dimen/dp_5"
+                android:layout_alignParentBottom="true"
                 android:layout_centerHorizontal="true"
-                android:layout_alignParentBottom="true"/>
+                android:layout_marginBottom="@dimen/dp_5"
+                android:fontFamily="@font/shipporimincho_bold"
+                android:text="測量筆數"
+                android:textColor="@color/black" />
 
         </RelativeLayout>
 
@@ -69,13 +69,36 @@
 
     <Space
         android:layout_width="match_parent"
-        android:layout_height="@dimen/dp_80"/>
+        android:layout_height="@dimen/dp_80" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_profile"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/dp_15"
-        android:layout_marginEnd="@dimen/dp_15"/>
+        android:layout_marginEnd="@dimen/dp_15" />
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="right"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="@dimen/dp_20"
+            android:layout_marginRight="@dimen/dp_20">
+
+            <Button
+                android:id="@+id/btn_signOut"
+                android:layout_width="@dimen/dp_120"
+                android:layout_height="wrap_content"
+                android:background="@drawable/background_button"
+                android:fontFamily="@font/rajdhani_bold"
+                android:text="SIGN OUT"
+                android:textColor="@color/red"
+                android:textSize="@dimen/dp_20" />
+        </LinearLayout>
+    </RelativeLayout>
 </LinearLayout>

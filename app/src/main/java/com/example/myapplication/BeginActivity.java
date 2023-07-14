@@ -23,8 +23,6 @@ public class BeginActivity extends AppCompatActivity {
 
     Button btn_signin,btn_signup;
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -101,15 +99,19 @@ public class BeginActivity extends AppCompatActivity {
                     Intent intent_IN = new Intent();
                     intent_IN.setClass(BeginActivity.this, SignInActivity.class);
                     startActivity(intent_IN);
-                    finish();
                     break;
                 case R.id.btn_signup:
                     Intent intent_UP = new Intent();
                     intent_UP.setClass(BeginActivity.this, SignUpActivity.class);
                     startActivity(intent_UP);
-                    finish();
                     break;
             }
         }
     };
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        finish();
+    }
 }

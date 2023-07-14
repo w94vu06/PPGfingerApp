@@ -6,7 +6,6 @@ import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -53,13 +52,12 @@ public class SignUpActivity extends AppCompatActivity implements MariaDBCallback
 
     String userName, email, phone, birth, old, height, weight,
             checkedSex, checkedSmoke, checkedDia, checkedHbp = "";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
         initWidget();
-        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN); //禁止自動彈出虛擬鍵盤
+//        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN); //禁止自動彈出虛擬鍵盤
         ButterKnife.bind(SignUpActivity.this);
     }
 
@@ -71,10 +69,8 @@ public class SignUpActivity extends AppCompatActivity implements MariaDBCallback
         edit_height = findViewById(R.id.edit_height);
         edit_weight = findViewById(R.id.edit_weight);
         img_signup = findViewById(R.id.img_signup);
-        img_signUpback = findViewById(R.id.img_signUpBack);
         imgbtn_signUp = findViewById(R.id.imgbtn_signUp);
         img_signup.setImageResource(R.drawable.sign_up2);
-        img_signUpback.setImageResource(R.drawable.sign_background2);
         imgbtn_signUp.setImageResource(R.drawable.btn_signup);
         imgbtn_signUp.setOnClickListener(lis);
         showDateOnClick(edit_birth);
@@ -149,11 +145,14 @@ public class SignUpActivity extends AppCompatActivity implements MariaDBCallback
         DatePickerDialog datePickerDialog = new DatePickerDialog(SignUpActivity.this, new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int month, int day) {
+
                 month += 1;
                 edt.setText(year + "-" + month + "-" + day);
             }
         }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
+        datePickerDialog.getDatePicker().setSpinnersShown(true);
         datePickerDialog.show();
+
     }
 
     /**
@@ -243,7 +242,6 @@ public class SignUpActivity extends AppCompatActivity implements MariaDBCallback
     public void onTest(String result) {
 
     }
-
     /**
      * 判斷事件代碼
      */
