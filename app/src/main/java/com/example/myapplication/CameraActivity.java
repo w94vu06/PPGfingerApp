@@ -64,6 +64,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 
 public class CameraActivity extends AppCompatActivity implements MariaDBCallback {
@@ -85,9 +86,9 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
     /**
      * 總共要抓的心跳數
      */
-    private int captureRate = 35;
+    private int captureRate;
     // detectTime
-    private final int setHeartDetectTime = 30;
+    private final int setHeartDetectTime = 40;
     private final int rollAvgStandard = setHeartDetectTime + 29;
     private int mCurrentRollingAverage;
     private int mLastRollingAverage;
@@ -262,11 +263,13 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
                     openCamera();
                 }
             }
+
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {
             }
         });
     }
+
     public void restartAll() {
         initProgressBar();
         chart.clear();//畫布清除
@@ -274,6 +277,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         chartUtil.initChart(chart);//確保畫布初始化
         txt_phoneMarquee.setText("把手指靠近相機鏡頭，調整直到畫面\n充滿紅色，然後保持靜止。");
     }
+
     /**
      * dialog
      */
@@ -300,6 +304,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         });
         dialog.show();
     }
+
     /**
      * 停止量測
      */
@@ -403,7 +408,6 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
                         mTimeArray[mNumBeats] = System.currentTimeMillis();
                         initProgressBar();
                         mNumBeats++;
-                        Log.d("tttt", "mNumBeats: "+mNumBeats);
                         if (mNumBeats > prevNumBeats) {
                             triggerHandler();
                         }
@@ -450,7 +454,10 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
      */
     private void disableSomeFunction() {
         // 關閉功能，停止影像
-        shoutDownDetect();
+        closeCamera();
+        chart.clear();//畫布清除
+        initValue();//初始化量測用數值
+        chartUtil.initChart(chart);//確保畫布初始化
     }
 
     /**
@@ -515,8 +522,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             outlierRRI = calculateHRV.IQR(time_dist);//去掉離群值
-        }
-        else {
+        } else {
             outlierRRI = IQRForAPI23(time_dist);//去掉離群值
         }
         //calcBPM
@@ -535,10 +541,10 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         phoneMedianNN = df.format(calculateHRV.calculateMedianNN(getBPMOutlier));
 
         try {
+            txt_phoneMarquee.setText("");
             txt_phoneMarquee.setText("手機端：RMSSD：" + phoneRMSSD + "\nSDNN：" + phoneSDNN + "\nBPM：" + phoneBPM);
             String showHRV = "RMSSD：" + phoneRMSSD + ",SDNN：" + phoneSDNN + ",ecg_hr_mean：" + phoneBPM +
                     ",MedianNN：" + phoneMedianNN + ",pNN50：" + phonePNN50 + ",minNN：" + phoneMinNN + ",maxNN：" + phoneMaxNN;
-            Log.d("rrrr", "calcBPM_RMMSD_SDNN: "+showHRV);
             String[] showHRVOnPhone = showHRV.split(",");
             for (String s : showHRVOnPhone) {
                 txt_phoneCal.append(s + "\n");
@@ -618,7 +624,11 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
     @Override
     public void onResult(String result) {
         Log.d("eeee", "onResult: " + result);
-        unpackJsonAndSave(result);
+        if (result.equals("fail")) {
+            txt_phoneMarquee.append("\n伺服器發生錯誤");
+        } else {
+            unpackJsonAndSave(result);
+        }
     }
 
     /**
@@ -629,7 +639,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         int errorCode = Integer.parseInt(result);
         //如果儲存失敗會顯示伺服器發生錯誤
         if (errorCode == 0) {
-            txt_phoneMarquee.append("伺服器發生錯誤");
+            txt_phoneMarquee.append("\n伺服器發生錯誤");
         }
     }
 
@@ -641,7 +651,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         if (Objects.equals(result, "open")) {
             txt_serverInfo.setText("ai伺服器已開啟");
         } else if (Objects.equals(result, "fail")) {
-            txt_serverInfo.setText("伺服器未開啟或發生錯誤");
+            txt_serverInfo.setText("伺服器發生錯誤");
         }
     }
 
@@ -831,7 +841,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
             @Override
             public void run() {
                 if (mNumBeats <= captureRate) {
-                    int progress = (int) (mNumBeats / (float)captureRate * 100);
+                    int progress = (int) (mNumBeats / (float) captureRate * 100);
                     progressBar_text.setText(progress + "%");
                     progressBar.setProgress(progress);
                 }
@@ -933,9 +943,12 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
                         txt_aiCal.setText("");
                         String trimmedJsonString = jsonString.substring(1, jsonString.length() - 1);
                         String[] lines = trimmedJsonString.split(",");
+                        Pattern pattern = Pattern.compile("\"|\\\\");
                         for (String line : lines) {
-                            txt_aiCal.append(line + "\n");
+                            String cleanedLine = pattern.matcher(line).replaceAll("");
+                            txt_aiCal.append(cleanedLine + "\n");
                         }
+
                     }
                 });
 

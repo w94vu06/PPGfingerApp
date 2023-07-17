@@ -23,14 +23,16 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
 
 public class ControlMariaDB {
     private static final OkHttpClient client = new OkHttpClient();
     Handler mHandler = new MHandler();
     Handler resHandler = new ResHandler();
-    String serverUrl = "http://192.168.2.12:5000/"; //公司
+    String serverUrl = "https://6652-61-221-86-50.ngrok-free.app/"; //公司
 //    String serverUrl = "http://192.168.0.102:5000/"; //家裡
     String calServerUrl = "http://192.168.2.97:8090";//計算用server
+//    String calServerUrl = "https://6652-61-221-86-50.ngrok-free.app/";//計算用server
     private MariaDBCallback mCallback;
     private static final int MSG_REGISTER = 1;
     private static final int MSG_LOGIN = 2;
@@ -258,7 +260,8 @@ public class ControlMariaDB {
                 MediaType mediaType = MediaType.parse("application/json; charset=utf-8");
                 RequestBody requestBody = RequestBody.create(mediaType, jsonString);
                 Request request = new Request.Builder()
-                        .url(calServerUrl)
+                        .url("https://6652-61-221-86-50.ngrok-free.app/"+"calculate")
+//                        .url(calServerUrl)
                         .post(requestBody)
                         .build();
 
@@ -269,6 +272,8 @@ public class ControlMariaDB {
                     msg.obj = res;
                     Log.d("serverRes", "getServerRes: " + res);
                     mHandler.sendMessage(msg);
+                    assert response.body() != null;
+                    response.body().close();
                 }
             } catch (IOException e) {
                 String res = "fail";
@@ -289,6 +294,7 @@ public class ControlMariaDB {
                 MediaType mediaType = MediaType.parse("application/json; charset=utf-8");
                 RequestBody requestBody = RequestBody.create(mediaType, jsonString);
                 Request request = new Request.Builder()
+//                        .url("https://6652-61-221-86-50.ngrok-free.app/"+"testServer")//伺服器
                         .url(calServerUrl)//伺服器
 //                        .url("http://192.168.2.110:5000")//測試服
                         .post(requestBody)
@@ -298,6 +304,7 @@ public class ControlMariaDB {
                     Message msg = Message.obtain();
                     if (!response.isSuccessful()) {
                         msg.what = MSG_TEST;
+//                        msg.obj = "fail";
                         msg.obj = "open";
                         mHandler.sendMessage(msg);
                     }

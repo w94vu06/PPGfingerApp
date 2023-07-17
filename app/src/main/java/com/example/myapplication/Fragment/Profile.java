@@ -1,6 +1,7 @@
 package com.example.myapplication.Fragment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
@@ -13,9 +14,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.myapplication.Adapter.ProfileAdapter;
+import com.example.myapplication.BeginActivity;
 import com.example.myapplication.Data.DataProfile;
 import com.example.myapplication.R;
 
@@ -38,6 +41,8 @@ public class Profile extends Fragment {
 
     private TextView titleName;
 
+    private Button btn_signOut;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,7 +61,9 @@ public class Profile extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
         recycler_profile = view.findViewById(R.id.recycler_profile);
+        btn_signOut = view.findViewById(R.id.btn_signOut);
         titleName = view.findViewById(R.id.txt_name);
+        isSignOut();
         recyclerViewProfile();
         return view;
     }
@@ -79,6 +86,21 @@ public class Profile extends Fragment {
         }
         adapter_profile = new ProfileAdapter(profileList);
         recycler_profile.setAdapter(adapter_profile);
+    }
+
+    private void isSignOut() {
+        btn_signOut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                editor.putBoolean("isLoggedIn", false);
+                editor.clear();
+                editor.apply();
+                Intent signOutIntent = new Intent(getActivity(), BeginActivity.class);
+                startActivity(signOutIntent);
+                requireActivity().finish();
+            }
+        });
+
     }
 
 

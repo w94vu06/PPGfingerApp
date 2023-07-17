@@ -247,9 +247,9 @@ public class SignUpActivity extends AppCompatActivity implements MariaDBCallback
      */
     public void judgeEventCode(int res) {
         if (res == 1) {
-            Toast.makeText(SignUpActivity.this, "註冊成功，頁面跳轉中...", Toast.LENGTH_SHORT).show();
+            Toast.makeText(SignUpActivity.this, "註冊成功，請重新登入", Toast.LENGTH_SHORT).show();
             EventBus.getDefault().postSticky(new MessageEvent(profileJson));//把profile資料送去MainActivity
-            Intent goHomePage = new Intent(SignUpActivity.this, MainActivity.class);
+            Intent goHomePage = new Intent(SignUpActivity.this, SignInActivity.class);
             startActivity(goHomePage);
             finish();
         }

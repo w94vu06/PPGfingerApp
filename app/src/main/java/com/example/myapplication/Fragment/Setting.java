@@ -80,23 +80,6 @@ public class Setting extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_setting, container, false);
-        btn_signOut = view.findViewById(R.id.btn_signOut);
-        isSignOut();
         return view;
-    }
-
-    private void isSignOut() {
-        btn_signOut.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                editor.putBoolean("isLoggedIn", false);
-                editor.clear();
-                editor.apply();
-                Intent signOutIntent = new Intent(getActivity(), BeginActivity.class);
-                startActivity(signOutIntent);
-                requireActivity().finish();
-            }
-        });
-
     }
 }

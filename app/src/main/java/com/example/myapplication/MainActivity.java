@@ -79,6 +79,8 @@ public class MainActivity extends AppCompatActivity implements MariaDBCallback {
         editor = preferences.edit();
         CheckInternetDialog checkInternetDialog = new CheckInternetDialog(MainActivity.this);
         checkInternetDialog.checkInternet();
+
+
     }
 
     /**
@@ -158,7 +160,7 @@ public class MainActivity extends AppCompatActivity implements MariaDBCallback {
     public void onMessageEvent(SignUpActivity.MessageEvent event) {
         // 收到MessageEvent時要做的事寫在這裡
         String profileMsg = event.getMessage();
-//        unpackJson(profileMsg);
+        unpackJson(profileMsg);
     }
 
     /**
