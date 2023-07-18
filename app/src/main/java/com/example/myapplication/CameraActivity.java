@@ -86,9 +86,8 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
     /**
      * 總共要抓的心跳數
      */
-    private int captureRate;
-    // detectTime
-    private final int setHeartDetectTime = 40;
+    private int captureRate = 35;
+    private final int setHeartDetectTime = 30;
     private final int rollAvgStandard = setHeartDetectTime + 29;
     private int mCurrentRollingAverage;
     private int mLastRollingAverage;
@@ -110,7 +109,6 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
     //API23
     long[] nonZeroValuesAPI23;
     long[] outlierRRI;
-
     static long[] getBPMOutlier;
     //抓色素
     int fullAvgRed, fullAvgGreen, fullAvgBlue;
@@ -127,6 +125,9 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
     TextView txt_phoneCal;
     TextView txt_aiCal;
     Spinner spinner_beats;
+    private int lastSelectedItem = 0;  // 初始化為預設的索引值，例如 0
+
+    private long elapsedSecond;//量測幾秒
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -163,6 +164,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         setCameraShape();
         initDialog();
         controlMariaDB.testServer("test");
+//        setSpinner_beats();
     }
 
     /**
@@ -228,6 +230,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
             initProgressBar();
             shoutDownDetect();
             txt_phoneMarquee.setText("把手指靠近相機鏡頭，調整直到畫面\n充滿紅色，然後保持靜止。");
+            txt_phoneCal.setText("");
             onResume();
         });
         btn_detailed.setOnClickListener(v -> {
@@ -245,20 +248,19 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         spinner_beats.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                lastSelectedItem = i;
                 switch (i) {
                     case 0:
                         captureRate = 35;
-                        restartAll();
                         break;
                     case 1:
                         captureRate = 45;
-                        restartAll();
                         break;
                     case 2:
                         captureRate = 55;
-                        restartAll();
                         break;
                 }
+                restartAll();
                 if (cameraDevice == null) {
                     openCamera();
                 }
@@ -410,15 +412,20 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
                         mNumBeats++;
                         if (mNumBeats > prevNumBeats) {
                             triggerHandler();
+                        } else {
+                            qualityHandler.postDelayed(qualityRunnable, 10000);
+                            idleHandler.postDelayed(idleRunnable, 15000);
                         }
                         prevNumBeats = mNumBeats;
                         startChartRun();//開始跑圖表
-//                        heartBeatCount.setText("檢測到的心跳次數：" + mNumBeats);
                         if (mNumBeats == captureRate) {
+                            long elapsedTime = (mTimeArray[mNumBeats - 1] - mTimeArray[0]);
+                            elapsedSecond = elapsedTime / 1000;
                             chartIsRunning = false;
                             closeCamera();
-                            setScreenOff();
                             calcBPM_RMMSD_SDNN();
+                            qualityHandler.removeCallbacks(qualityRunnable);
+                            idleHandler.removeCallbacks(idleRunnable);
                         }
                     }
                 }
@@ -427,10 +434,8 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
                 // Save previous two values
                 mLastLastRollingAverage = mLastRollingAverage;
                 mLastRollingAverage = mCurrentRollingAverage;
-            } else {
-                qualityHandler.postDelayed(qualityRunnable, 5000);
-                idleHandler.postDelayed(idleRunnable, 15000);
             }
+
         }
     };
 
@@ -467,7 +472,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
     private Runnable qualityRunnable = new Runnable() {
         @Override
         public void run() {
-            txt_phoneMarquee.setText("把手指靠近相機鏡頭，調整直到畫面\n充滿紅色，然後保持靜止。");
+            txt_phoneMarquee.setText("未偵測到手指");
         }
     };
     /**
@@ -514,7 +519,6 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
     }
 
     private void calcBPM_RMMSD_SDNN() {
-
         long[] time_dist = new long[mTimeArray.length - 1];
         //calcRRI
         for (int i = 0; i < time_dist.length - 1; i++) {
@@ -527,6 +531,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         }
         //calcBPM
         getBPMOutlier = outlierRRI;
+
         //calcRMSSD_SDNN
         uploadResult(getBPMOutlier);
 
@@ -542,13 +547,16 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
 
         try {
             txt_phoneMarquee.setText("");
-            txt_phoneMarquee.setText("手機端：RMSSD：" + phoneRMSSD + "\nSDNN：" + phoneSDNN + "\nBPM：" + phoneBPM);
+            txt_phoneMarquee.setText("本次量測使用" + elapsedSecond + "秒\n");
+            txt_phoneMarquee.append("手機端：RMSSD：" + phoneRMSSD + "\nSDNN：" + phoneSDNN + "\nBPM：" + phoneBPM);
+            txt_phoneCal.setText("");
             String showHRV = "RMSSD：" + phoneRMSSD + ",SDNN：" + phoneSDNN + ",ecg_hr_mean：" + phoneBPM +
                     ",MedianNN：" + phoneMedianNN + ",pNN50：" + phonePNN50 + ",minNN：" + phoneMinNN + ",maxNN：" + phoneMaxNN;
             String[] showHRVOnPhone = showHRV.split(",");
             for (String s : showHRVOnPhone) {
                 txt_phoneCal.append(s + "\n");
             }
+
             onPause();
         } catch (Exception e) {
             System.out.println(e);
@@ -658,9 +666,9 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
     @Override
     protected void onResume() {
         super.onResume();
+        spinner_beats.setSelection(lastSelectedItem);
         startBackgroundThread();
         setScreenOn();
-        idleHandler.removeCallbacks(idleRunnable);
         if (CameraView.isAvailable()) {
             openCamera();
         } else {
@@ -671,14 +679,15 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
     @Override
     protected void onPause() {
         closeCamera();
-        setScreenOff();
         stopBackgroundThread();
+        qualityHandler.removeCallbacks(qualityRunnable);
         super.onPause();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+        setScreenOff();
         finish();
     }
 

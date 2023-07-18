@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -184,7 +185,16 @@ public class MainActivity extends AppCompatActivity implements MariaDBCallback {
     @Override
     public void onResult(String result) {
         Log.d("resultLONG", "onResult: "+result);
-        unpackJson(result);
+        if (result.equals("0")) {
+            Toast.makeText(MainActivity.this, "請重新登入", Toast.LENGTH_SHORT).show();
+            Intent it = new Intent(MainActivity.this, BeginActivity.class);
+            startActivity(it);
+            editor.putBoolean("isLoggedIn", false);
+            editor.apply();
+            finish();
+        } else {
+            unpackJson(result);
+        }
     }
 
     @Override

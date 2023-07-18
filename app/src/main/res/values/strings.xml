@@ -13,8 +13,8 @@
     <string name="danger">危險</string>
 
     <string-array name="beats_array">
-        <item>35</item>
-        <item>45</item>
-        <item>55</item>
+        <item>35下</item>
+        <item>45下</item>
+        <item>55下</item>
     </string-array>
 </resources>

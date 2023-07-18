@@ -23,6 +23,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.myapplication.CameraActivity;
+import com.example.myapplication.Data.DataCategory;
 import com.example.myapplication.Data.DataFeature;
 import com.example.myapplication.Data.DataImage;
 import com.example.myapplication.Adapter.FeatureAdapter;
@@ -228,6 +229,7 @@ public class HomePage extends Fragment {
     private void RecyclerViewFeature(){
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity(),LinearLayoutManager.HORIZONTAL,false);
         recycler_feature.setLayoutManager(new WrapContentLinearLayoutManager(getActivity(),LinearLayoutManager.HORIZONTAL,false));
+
         featureList = new ArrayList<>();
         if (checkFeature.size() == 0) {
             featureList.add(new DataFeature("無資料", 0.0));

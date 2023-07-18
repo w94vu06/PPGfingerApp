@@ -27,7 +27,6 @@ public class BeginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         preferences = getSharedPreferences("my_preferences", MODE_PRIVATE);
-        isLoggedIn();
     }
 
     /**
@@ -70,26 +69,26 @@ public class BeginActivity extends AppCompatActivity {
         btn_signup.setOnClickListener(lis);
     }
 
-    private void isLoggedIn() {
-        boolean isLoggedIn = preferences.getBoolean("isLoggedIn", false);
-        if (isLoggedIn) {
-            Intent intent_IN = new Intent();
-            intent_IN.setClass(BeginActivity.this, MainActivity.class);
-            startActivity(intent_IN);
-            finish();
-        } else {
-            Window window = getWindow();
-            if(window != null){
-                window.requestFeature(Window.FEATURE_ACTIVITY_TRANSITIONS);
-                window.setEnterTransition(new android.transition.Slide(Gravity.BOTTOM));
-                window.setExitTransition(new android.transition.Slide(Gravity.TOP));
-                window.setReenterTransition(new android.transition.Slide(Gravity.BOTTOM));
-                window.setReturnTransition(new android.transition.Slide(Gravity.TOP));
-            }
-            setContentView(R.layout.activity_begin);
-            initParameter();
-        }
-    }
+//    private void isLoggedIn() {
+//        boolean isLoggedIn = preferences.getBoolean("isLoggedIn", false);
+//        if (isLoggedIn) {
+//            Intent intent_IN = new Intent();
+//            intent_IN.setClass(BeginActivity.this, MainActivity.class);
+//            startActivity(intent_IN);
+//            finish();
+//        } else {
+//            Window window = getWindow();
+//            if(window != null){
+//                window.requestFeature(Window.FEATURE_ACTIVITY_TRANSITIONS);
+//                window.setEnterTransition(new android.transition.Slide(Gravity.BOTTOM));
+//                window.setExitTransition(new android.transition.Slide(Gravity.TOP));
+//                window.setReenterTransition(new android.transition.Slide(Gravity.BOTTOM));
+//                window.setReturnTransition(new android.transition.Slide(Gravity.TOP));
+//            }
+//            setContentView(R.layout.activity_begin);
+//            initParameter();
+//        }
+//    }
 
     View.OnClickListener lis = new View.OnClickListener() {
         @Override

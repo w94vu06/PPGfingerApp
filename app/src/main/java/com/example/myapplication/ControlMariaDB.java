@@ -29,10 +29,11 @@ public class ControlMariaDB {
     private static final OkHttpClient client = new OkHttpClient();
     Handler mHandler = new MHandler();
     Handler resHandler = new ResHandler();
-    String serverUrl = "https://6652-61-221-86-50.ngrok-free.app/"; //公司
+    String serverUrl = "https://8020-61-221-86-50.ngrok-free.app/"; //公司
 //    String serverUrl = "http://192.168.0.102:5000/"; //家裡
-    String calServerUrl = "http://192.168.2.97:8090";//計算用server
-//    String calServerUrl = "https://6652-61-221-86-50.ngrok-free.app/";//計算用server
+
+    //    String calServerUrl = "http://192.168.2.97:8090";//計算用server
+    String calServerUrl = "https://8020-61-221-86-50.ngrok-free.app/";//計算用server
     private MariaDBCallback mCallback;
     private static final int MSG_REGISTER = 1;
     private static final int MSG_LOGIN = 2;
@@ -42,6 +43,7 @@ public class ControlMariaDB {
     private static final int MSG_ID_READ = 6;
     private static final int MSG_AI_CAL = 7;
     private static final int MSG_TEST = 8;
+
     public ControlMariaDB(MariaDBCallback mCallback) {
         this.mCallback = mCallback;
     }
@@ -68,8 +70,6 @@ public class ControlMariaDB {
                         // 登入回應
                         String loginRes = Objects.requireNonNull(loginResponse.body()).string();
                         // 0:登入失敗、1:登入成功
-                        Log.d("loginRes", "getLoginRes: " + loginRes);
-
                         Message resMsg = Message.obtain();
                         resMsg.what = MSG_LOGIN;
                         resMsg.obj = loginRes;
@@ -260,13 +260,13 @@ public class ControlMariaDB {
                 MediaType mediaType = MediaType.parse("application/json; charset=utf-8");
                 RequestBody requestBody = RequestBody.create(mediaType, jsonString);
                 Request request = new Request.Builder()
-                        .url("https://6652-61-221-86-50.ngrok-free.app/"+"calculate")
+                        .url(calServerUrl + "calculate")
 //                        .url(calServerUrl)
                         .post(requestBody)
                         .build();
 
                 try (Response response = client.newCall(request).execute()) {
-                    String res = response.isSuccessful() ? Objects.requireNonNull(response.body()).string(): "fail";
+                    String res = response.isSuccessful() ? Objects.requireNonNull(response.body()).string() : "fail";
                     Message msg = Message.obtain();
                     msg.what = MSG_AI_CAL;
                     msg.obj = res;
@@ -284,34 +284,34 @@ public class ControlMariaDB {
             }
         }).start();
     }
+
     public void testServer(String jsonString) {
-        /**
-         * 連接伺服器運算
-         **/
         new Thread() {
             @Override
             public void run() {
-                MediaType mediaType = MediaType.parse("application/json; charset=utf-8");
-                RequestBody requestBody = RequestBody.create(mediaType, jsonString);
-                Request request = new Request.Builder()
-//                        .url("https://6652-61-221-86-50.ngrok-free.app/"+"testServer")//伺服器
-                        .url(calServerUrl)//伺服器
-//                        .url("http://192.168.2.110:5000")//測試服
-                        .post(requestBody)
-                        .build();
+                try {
+                    MediaType mediaType = MediaType.parse("application/json; charset=utf-8");
+                    RequestBody requestBody = RequestBody.create(mediaType, jsonString);
+                    Request request = new Request.Builder()
+                            .url(calServerUrl + "testServer")
+//                        .url(calServerUrl)
+                            .post(requestBody)
+                            .build();
 
-                try (Response response = client.newCall(request).execute()) {
-                    Message msg = Message.obtain();
-                    if (!response.isSuccessful()) {
+                    try (Response response = client.newCall(request).execute()) {
+                        String res = response.isSuccessful() ? Objects.requireNonNull(response.body()).string() : "open";
+                        Message msg = Message.obtain();
                         msg.what = MSG_TEST;
-//                        msg.obj = "fail";
-                        msg.obj = "open";
+                        msg.obj = res;
                         mHandler.sendMessage(msg);
+                        assert response.body() != null;
+                        response.body().close();
                     }
                 } catch (IOException e) {
+                    String res = "fail";
                     Message msg = Message.obtain();
                     msg.what = MSG_TEST;
-                    msg.obj = "fail";
+                    msg.obj = res;
                     mHandler.sendMessage(msg);
                 }
             }
