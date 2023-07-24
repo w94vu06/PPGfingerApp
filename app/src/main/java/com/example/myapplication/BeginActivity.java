@@ -27,6 +27,17 @@ public class BeginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         preferences = getSharedPreferences("my_preferences", MODE_PRIVATE);
+
+        Window window = getWindow();
+        if(window != null){
+            window.requestFeature(Window.FEATURE_ACTIVITY_TRANSITIONS);
+            window.setEnterTransition(new android.transition.Slide(Gravity.BOTTOM));
+            window.setExitTransition(new android.transition.Slide(Gravity.TOP));
+            window.setReenterTransition(new android.transition.Slide(Gravity.BOTTOM));
+            window.setReturnTransition(new android.transition.Slide(Gravity.TOP));
+        }
+        setContentView(R.layout.activity_begin);
+        initParameter();
     }
 
     /**
@@ -45,7 +56,7 @@ public class BeginActivity extends AppCompatActivity {
         // 判斷是否按下Back
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             // 是否要退出
-            if (isExit == false) {
+            if (!isExit) {
                 isExit = true; //記錄下一次要退出
                 Toast.makeText(this, "再按一次退出APP"
                         , Toast.LENGTH_SHORT).show();
@@ -69,26 +80,17 @@ public class BeginActivity extends AppCompatActivity {
         btn_signup.setOnClickListener(lis);
     }
 
-//    private void isLoggedIn() {
-//        boolean isLoggedIn = preferences.getBoolean("isLoggedIn", false);
-//        if (isLoggedIn) {
-//            Intent intent_IN = new Intent();
-//            intent_IN.setClass(BeginActivity.this, MainActivity.class);
-//            startActivity(intent_IN);
-//            finish();
-//        } else {
-//            Window window = getWindow();
-//            if(window != null){
-//                window.requestFeature(Window.FEATURE_ACTIVITY_TRANSITIONS);
-//                window.setEnterTransition(new android.transition.Slide(Gravity.BOTTOM));
-//                window.setExitTransition(new android.transition.Slide(Gravity.TOP));
-//                window.setReenterTransition(new android.transition.Slide(Gravity.BOTTOM));
-//                window.setReturnTransition(new android.transition.Slide(Gravity.TOP));
-//            }
-//            setContentView(R.layout.activity_begin);
-//            initParameter();
-//        }
-//    }
+    private void isLoggedIn() {
+        boolean isLoggedIn = preferences.getBoolean("isLoggedIn", false);
+        if (isLoggedIn) {
+            Intent intent_IN = new Intent();
+            intent_IN.setClass(BeginActivity.this, MainActivity.class);
+            startActivity(intent_IN);
+            finish();
+        } else {
+
+        }
+    }
 
     View.OnClickListener lis = new View.OnClickListener() {
         @Override

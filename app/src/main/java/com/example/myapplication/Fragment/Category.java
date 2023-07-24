@@ -56,6 +56,10 @@ public class Category extends Fragment implements CategoryAdapter.OnItemListener
         recycler_detail = view.findViewById(R.id.recycler_detail);
 
         try {
+            boolean hasNewData = preferences.getBoolean("hasNewData", false);
+            if (hasNewData) {
+
+            }
             setCategoryData();
         } catch (JSONException e) {
             throw new RuntimeException(e);

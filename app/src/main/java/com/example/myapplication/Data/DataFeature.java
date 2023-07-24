@@ -2,8 +2,8 @@ package com.example.myapplication.Data;
 
 public class DataFeature {
 
-    private String name_feature;
-    private Double val_feature;
+    private final String name_feature;
+    private final Double val_feature;
 
     public DataFeature(String name, Double val){
         this.name_feature = name;

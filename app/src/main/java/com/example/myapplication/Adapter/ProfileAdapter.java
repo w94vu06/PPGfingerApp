@@ -39,7 +39,8 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
     }
 
     public class ProfileViewHolder extends RecyclerView.ViewHolder {
-        private TextView txt_profileTitle,txt_profileData;
+        private final TextView txt_profileTitle;
+        private final TextView txt_profileData;
 
         public ProfileViewHolder(@NonNull View itemView) {
             super(itemView);

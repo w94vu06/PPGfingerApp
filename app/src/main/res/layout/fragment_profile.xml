@@ -47,10 +47,11 @@
                 android:layout_height="wrap_content"
                 android:layout_above="@+id/txt_amountText"
                 android:layout_centerHorizontal="true"
-                android:fontFamily="@font/corporate_logo_rounded"
                 android:text="15"
                 android:textColor="@color/green"
-                android:textSize="@dimen/sp_25" />
+                android:textSize="@dimen/sp_25"
+                android:textStyle="bold"/>
+
 
             <TextView
                 android:id="@+id/txt_amountText"

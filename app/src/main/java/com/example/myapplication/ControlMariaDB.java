@@ -34,7 +34,7 @@ public class ControlMariaDB {
 
     //    String calServerUrl = "http://192.168.2.97:8090";//計算用server
     String calServerUrl = "https://8020-61-221-86-50.ngrok-free.app/";//計算用server
-    private MariaDBCallback mCallback;
+    private final MariaDBCallback mCallback;
     private static final int MSG_REGISTER = 1;
     private static final int MSG_LOGIN = 2;
     private static final int MSG_READ = 3;

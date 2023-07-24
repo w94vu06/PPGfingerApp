@@ -1,7 +1,8 @@
 package com.example.myapplication.Data;
 
 public class DataProfile {
-    private String profile_title,profile_data;
+    private final String profile_title;
+    private final String profile_data;
 
     public DataProfile(String title, String data){
         this.profile_title = title;

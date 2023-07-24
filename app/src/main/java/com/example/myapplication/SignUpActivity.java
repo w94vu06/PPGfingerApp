@@ -264,7 +264,7 @@ public class SignUpActivity extends AppCompatActivity implements MariaDBCallback
      * 註冊成功後傳profile到MainActivity
      **/
     public class MessageEvent {
-        private String message;
+        private final String message;
 
         public MessageEvent(String message) {
             this.message = message;

@@ -6,8 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DataCategory {
-    private String img;
-    private String cate;
+    private final String img;
+    private final String cate;
 
     public DataCategory(String img, String cate){
         this.img = img;

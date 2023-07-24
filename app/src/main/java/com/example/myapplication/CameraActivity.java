@@ -68,107 +68,145 @@ import java.util.regex.Pattern;
 
 
 public class CameraActivity extends AppCompatActivity implements MariaDBCallback {
-    ControlMariaDB controlMariaDB = new ControlMariaDB(this);
-    private SharedPreferences preferences;
-    private SharedPreferences.Editor editor;
-    private TextureView CameraView;
-    protected CameraDevice cameraDevice;
-    protected CameraCaptureSession cameraCaptureSessions;
-    protected CaptureRequest.Builder captureRequestBuilder;
-    private Size imageDimension;
-    private static final int REQUEST_CAMERA_PERMISSION = 420;
+    // 相機和使用者介面相關變數
+    private ControlMariaDB controlMariaDB = new ControlMariaDB(this);
+    private SharedPreferences preferences; // 儲存使用者設定的SharedPreferences
+    private TextureView CameraView; // 相機預覽的TextureView
+    private CameraDevice cameraDevice; // 相機設備
+    private CameraCaptureSession cameraCaptureSessions; // 相機捕獲會話
+    private CaptureRequest.Builder captureRequestBuilder; // 捕獲請求的Builder
+    private Size imageDimension; // 相片尺寸
+    private static final int REQUEST_CAMERA_PERMISSION = 420; // 請求相機權限的請求碼
 
-    // Thread handler member variables
-    private Handler mBackgroundHandler;
-    private HandlerThread mBackgroundThread;
+    // 執行緒處理相關的變數
+    private Handler mBackgroundHandler; // 背景執行緒的Handler
+    private HandlerThread mBackgroundThread; // 背景執行緒
 
-    //Heart rate detector member variables
-    /**
-     * 總共要抓的心跳數
-     */
-    private int captureRate = 35;
-    private final int setHeartDetectTime = 30;
-    private final int rollAvgStandard = setHeartDetectTime + 29;
-    private int mCurrentRollingAverage;
-    private int mLastRollingAverage;
-    private int mLastLastRollingAverage;
-    private long[] mTimeArray;
-    //Threshold
-    private int numCaptures = 0;
-    private int mNumBeats = 0;
-    private int prevNumBeats = 0;
+    // 心跳檢測相關變數
+    private int totalCaptureRate = 35; // 總共捕獲的心跳數量
+    private final int setHeartDetectTime = 30; // 設定心跳檢測時間
+    private final int rollAvgStandard = setHeartDetectTime; // 心跳平均值標準
+    private int mCurrentRollingAverage; // 當前心跳平均值
+    private int mLastRollingAverage; // 上一個心跳平均值
+    private int mLastLastRollingAverage; // 上上個心跳平均值
+    private long[] mTimeArray; // 記錄捕獲心跳的時間陣列
+    private int numRateCaptured = 0; // 目前已捕獲的心跳數量
+    private int mNumBeats = 0; // 當前捕獲的心跳數量
+    private int prevNumBeats = 0; // 上一個捕獲的心跳數量
+
+    // 心跳變異性計算相關變數
+    private CalculateHRV calculateHRV; // 心跳變異性計算工具
+
+    // 色素檢測相關變數
+    private int fullAvgRed, fullAvgGreen, fullAvgBlue; // 整個畫面的紅綠藍色素值
+    private int fixDarkRed; // 調整後的暗紅色素值
+    private int fixAvgRedThreshold; // 調整後的平均紅色素值閾值
+
+    // 使用者介面元件
     private TextView txt_phoneMarquee, txt_serverInfo;
+    private TextView txt_phoneCal, txt_aiCal;
     private Button btn_restart, btn_detailed;
-    //chart
-    private boolean chartIsRunning = false;
-    private ChartUtil chartUtil;
-    private LineChart chart;
-    private Thread chartThread;
-    //IQR
-    private CalculateHRV calculateHRV;
-    //API23
-    long[] nonZeroValuesAPI23;
-    long[] outlierRRI;
-    static long[] getBPMOutlier;
-    //抓色素
-    int fullAvgRed, fullAvgGreen, fullAvgBlue;
-    int fixDarkRed;
-    int fixAvgRedThreshold;
-    //進度條
-    ProgressBar progressBar;
-    TextView progressBar_text;
-    String phoneRMSSD, phoneSDNN, phoneMedianNN, phonePNN50, phoneMinNN, phoneMaxNN, phoneBPM;
-    String time = new SimpleDateFormat("yyyyMMddHHmmss",
-            Locale.getDefault()).format(System.currentTimeMillis());
-    //dialog
-    Dialog dialog;
-    TextView txt_phoneCal;
-    TextView txt_aiCal;
-    Spinner spinner_beats;
-    private int lastSelectedItem = 0;  // 初始化為預設的索引值，例如 0
+    private Dialog dialog;
+    private ProgressBar progressBar;
+    private TextView progressBar_text;
+    private Spinner spinner_beats; // 心跳選擇的下拉選單
+    private int lastSelectedItem = 0; // 初始化為預設的索引值，例如 0
+    private long elapsedSecond; // 量測的秒數
 
-    private long elapsedSecond;//量測幾秒
+    // 圖表相關變數
+    private boolean chartIsRunning = false; // 圖表是否正在運行
+    private ChartUtil chartUtil; // 圖表工具
+    private LineChart chart; // 折線圖
+    private Thread chartThread; // 圖表的執行緒
+
+    // API23
+    private long[] nonZeroValuesAPI23;
+    private long[] outlierRRI;
+    private static long[] getBPMOutlier;
+
+    // 時間相關變數
+    private String time = new SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault()).format(System.currentTimeMillis()); // 現在的時間字串
+
+    // 手機計算的特徵
+    private String phoneRMSSD, phoneSDNN, phoneMedianNN, phonePNN50, phoneMinNN, phoneMaxNN, phoneBPM;
 
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        setTheme(R.style.AppTheme);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ppg);
 
         preferences = getSharedPreferences("my_preferences", Context.MODE_PRIVATE);
-        editor = preferences.edit();
+        SharedPreferences.Editor editor = preferences.edit();
 
         CameraView = findViewById(R.id.texture);
         CameraView.setSurfaceTextureListener(textureListener);
-
-        mTimeArray = new long[captureRate];
 
         btn_restart = findViewById(R.id.btn_restart);
         btn_detailed = findViewById(R.id.btn_detailed);
         txt_phoneMarquee = findViewById(R.id.txt_phoneMarquee);
         txt_serverInfo = findViewById(R.id.txt_serverInfo);
 
-        calculateHRV = new CalculateHRV();
+        chart = findViewById(R.id.lineChart);
+        chartUtil = new ChartUtil();
+        chartUtil.initChart(chart);//確保畫布初始化
 
         progressBar = findViewById(R.id.progressBar_Circle);
         progressBar_text = findViewById(R.id.progress_text);
-
         spinner_beats = findViewById(R.id.spinner_beats);
-        //初始畫圖表
-        chart = findViewById(R.id.lineChart);
-        chartUtil = new ChartUtil();
-        chartUtil.initChart(chart);
+
+        mTimeArray = new long[totalCaptureRate];
+        calculateHRV = new CalculateHRV();
+
         closeTopBar();
-        restartBtn();
-        setCameraShape();
-        initDialog();
         controlMariaDB.testServer("test");
-//        setSpinner_beats();
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        setScreenOn();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setScreenOn();
+        startBackgroundThread();
+        chartUtil.initChart(chart);//確保畫布初始化
+        idleHandler.removeCallbacks(idleRunnable);
+        if (CameraView.isAvailable()) {
+            openCamera();
+        } else {
+            CameraView.setSurfaceTextureListener(textureListener);
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        closeCamera();
+        setScreenOff();
+        stopBackgroundThread();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        closeCamera();
+        setScreenOff();
+        removeRunnable();
+        finish();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
+
     /**
-     * //關閉標題列
+     * 關閉標題列
      */
     public void closeTopBar() {
         ActionBar actionBar = getSupportActionBar();
@@ -177,14 +215,12 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         }
     }
 
-    /**
-     * 初始化量測用數值
-     */
-    public void initValue() {
-        numCaptures = 0;
-        prevNumBeats = 0;
-        mNumBeats = 0;
-        mTimeArray = new long[captureRate];
+    public void setScreenOn() {
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+    }
+
+    public void setScreenOff() {
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
     /**
@@ -198,93 +234,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         txt_aiCal = dialog.findViewById(R.id.txt_aiCal);
     }
 
-    /**
-     * 設定相機形狀
-     */
-    public void setCameraShape() {
-        View overlay = findViewById(R.id.overlay);
-        Drawable circleDrawable = ContextCompat.getDrawable(this, R.drawable.shape_oval);
-        if (circleDrawable instanceof GradientDrawable) {
-            GradientDrawable gradientDrawable = (GradientDrawable) circleDrawable;
-            overlay.setBackground(gradientDrawable);
-        }
-        CameraView.setOutlineProvider(new ViewOutlineProvider() {
-            @Override
-            public void getOutline(View view, Outline outline) {
-                int width = view.getWidth();
-                int height = view.getHeight();
-                int radius = Math.min(width, height) / 2;
-                int centerX = width / 2;
-                int centerY = height / 2;
-                outline.setOval(centerX - radius, centerY - radius, centerX + radius, centerY + radius);
-            }
-        });
-        CameraView.setClipToOutline(true);
-    }
-
-    /**
-     * 重新量測-按鈕
-     */
-    public void restartBtn() {
-        btn_restart.setOnClickListener(v -> {
-            initProgressBar();
-            shoutDownDetect();
-            txt_phoneMarquee.setText("把手指靠近相機鏡頭，調整直到畫面\n充滿紅色，然後保持靜止。");
-            txt_phoneCal.setText("");
-            onResume();
-        });
-        btn_detailed.setOnClickListener(v -> {
-            detailDialog();
-        });
-    }
-
-    public void setSpinner_beats() {
-        ArrayAdapter<CharSequence> adapter =
-                ArrayAdapter.createFromResource(this,    //對應的Context
-                        R.array.beats_array,                    //資料選項內容
-                        android.R.layout.simple_spinner_item); //預設Spinner未展開時的View(預設及選取後樣式)
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner_beats.setAdapter(adapter);
-        spinner_beats.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                lastSelectedItem = i;
-                switch (i) {
-                    case 0:
-                        captureRate = 35;
-                        break;
-                    case 1:
-                        captureRate = 45;
-                        break;
-                    case 2:
-                        captureRate = 55;
-                        break;
-                }
-                restartAll();
-                if (cameraDevice == null) {
-                    openCamera();
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-            }
-        });
-    }
-
-    public void restartAll() {
-        initProgressBar();
-        chart.clear();//畫布清除
-        initValue();//初始化量測用數值
-        chartUtil.initChart(chart);//確保畫布初始化
-        txt_phoneMarquee.setText("把手指靠近相機鏡頭，調整直到畫面\n充滿紅色，然後保持靜止。");
-    }
-
-    /**
-     * dialog
-     */
     public void detailDialog() {
-//        dialog.setCancelable(true);
         Window window = dialog.getWindow();
 
         if (window != null) {
@@ -307,14 +257,54 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         dialog.show();
     }
 
+    public void initProgressBar() {
+        progressBar.setVisibility(View.VISIBLE);
+        progressBar_text.setVisibility(View.VISIBLE);
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (mNumBeats <= totalCaptureRate) {
+                    int progress = (int) (mNumBeats / (float) totalCaptureRate * 100);
+                    progressBar_text.setText(progress + "%");
+                    progressBar.setProgress(progress);
+                }
+            }
+        }, 200);
+    }
+
     /**
-     * 停止量測
+     * 重新量測-按鈕
+     * 詳細數據-按鈕
      */
-    public void shoutDownDetect() {
-//        closeCamera();
-        chart.clear();//畫布清除
-        initValue();//初始化量測用數值
+    public void initBtn() {
+        btn_restart.setOnClickListener(v -> {
+            initProgressBar();
+            resetChartAndProgressBar();
+            onResume();
+        });
+        btn_detailed.setOnClickListener(v -> {
+            detailDialog();
+        });
+    }
+
+    /**
+     * 初始化量測用數值
+     */
+    public void initValue() {
+        mTimeArray = new long[totalCaptureRate];
+        numRateCaptured = 0;
+        prevNumBeats = 0;
+        mNumBeats = 0;
+    }
+
+    private void resetChartAndProgressBar() {
+        chart.clear(); // 畫布清除
         chartUtil.initChart(chart);//確保畫布初始化
+        initValue(); // 初始化量測用數值
+        initProgressBar();// 重置progressBar
+        txt_phoneMarquee.setText("把手指靠近相機鏡頭，調整直到畫面\n充滿紅色，然後保持靜止。");
+        txt_phoneCal.setText("");
     }
 
     /**
@@ -324,7 +314,6 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         @Override
         public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
             openCamera();
-            setScreenOn();
         }
 
         @Override
@@ -374,12 +363,14 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
             int averageRedThreshold = redThreshold / (height * width);// 0 1 2
             int averageGreenThreshold = greenThreshold / (height * width);
             int averageBlueThreshold = blueThreshold / (height * width);
+
             //整個畫面平均值
             fullAvgRed = fullScreenRed / (height * width);// < 150
             fullAvgGreen = fullScreenGreen / (height * width);
             fullAvgBlue = fullScreenBlue / (height * width);
 
-//            Log.d("yyyy", "RED: " + averageRedThreshold + "\nGREEN: " + averageGreenThreshold + "\nBLUE: " + averageBlueThreshold);
+            Log.d("yyyy", "RED: " + averageRedThreshold + "\nGREEN: " + averageGreenThreshold + "\nBLUE: " + averageBlueThreshold);
+            Log.d("tttt", "RED: " + fullAvgRed + "\nGREEN: " + fullAvgGreen + "\nBLUE: " + fullAvgBlue);
             if (fullAvgRed < 150) {
                 fixDarkRed = fullScreenRed * 2;
                 fixAvgRedThreshold = averageRedThreshold * 2;
@@ -387,53 +378,52 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
                 fixDarkRed = fullScreenRed;
                 fixAvgRedThreshold = averageRedThreshold;
             }
+            Log.d("gggg", "RED: " + fixAvgRedThreshold + "\nGREEN: " + averageGreenThreshold + "\nBLUE: " + averageBlueThreshold);
             //如果色素閥值是正確的才進行量測
             if (fixAvgRedThreshold == 2 && averageGreenThreshold == 0 && averageBlueThreshold == 0) { //改
-                idleHandler.removeCallbacks(idleRunnable);
-
                 // Waits 20 captures, to remove startup artifacts.  First average is the sum.
                 //等待前幾個取樣，以去除啟動過程中的初始偏差
-                if (numCaptures == setHeartDetectTime) {
+                if (numRateCaptured == setHeartDetectTime) {
                     mCurrentRollingAverage = fixDarkRed;//改
                 }
                 // Next 18 averages needs to incorporate the sum with the correct N multiplier
                 // in rolling average.
-                //在接下來18個取樣之間，程式會使用前面的取樣和當前取樣的加權平均值來計算移動平均值
-                else if (numCaptures > setHeartDetectTime && numCaptures < rollAvgStandard) {
-                    mCurrentRollingAverage = (mCurrentRollingAverage * (numCaptures - setHeartDetectTime) + fixDarkRed) / (numCaptures - (setHeartDetectTime - 1));//改
+                //在接下來18個取樣之間，會使用前面的取樣和當前取樣的加權平均值來計算移動平均值
+                else if (numRateCaptured > setHeartDetectTime && numRateCaptured < rollAvgStandard) {
+                    mCurrentRollingAverage = (mCurrentRollingAverage * (numRateCaptured - setHeartDetectTime) + fixDarkRed) / (numRateCaptured - (setHeartDetectTime - 1));//改
                 }
 
                 // From 49 on, the rolling average incorporates the last 30 rolling averages.
-                else if (numCaptures >= rollAvgStandard) {
+                else if (numRateCaptured >= rollAvgStandard) {
                     mCurrentRollingAverage = (mCurrentRollingAverage * 29 + fixDarkRed) / 30;//改
-                    if (mLastRollingAverage > mCurrentRollingAverage && mLastRollingAverage > mLastLastRollingAverage && mNumBeats < captureRate) {
+                    if (mLastRollingAverage > mCurrentRollingAverage && mLastRollingAverage > mLastLastRollingAverage && mNumBeats < totalCaptureRate) {
                         mTimeArray[mNumBeats] = System.currentTimeMillis();
-                        initProgressBar();
                         mNumBeats++;
                         if (mNumBeats > prevNumBeats) {
                             triggerHandler();
-                        } else {
-                            qualityHandler.postDelayed(qualityRunnable, 10000);
-                            idleHandler.postDelayed(idleRunnable, 15000);
                         }
                         prevNumBeats = mNumBeats;
+                        initProgressBar();
                         startChartRun();//開始跑圖表
-                        if (mNumBeats == captureRate) {
+                        if (mNumBeats == totalCaptureRate) {
                             long elapsedTime = (mTimeArray[mNumBeats - 1] - mTimeArray[0]);
                             elapsedSecond = elapsedTime / 1000;
                             chartIsRunning = false;
                             closeCamera();
                             calcBPM_RMMSD_SDNN();
-                            qualityHandler.removeCallbacks(qualityRunnable);
-                            idleHandler.removeCallbacks(idleRunnable);
+                            removeRunnable();
                         }
                     }
                 }
                 // Another capture
-                numCaptures++;
+                numRateCaptured++;
                 // Save previous two values
                 mLastLastRollingAverage = mLastRollingAverage;
                 mLastRollingAverage = mCurrentRollingAverage;
+                removeRunnable();
+            } else {
+                qualityHandler.postDelayed(qualityRunnable, 8000);
+                idleHandler.postDelayed(idleRunnable, 15000);
             }
 
         }
@@ -442,12 +432,13 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
     /**
      * 閒置太久強制中止
      */
-    private Handler idleHandler = new Handler();
-    private Runnable idleRunnable = new Runnable() {
+    private final Handler idleHandler = new Handler();
+    private final Runnable idleRunnable = new Runnable() {
         @Override
         public void run() {
             // 在此暫時關閉某些功能
-            disableSomeFunction();
+            onPause();
+            resetChartAndProgressBar();
             qualityHandler.removeCallbacks(qualityRunnable);
             chartIsRunning = false;//關閉畫圖
             txt_phoneMarquee.setText("訊號過差，量測失敗");
@@ -455,26 +446,34 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
     };
 
     /**
-     * 關閉功能
-     */
-    private void disableSomeFunction() {
-        // 關閉功能，停止影像
-        closeCamera();
-        chart.clear();//畫布清除
-        initValue();//初始化量測用數值
-        chartUtil.initChart(chart);//確保畫布初始化
-    }
-
-    /**
      * 量測提醒
      */
-    private Handler qualityHandler = new Handler();
-    private Runnable qualityRunnable = new Runnable() {
+    private final Handler qualityHandler = new Handler();
+    private final Runnable qualityRunnable = new Runnable() {
         @Override
         public void run() {
-            txt_phoneMarquee.setText("未偵測到手指");
+            Toast toast = Toast.makeText(CameraActivity.this, "請勿用力按緊，並避免移動", Toast.LENGTH_SHORT);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                if (qualityHandler.hasCallbacks(qualityRunnable)) {
+                    qualityHandler.removeCallbacks(qualityRunnable);
+                } else {
+                    toast.show();
+                }
+            }
+            qualityHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    toast.cancel();
+                }
+            }, 1000);
         }
     };
+
+    private void removeRunnable() {
+        qualityHandler.removeCallbacks(qualityRunnable);
+        idleHandler.removeCallbacks(idleRunnable);
+    }
+
     /**
      * 開啟相機服務
      */
@@ -483,7 +482,14 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         public void onOpened(CameraDevice camera) {
             cameraDevice = camera;
             createCameraPreview();
+            setCameraShape();
+
+            //UI初始化
+            chartUtil.initChart(chart);
             setSpinner_beats();
+            spinner_beats.setSelection(lastSelectedItem);
+            initDialog();
+            initBtn();
         }
 
         @Override
@@ -498,6 +504,64 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
             cameraDevice = null;
         }
     };
+
+    /**
+     * 設定相機形狀
+     */
+    public void setCameraShape() {
+        View overlay = findViewById(R.id.overlay);
+        Drawable circleDrawable = ContextCompat.getDrawable(this, R.drawable.shape_oval);
+        if (circleDrawable instanceof GradientDrawable) {
+            GradientDrawable gradientDrawable = (GradientDrawable) circleDrawable;
+            overlay.setBackground(gradientDrawable);
+        }
+        CameraView.setOutlineProvider(new ViewOutlineProvider() {
+            @Override
+            public void getOutline(View view, Outline outline) {
+                int width = view.getWidth();
+                int height = view.getHeight();
+                int radius = Math.min(width, height) / 2;
+                int centerX = width / 2;
+                int centerY = height / 2;
+                outline.setOval(centerX - radius, centerY - radius, centerX + radius, centerY + radius);
+            }
+        });
+        CameraView.setClipToOutline(true);
+    }
+
+    public void setSpinner_beats() {
+        ArrayAdapter<CharSequence> adapter =
+                ArrayAdapter.createFromResource(this,    //對應的Context
+                        R.array.beats_array,                    //資料選項內容
+                        android.R.layout.simple_spinner_item); //預設Spinner未展開時的View(預設及選取後樣式)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner_beats.setAdapter(adapter);
+        spinner_beats.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                lastSelectedItem = i;
+                switch (i) {
+                    case 0:
+                        totalCaptureRate = 35;
+                        break;
+                    case 1:
+                        totalCaptureRate = 45;
+                        break;
+                    case 2:
+                        totalCaptureRate = 55;
+                        break;
+                }
+                resetChartAndProgressBar();
+                if (cameraDevice == null) {
+                    openCamera();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+            }
+        });
+    }
 
     protected void startBackgroundThread() {
         mBackgroundThread = new HandlerThread("Camera Background");
@@ -556,7 +620,6 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
             for (String s : showHRVOnPhone) {
                 txt_phoneCal.append(s + "\n");
             }
-
             onPause();
         } catch (Exception e) {
             System.out.println(e);
@@ -631,7 +694,6 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
      */
     @Override
     public void onResult(String result) {
-        Log.d("eeee", "onResult: " + result);
         if (result.equals("fail")) {
             txt_phoneMarquee.append("\n伺服器發生錯誤");
         } else {
@@ -663,34 +725,6 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         }
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        spinner_beats.setSelection(lastSelectedItem);
-        startBackgroundThread();
-        setScreenOn();
-        if (CameraView.isAvailable()) {
-            openCamera();
-        } else {
-            CameraView.setSurfaceTextureListener(textureListener);
-        }
-    }
-
-    @Override
-    protected void onPause() {
-        closeCamera();
-        stopBackgroundThread();
-        qualityHandler.removeCallbacks(qualityRunnable);
-        super.onPause();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        setScreenOff();
-        finish();
-    }
-
     protected void createCameraPreview() {
         try {
             SurfaceTexture texture = CameraView.getSurfaceTexture();
@@ -719,6 +753,20 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         }
     }
 
+    //check camera and flash can be use
+    protected void updatePreview() {
+        if (null == cameraDevice) {
+            System.out.println("updatePreview error, return");
+        }
+        captureRequestBuilder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO);
+        captureRequestBuilder.set(CaptureRequest.FLASH_MODE, CameraMetadata.FLASH_MODE_TORCH);
+        try {
+            cameraCaptureSessions.setRepeatingRequest(captureRequestBuilder.build(), null, mBackgroundHandler);
+        } catch (CameraAccessException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void openCamera() {
         CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
         System.out.println("is camera open");
@@ -740,20 +788,6 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         System.out.println("openCamera X");
     }
 
-    //check camera and flash can be use
-    protected void updatePreview() {
-        if (null == cameraDevice) {
-            System.out.println("updatePreview error, return");
-        }
-        captureRequestBuilder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO);
-        captureRequestBuilder.set(CaptureRequest.FLASH_MODE, CameraMetadata.FLASH_MODE_TORCH);
-        try {
-            cameraCaptureSessions.setRepeatingRequest(captureRequestBuilder.build(), null, mBackgroundHandler);
-        } catch (CameraAccessException e) {
-            e.printStackTrace();
-        }
-    }
-
     private void closeCamera() {
         if (null != cameraDevice) {
             cameraDevice.close();
@@ -771,18 +805,6 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
                 recreate();
             }
         }
-    }
-
-
-    /**
-     * keep screen open
-     */
-    public void setScreenOn() {
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-    }
-
-    public void setScreenOff() {
-        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
     /**
@@ -828,7 +850,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         data.notifyDataChanged();
         data.setDrawValues(false);//是否繪製線條上的文字
         chart.notifyDataSetChanged();
-        chart.setVisibleXRange(0, 100);//設置可見範圍 預設0-60
+        chart.setVisibleXRange(0,80);//設置可見範圍 預設0-60
         chart.moveViewToX(data.getEntryCount());//將可視焦點放在最新一個數據，使圖表可移動
     }
 
@@ -836,27 +858,10 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
      * 觸發心跳
      */
     public void triggerHandler() {
-        float inputData = 60;
-        float downData = 40;
-        addData(inputData);
-        addData(downData);
+        addData(60);
+        addData(40);
     }
 
-    public void initProgressBar() {
-        progressBar.setVisibility(View.VISIBLE);
-        progressBar_text.setVisibility(View.VISIBLE);
-        final Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (mNumBeats <= captureRate) {
-                    int progress = (int) (mNumBeats / (float) captureRate * 100);
-                    progressBar_text.setText(progress + "%");
-                    progressBar.setProgress(progress);
-                }
-            }
-        }, 200);
-    }
 
     public long[] IQRForAPI23(long[] RRI) {
 

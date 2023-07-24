@@ -20,10 +20,8 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.myapplication.CameraActivity;
-import com.example.myapplication.Data.DataCategory;
 import com.example.myapplication.Data.DataFeature;
 import com.example.myapplication.Data.DataImage;
 import com.example.myapplication.Adapter.FeatureAdapter;

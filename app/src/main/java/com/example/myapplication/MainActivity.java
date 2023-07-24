@@ -2,10 +2,6 @@ package com.example.myapplication;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.navigation.fragment.NavHostFragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
 import android.content.Intent;
@@ -17,27 +13,14 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.GlideBuilder;
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
-import com.bumptech.glide.request.RequestOptions;
 import com.example.myapplication.Fragment.Category;
 import com.example.myapplication.Fragment.HomePage;
 import com.example.myapplication.Fragment.Profile;
 import com.example.myapplication.Fragment.Setting;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
-import com.google.android.material.snackbar.Snackbar;
-import com.youth.banner.Banner;
-import com.youth.banner.adapter.BannerImageAdapter;
-import com.youth.banner.holder.BannerImageHolder;
-import com.youth.banner.indicator.CircleIndicator;
-import com.youth.banner.indicator.RectangleIndicator;
-import com.youth.banner.util.BannerUtils;
-import com.youth.banner.util.LogUtils;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -45,8 +28,6 @@ import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -80,8 +61,6 @@ public class MainActivity extends AppCompatActivity implements MariaDBCallback {
         editor = preferences.edit();
         CheckInternetDialog checkInternetDialog = new CheckInternetDialog(MainActivity.this);
         checkInternetDialog.checkInternet();
-
-
     }
 
     /**
@@ -100,7 +79,7 @@ public class MainActivity extends AppCompatActivity implements MariaDBCallback {
         // 判斷是否按下Back
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             // 是否要退出
-            if (isExit == false) {
+            if (!isExit) {
                 isExit = true; //記錄下一次要退出
                 Toast.makeText(this, "再按一次退出APP"
                         , Toast.LENGTH_SHORT).show();
@@ -247,7 +226,7 @@ public class MainActivity extends AppCompatActivity implements MariaDBCallback {
     }
 
 
-    private NavigationBarView.OnItemSelectedListener NaviSelectedListener = new NavigationBarView.OnItemSelectedListener() {
+    private final NavigationBarView.OnItemSelectedListener NaviSelectedListener = new NavigationBarView.OnItemSelectedListener() {
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {

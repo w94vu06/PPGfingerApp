@@ -13,6 +13,7 @@ import android.hardware.camera2.params.StreamConfigurationMap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PersistableBundle;
+import android.util.Log;
 import android.util.Size;
 import android.view.Gravity;
 import android.view.Window;
@@ -40,7 +41,7 @@ public class SplashActivity extends AppCompatActivity {
                 isLoggedIn();
             }
         }, 2000); // 延遲時間，單位毫秒（此處設置為 2000 毫秒，即 2 秒）
-        openCamera();
+//        openCamera();
     }
 
     private void openCamera() {
@@ -65,6 +66,7 @@ public class SplashActivity extends AppCompatActivity {
 
     private void isLoggedIn() {
         boolean isLoggedIn = preferences.getBoolean("isLoggedIn", false);
+        Log.d("llll", "isLoggedIn: "+isLoggedIn);
         Intent intent_IN = new Intent();
         if (isLoggedIn) {
             intent_IN.setClass(SplashActivity.this, MainActivity.class);

@@ -6,8 +6,8 @@ public class DataDetail {
 
     public static final int PARENT_ITEM = 0;
     public static final int CHILD_ITEM = 1;
-    private String title;
-    private String value;
+    private final String title;
+    private final String value;
     private String meaning;
 
     public DataDetail(String title, String value){

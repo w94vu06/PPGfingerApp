@@ -30,6 +30,6 @@
         android:text="38"
         android:textColor="@color/green"
         android:textSize="@dimen/sp_25"
-        android:fontFamily="@font/chiayicity"/>
+        android:fontFamily="@font/shipporimincho_bold"/>
 
 </RelativeLayout>

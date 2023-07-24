@@ -91,9 +91,7 @@ public class CalculateHRV {
     // 計算MedianNN
     public double calculateMedianNN(long[] rrIntervals) {
         long[] extendRRI = new long[rrIntervals.length];
-        for (int i = 0; i < rrIntervals.length; i++) {
-            extendRRI[i] = rrIntervals[i];
-        }
+        System.arraycopy(rrIntervals, 0, extendRRI, 0, rrIntervals.length);
         Arrays.sort(extendRRI);
         int length = extendRRI.length;
         double medianNN;

@@ -8,7 +8,7 @@ import android.net.NetworkInfo;
 import androidx.appcompat.app.AlertDialog;
 
 public class CheckInternetDialog {
-    private Context context;
+    private final Context context;
 
     public  CheckInternetDialog(Context context) {
         this.context = context;
