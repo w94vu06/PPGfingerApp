@@ -42,14 +42,15 @@ public class ChartUtil {
         x.setGranularity(0.5f);
 
         YAxis y = chart.getAxisLeft();
-        y.setTextColor(Color.parseColor("#F2E5CC"));
-        y.setDrawLabels(false);//去掉Y軸標籤
+//        y.setTextColor(Color.parseColor("#F2E5CC"));
+        y.setTextColor(Color.parseColor("#0a0a0a"));
+        y.setDrawLabels(true);//去掉Y軸標籤
         y.setDrawGridLines(true);//畫Y軸線
         y.setGridColor(Color.parseColor("#F2E5CC"));
         y.setGranularity(0.2f);
 
-        y.setAxisMaximum(80);//最高100
-        y.setAxisMinimum(20);//最低0
+        y.setAxisMaximum(0);//最高100
+        y.setAxisMinimum(-255);//最低0
 
         chart.getAxisRight().setEnabled(false);//右邊Y軸不可視
 //        chart.setVisibleXRange(0,50);//設置顯示範圍

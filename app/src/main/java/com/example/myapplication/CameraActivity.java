@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.ImageFormat;
 import android.graphics.Outline;
 import android.graphics.SurfaceTexture;
 import android.graphics.drawable.Drawable;
@@ -26,6 +27,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Log;
+import android.util.Range;
 import android.util.Size;
 import android.view.Surface;
 import android.view.TextureView;
@@ -49,6 +51,7 @@ import androidx.core.content.ContextCompat;
 
 import com.example.myapplication.Util.ChartUtil;
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
@@ -118,6 +121,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
     private ChartUtil chartUtil; // 圖表工具
     private LineChart chart; // 折線圖
     private Thread chartThread; // 圖表的執行緒
+    private int newFullAvgRed = 0; // 圖表上下界
 
     // API23
     private long[] nonZeroValuesAPI23;
@@ -180,6 +184,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         } else {
             CameraView.setSurfaceTextureListener(textureListener);
         }
+        mUpdateChartHandler.postDelayed(mUpdateChartRunnable, 3000);
     }
 
     @Override
@@ -188,6 +193,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         closeCamera();
         setScreenOff();
         stopBackgroundThread();
+        mUpdateChartHandler.removeCallbacks(mUpdateChartRunnable);
     }
 
     @Override
@@ -196,6 +202,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         closeCamera();
         setScreenOff();
         removeRunnable();
+        mUpdateChartHandler.removeCallbacks(mUpdateChartRunnable);
         finish();
     }
 
@@ -303,6 +310,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         chartUtil.initChart(chart);//確保畫布初始化
         initValue(); // 初始化量測用數值
         initProgressBar();// 重置progressBar
+        mUpdateChartHandler.postDelayed(mUpdateChartRunnable, 3000);
         txt_phoneMarquee.setText("把手指靠近相機鏡頭，調整直到畫面\n充滿紅色，然後保持靜止。");
         txt_phoneCal.setText("");
     }
@@ -314,6 +322,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         @Override
         public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
             openCamera();
+            mUpdateChartHandler.postDelayed(mUpdateChartRunnable, 3000);
         }
 
         @Override
@@ -368,9 +377,10 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
             fullAvgRed = fullScreenRed / (height * width);// < 150
             fullAvgGreen = fullScreenGreen / (height * width);
             fullAvgBlue = fullScreenBlue / (height * width);
-
+            newFullAvgRed = fullAvgRed;
             Log.d("yyyy", "RED: " + averageRedThreshold + "\nGREEN: " + averageGreenThreshold + "\nBLUE: " + averageBlueThreshold);
             Log.d("tttt", "RED: " + fullAvgRed + "\nGREEN: " + fullAvgGreen + "\nBLUE: " + fullAvgBlue);
+            Log.d("nnnn", "RED: " + fullAvgRed);
             if (fullAvgRed < 150) {
                 fixDarkRed = fullScreenRed * 2;
                 fixAvgRedThreshold = averageRedThreshold * 2;
@@ -412,6 +422,9 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
                             closeCamera();
                             calcBPM_RMMSD_SDNN();
                             removeRunnable();
+                            chart.setScaleEnabled(true);
+                        } else {
+                            chart.setScaleEnabled(false);
                         }
                     }
                 }
@@ -440,6 +453,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
             onPause();
             resetChartAndProgressBar();
             qualityHandler.removeCallbacks(qualityRunnable);
+            mUpdateChartHandler.removeCallbacks(mUpdateChartRunnable);
             chartIsRunning = false;//關閉畫圖
             txt_phoneMarquee.setText("訊號過差，量測失敗");
         }
@@ -472,6 +486,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
     private void removeRunnable() {
         qualityHandler.removeCallbacks(qualityRunnable);
         idleHandler.removeCallbacks(idleRunnable);
+
     }
 
     /**
@@ -552,6 +567,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
                         break;
                 }
                 resetChartAndProgressBar();
+
                 if (cameraDevice == null) {
                     openCamera();
                 }
@@ -742,7 +758,6 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
                     cameraCaptureSessions = cameraCaptureSession;
                     updatePreview();
                 }
-
                 @Override
                 public void onConfigureFailed(@NonNull CameraCaptureSession cameraCaptureSession) {
                     Toast.makeText(CameraActivity.this, "Configuration change", Toast.LENGTH_SHORT).show();
@@ -753,6 +768,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         }
     }
 
+
     //check camera and flash can be use
     protected void updatePreview() {
         if (null == cameraDevice) {
@@ -760,8 +776,12 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         }
         captureRequestBuilder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO);
         captureRequestBuilder.set(CaptureRequest.FLASH_MODE, CameraMetadata.FLASH_MODE_TORCH);
+//        Range<Integer> selectedFpsRange = new Range<>(30, 60);
+//        captureRequestBuilder.set(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE,selectedFpsRange);
+//        imageDimension = new Size(selectedFpsRange.getUpper(), selectedFpsRange.getUpper());
         try {
             cameraCaptureSessions.setRepeatingRequest(captureRequestBuilder.build(), null, mBackgroundHandler);
+
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
@@ -795,6 +815,25 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         }
     }
 
+    private Range<Integer>[] getCameraFpsRanges(CameraManager cameraManager, String cameraId) {
+        try {
+            CameraCharacteristics characteristics = cameraManager.getCameraCharacteristics(cameraId);
+            Range<Integer>[] fpsRanges = characteristics.get(CameraCharacteristics.CONTROL_AE_AVAILABLE_TARGET_FPS_RANGES);
+            if (fpsRanges != null && fpsRanges.length > 0) {
+                // 在這裡打印或處理可用的幀率範圍
+                for (Range<Integer> range : fpsRanges) {
+                    int minFps = range.getLower();
+                    int maxFps = range.getUpper();
+                    Log.d("CameraFpsRange", "Min FPS: " + minFps + ", Max FPS: " + maxFps);
+                }
+                return fpsRanges;
+            }
+        } catch (CameraAccessException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     //check Permission
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -817,7 +856,8 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         //簡略寫法
         chartIsRunning = true;
         Runnable runnable = () -> {
-            addData(50);
+            addData(-fullAvgRed);
+//            addData(50);
         };
 
         //簡略寫法
@@ -850,16 +890,39 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         data.notifyDataChanged();
         data.setDrawValues(false);//是否繪製線條上的文字
         chart.notifyDataSetChanged();
-        chart.setVisibleXRange(0,80);//設置可見範圍 預設0-60
+        chart.setVisibleXRange(0, 80);//設置可見範圍 預設0-60
         chart.moveViewToX(data.getEntryCount());//將可視焦點放在最新一個數據，使圖表可移動
+
+
+//        YAxis y = chart.getAxisLeft();
+//        y.setAxisMaximum(fullAvgRed*1.03f);//最高100
+//        y.setAxisMinimum(fullAvgRed*0.97f);//最低0
+
+
     }
+
+    private Handler mUpdateChartHandler = new Handler();
+    private Runnable mUpdateChartRunnable = new Runnable() {
+        @Override
+        public void run() {
+            float upperBound = newFullAvgRed * 1.03f;
+            float lowerBound = newFullAvgRed * 0.97f;
+
+            YAxis y = chart.getAxisLeft();
+            y.setAxisMaximum(-lowerBound);
+            y.setAxisMinimum(-upperBound);
+
+            // 定時每3秒執行一次更新
+            mUpdateChartHandler.postDelayed(this, 3000);
+        }
+    };
 
     /**
      * 觸發心跳
      */
     public void triggerHandler() {
-        addData(60);
-        addData(40);
+//        addData(60);
+//        addData(40);
     }
 
 
