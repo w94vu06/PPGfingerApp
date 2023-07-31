@@ -13,6 +13,10 @@
         android:icon="@drawable/notes"/>
 
     <item
+        android:id="@+id/palce_holder"
+        android:title=""/>
+
+    <item
         android:id="@+id/setting"
         android:title="SETTING"
         android:icon="@drawable/setting"/>
