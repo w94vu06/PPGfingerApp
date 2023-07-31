@@ -49,7 +49,7 @@ public class HomePage extends Fragment {
     private View view;
     private Banner banner;
     private TextView txt_filename;
-    private Button btn_choose,btn_count,btn_dialogCancel,btn_dialogSure,btn_detect;
+    private Button btn_choose,btn_count,btn_addSelect,btn_addCancel,btn_addDone,btn_detect;
     private ImageButton imgbtn_add,imgbtn_close;
     private RecyclerView recycler_feature;
     private RecyclerView.Adapter adapter_feature;
@@ -164,9 +164,9 @@ public class HomePage extends Fragment {
         dialog.setContentView(dialogView);
 
         /** 宣告UI參數 **/
-        imgbtn_close = dialogView.findViewById(R.id.imgbtn_close);
-//        btn_dialogCancel = dialogView.findViewById(R.id.btn_dialogCancel);
-        btn_dialogSure = dialogView.findViewById(R.id.btn_dialogSure);
+        btn_addSelect = dialogView.findViewById(R.id.btn_addSelect);
+        btn_addCancel = dialogView.findViewById(R.id.btn_addCancel);
+        btn_addDone = dialogView.findViewById(R.id.btn_addDone);
         unbinder = ButterKnife.bind(this,dialogView);
         dialog.show();
         Window window = dialog.getWindow();
@@ -178,8 +178,9 @@ public class HomePage extends Fragment {
         dialog.getWindow().setAttributes(lp);
         dialog.setCancelable(false);
         imgbtn_close.setOnClickListener(lis);
-        btn_dialogSure.setOnClickListener(lis);
-//        btn_dialogCancel.setOnClickListener(lis);
+        btn_addSelect.setOnClickListener(lis);
+        btn_addDone.setOnClickListener(lis);
+        btn_addCancel.setOnClickListener(lis);
     }
 
     @OnClick({R.id.check_dbp, R.id.check_sbp, R.id.check_bs, R.id.check_hr, R.id.check_sdnn, R.id.check_rmssd})
@@ -207,12 +208,12 @@ public class HomePage extends Fragment {
                 case R.id.imgbtn_add:
                     buildDialog();
                     break;
-                case R.id.imgbtn_close:
+                case R.id.btn_addCancel:
                     dialog.dismiss();
                     break;
 //                case R.id.btn_dialogCancel:
 //                    break;
-                case R.id.btn_dialogSure:
+                case R.id.btn_addDone:
 //                    Toast.makeText(getContext(),checkFeature.toString(),Toast.LENGTH_SHORT).show();
                     if (checkFeature.size() == 0) {
                         dialog.dismiss();

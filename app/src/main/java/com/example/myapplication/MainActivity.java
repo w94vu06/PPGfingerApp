@@ -19,6 +19,7 @@ import com.example.myapplication.Fragment.Category;
 import com.example.myapplication.Fragment.HomePage;
 import com.example.myapplication.Fragment.Profile;
 import com.example.myapplication.Fragment.Setting;
+import com.google.android.material.bottomappbar.BottomAppBar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 
@@ -34,9 +35,8 @@ import java.util.TimerTask;
 public class MainActivity extends AppCompatActivity implements MariaDBCallback {
 
     private FrameLayout fragmentContainer;
+    private BottomAppBar bar;
     private BottomNavigationView navigationView;
-
-
 
     private String loginName, loginPhone;
     private String userId,userName, email, phone, birth;
@@ -54,6 +54,7 @@ public class MainActivity extends AppCompatActivity implements MariaDBCallback {
         setContentView(R.layout.activity_main);
         initPermission();
         fragmentContainer = findViewById(R.id.fragmentContainer);
+        bar = findViewById(R.id.bar);
         setMain();//設定主畫面
         navigationView = findViewById(R.id.navigationView);
         navigationView.setOnItemSelectedListener(NaviSelectedListener);
