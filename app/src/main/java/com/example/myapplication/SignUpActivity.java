@@ -2,15 +2,23 @@ package com.example.myapplication;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Activity;
 import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.NumberPicker;
 import android.widget.Toast;
 
 import com.example.myapplication.Util.CommonUtil;
@@ -73,7 +81,7 @@ public class SignUpActivity extends AppCompatActivity implements MariaDBCallback
         img_signup.setImageResource(R.drawable.sign_up2);
         imgbtn_signUp.setImageResource(R.drawable.btn_signup);
         imgbtn_signUp.setOnClickListener(lis);
-        showDateOnClick(edit_birth);
+        createMonthDialog(edit_birth);
     }
 
     /**
@@ -119,40 +127,25 @@ public class SignUpActivity extends AppCompatActivity implements MariaDBCallback
     /**
      * 出生日期欄點擊事件
      **/
-    private void showDateOnClick(final EditText edt) {
-        edt.setOnClickListener(new View.OnClickListener() {
+    public void createMonthDialog(final EditText edt){
+        BirthPickDialog dialog = new BirthPickDialog(this);
+        edt.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public void onClick(View view) {
-                showDatePick(edt);
-            }
-        });
-
-        edt.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View view, boolean b) {
-                if (b && !edt.isClickable()) {
-                    showDatePick(edt);
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN){
+                    dialog.showDialog();
+                    return true;
                 }
+                return false;
             }
         });
-    }
 
-    /**
-     * 日期選擇Dialog
-     **/
-    private void showDatePick(final EditText edt) {
-        Calendar calendar = Calendar.getInstance();
-        DatePickerDialog datePickerDialog = new DatePickerDialog(SignUpActivity.this, new DatePickerDialog.OnDateSetListener() {
+        dialog.onDialogRespond = new BirthPickDialog.OnDialogRespond() {
             @Override
-            public void onDateSet(DatePicker view, int year, int month, int day) {
-
-                month += 1;
-                edt.setText(year + "-" + month + "-" + day);
+            public void onRespond(String selected) {
+                edt.setText(selected);
             }
-        }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
-        datePickerDialog.getDatePicker().setSpinnersShown(true);
-        datePickerDialog.show();
-
+        };
     }
 
     /**
@@ -359,5 +352,86 @@ public class SignUpActivity extends AppCompatActivity implements MariaDBCallback
     @Override
     protected void onDestroy() {
         super.onDestroy();
+    }
+}
+
+/** 日期選擇Dialog **/
+class BirthPickDialog {
+    private Activity activity;
+    BirthPickDialog.OnDialogRespond onDialogRespond;
+    private NumberPicker np_birthY,np_birthM,np_birthD;
+    private Button btn_birthCancel,btn_birthDone;
+    private DatePickerDialog datePickerDialog;
+
+    public BirthPickDialog(Activity activity){
+        this.activity = activity;
+    }
+
+    public void showDialog(){
+        Dialog monthDialog = new Dialog(this.activity, R.style.MonthDialog);
+        View contentView = LayoutInflater.from(this.activity).inflate(R.layout.dialog_birth, null);
+        monthDialog.setContentView(contentView);
+        ViewGroup.LayoutParams params = contentView.getLayoutParams();
+        params.width = activity.getResources().getDisplayMetrics().widthPixels;
+        contentView.setLayoutParams(params);
+        monthDialog.getWindow().setGravity(Gravity.BOTTOM);
+        monthDialog.getWindow().setWindowAnimations(R.style.dialogWindowAnim);
+        monthDialog.show();
+
+        np_birthY = contentView.findViewById(R.id.np_birthY);
+        np_birthM = contentView.findViewById(R.id.np_birthM);
+        np_birthD = contentView.findViewById(R.id.np_birthD);
+        btn_birthCancel = contentView.findViewById(R.id.btn_birthCancel);
+        btn_birthDone = contentView.findViewById(R.id.btn_birthDone);
+        Calendar calendar = Calendar.getInstance();
+        Date date = new Date();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH)+1;
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+        np_birthY.setMaxValue(year);
+        np_birthY.setMinValue(year-150);
+        np_birthY.setValue(Integer.parseInt(new SimpleDateFormat("yyyy").format(date)));
+        np_birthM.setMaxValue(12);
+        np_birthM.setMinValue(1);
+        np_birthM.setValue(Integer.parseInt(new SimpleDateFormat("MM").format(date)));
+
+        np_birthY.setOnValueChangedListener((picker, oldVal, newVal) -> setDaysInDayPicker(newVal,np_birthM.getValue()));
+        np_birthM.setOnValueChangedListener((picker, oldVal, newVal) -> setDaysInDayPicker(np_birthY.getValue(),newVal));
+
+        np_birthY.setValue(year);
+        np_birthM.setValue(month);
+        np_birthD.setValue(day);
+
+        // 設置當前月份的天數
+        setDaysInDayPicker(year,month);
+
+        btn_birthCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                monthDialog.dismiss();
+            }
+        });
+        btn_birthDone.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String s = String.format("%04d-%02d-%02d",np_birthY.getValue(),np_birthM.getValue(),np_birthD.getValue());
+                onDialogRespond.onRespond(s);
+                monthDialog.dismiss();
+            }
+        });
+    }
+
+    private void setDaysInDayPicker(int year, int month) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.YEAR, year);
+        calendar.set(Calendar.MONTH, month - 1);
+        int maxDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+        np_birthD.setMaxValue(maxDay);
+        np_birthD.setMinValue(1);
+    }
+
+    interface OnDialogRespond{
+        void onRespond(String selected);
     }
 }
