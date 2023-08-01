@@ -49,7 +49,7 @@ public class HomePage extends Fragment {
     private View view;
     private Banner banner;
     private TextView txt_filename;
-    private Button btn_choose,btn_count,btn_addSelect,btn_addCancel,btn_addDone,btn_detect;
+    private Button btn_choose,btn_count,btn_addSelect,btn_addCancel,btn_addDone;
     private ImageButton imgbtn_add,imgbtn_close;
     private RecyclerView recycler_feature;
     private RecyclerView.Adapter adapter_feature;
@@ -74,7 +74,6 @@ public class HomePage extends Fragment {
         view = inflater.inflate(R.layout.fragment_home_page,container,false);
         initParameter();
         initChooser();
-        enterPPG();
         return view;
     }
 
@@ -251,16 +250,4 @@ public class HomePage extends Fragment {
             adapter_feature.notifyItemRangeInserted(0,checkFeature.size());
         }
     }
-
-    public void enterPPG() {
-        btn_detect = view.findViewById(R.id.btn_detect);
-        btn_detect.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intentPPG = new Intent(getActivity(), CameraActivity.class);
-                startActivity(intentPPG);
-            }
-        });
-    }
-
 }

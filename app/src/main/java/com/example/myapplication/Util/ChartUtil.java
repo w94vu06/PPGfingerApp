@@ -9,8 +9,11 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.listener.BarLineChartTouchListener;
+
+import java.util.Locale;
 
 public class ChartUtil {
 
@@ -21,7 +24,9 @@ public class ChartUtil {
         chart.getDescription().setEnabled(false);//設置不要圖表標籤
         chart.setBackgroundColor(Color.parseColor("#FFFFFFFF"));//畫布顏色
 //        chart.setTouchEnabled(false);//設置不可觸碰
-//        chart.setDragEnabled(false);//設置不可互動
+        chart.setDragEnabled(true);//設置不可互動
+        chart.setPinchZoom(false);
+        chart.setDoubleTapToZoomEnabled(false);
         chart.setDrawBorders(true);  // 啟用畫布的外框線
         chart.setBorderWidth(1.5f);   // 設置外框線的寬度
         chart.setBorderColor(Color.BLACK);  // 設置外框線的顏色
@@ -35,11 +40,18 @@ public class ChartUtil {
 
         //設置X軸
         XAxis x = chart.getXAxis();
-        x.setTextColor(Color.parseColor("#F2E5CC"));
-        x.setDrawLabels(false);//去掉X軸標籤
+        x.setTextColor(Color.BLACK);
+        x.setDrawLabels(true);//X軸標籤
+        x.setPosition(XAxis.XAxisPosition.BOTTOM);
         x.setDrawGridLines(true);//畫X軸線
         x.setGridColor(Color.parseColor("#F2E5CC"));
-        x.setGranularity(0.5f);
+        x.setGranularity(0.1f);//設置 X 軸的刻度間隔
+        x.setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                return String.format(Locale.getDefault(), "%.0f", value/10);
+            }
+        });
 
         YAxis y = chart.getAxisLeft();
 //        y.setTextColor(Color.parseColor("#F2E5CC"));
@@ -47,14 +59,13 @@ public class ChartUtil {
         y.setDrawLabels(true);//去掉Y軸標籤
         y.setDrawGridLines(true);//畫Y軸線
         y.setGridColor(Color.parseColor("#F2E5CC"));
-        y.setGranularity(0.2f);
+        y.setGranularity(0.1f);
 
-        y.setAxisMaximum(0);//最高100
-        y.setAxisMinimum(-255);//最低0
-
+        y.setAxisMaximum(255);//最高100
+        y.setAxisMinimum(0);//最低0
         chart.getAxisRight().setEnabled(false);//右邊Y軸不可視
 //        chart.setVisibleXRange(0,50);//設置顯示範圍
-
+        y.setInverted(true);
         float scaleX = chart.getScaleX();
         if (scaleX == 1)
             chart.zoomToCenter(5, 1f);
@@ -63,6 +74,7 @@ public class ChartUtil {
             barLineChartTouchListener.stopDeceleration();
             chart.fitScreen();
         }
+        chart.invalidate();
     }
 
     /**

@@ -1,7 +1,5 @@
 package com.example.myapplication;
 
-import static com.example.myapplication.CalculateHRV.findMedian;
-
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
@@ -9,7 +7,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.ImageFormat;
 import android.graphics.Outline;
 import android.graphics.SurfaceTexture;
 import android.graphics.drawable.Drawable;
@@ -27,7 +24,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Log;
-import android.util.Range;
 import android.util.Size;
 import android.view.Surface;
 import android.view.TextureView;
@@ -50,6 +46,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.example.myapplication.Util.ChartUtil;
+import com.example.myapplication.Util.GetPixelUtil;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
@@ -63,8 +60,8 @@ import org.json.JSONObject;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.regex.Pattern;
@@ -99,8 +96,11 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
 
     // 心跳變異性計算相關變數
     private CalculateHRV calculateHRV; // 心跳變異性計算工具
+    private long[] outlierRRI;
+    private static long[] getBPMOutlier;
 
     // 色素檢測相關變數
+    GetPixelUtil getPixelUtil = new GetPixelUtil();
     private int fullAvgRed, fullAvgGreen, fullAvgBlue; // 整個畫面的紅綠藍色素值
     private int fixDarkRed; // 調整後的暗紅色素值
     private int fixAvgRedThreshold; // 調整後的平均紅色素值閾值
@@ -122,18 +122,18 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
     private LineChart chart; // 折線圖
     private Thread chartThread; // 圖表的執行緒
     private int newFullAvgRed = 0; // 圖表上下界
+    private int maxFullAvgRed = Integer.MIN_VALUE;
+    private int minFullAvgRed = Integer.MAX_VALUE;
+    private boolean isFirstTwoSeconds = true;
+    private List<Float> fullAvgRedList = new ArrayList<>();
 
-    // API23
-    private long[] nonZeroValuesAPI23;
-    private long[] outlierRRI;
-    private static long[] getBPMOutlier;
+
 
     // 時間相關變數
     private String time = new SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault()).format(System.currentTimeMillis()); // 現在的時間字串
 
     // 手機計算的特徵
     private String phoneRMSSD, phoneSDNN, phoneMedianNN, phonePNN50, phoneMinNN, phoneMaxNN, phoneBPM;
-
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -142,7 +142,6 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
 
         preferences = getSharedPreferences("my_preferences", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
-
         CameraView = findViewById(R.id.texture);
         CameraView.setSurfaceTextureListener(textureListener);
 
@@ -184,7 +183,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         } else {
             CameraView.setSurfaceTextureListener(textureListener);
         }
-        mUpdateChartHandler.postDelayed(mUpdateChartRunnable, 3000);
+        updateChartLimitHandler.postDelayed(updateChartLimitRunnable, 3000);
     }
 
     @Override
@@ -193,7 +192,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         closeCamera();
         setScreenOff();
         stopBackgroundThread();
-        mUpdateChartHandler.removeCallbacks(mUpdateChartRunnable);
+        updateChartLimitHandler.removeCallbacks(updateChartLimitRunnable);
     }
 
     @Override
@@ -202,7 +201,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         closeCamera();
         setScreenOff();
         removeRunnable();
-        mUpdateChartHandler.removeCallbacks(mUpdateChartRunnable);
+        updateChartLimitHandler.removeCallbacks(updateChartLimitRunnable);
         finish();
     }
 
@@ -310,7 +309,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         chartUtil.initChart(chart);//確保畫布初始化
         initValue(); // 初始化量測用數值
         initProgressBar();// 重置progressBar
-        mUpdateChartHandler.postDelayed(mUpdateChartRunnable, 3000);
+        isFirstTwoSeconds = false;
         txt_phoneMarquee.setText("把手指靠近相機鏡頭，調整直到畫面\n充滿紅色，然後保持靜止。");
         txt_phoneCal.setText("");
     }
@@ -322,7 +321,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         @Override
         public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
             openCamera();
-            mUpdateChartHandler.postDelayed(mUpdateChartRunnable, 3000);
+            updateChartLimitRunnable.run();
         }
 
         @Override
@@ -336,21 +335,26 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
 
         @Override
         public void onSurfaceTextureUpdated(SurfaceTexture surface) {
+            getPixelUtil.getPixel(CameraView);
             Bitmap bmp = CameraView.getBitmap();
             int width = bmp.getWidth();
             int height = bmp.getHeight();
 
             int[] pixels = new int[height * width];
             int[] pixelsFullScreen = new int[height * width];
+
             bmp.getPixels(pixelsFullScreen, 0, width, 0, 0, width, height);//get full screen and main to detect
-            bmp.getPixels(pixels, 0, width, width / 2, height / 2, width / 10, height / 10);//get small screen
+            bmp.getPixels(pixels, 0, width, width / 2, height / 2,
+                    width / 10, height / 10);//get small screen
 
             int redThreshold = 0;
             int greenThreshold = 0;
             int blueThreshold = 0;//小畫面的紅綠藍
+
             int fullScreenRed = 0;
             int fullScreenGreen = 0;
             int fullScreenBlue = 0;//整個畫面的紅綠藍
+
             for (int i = 0; i < height * width; i++) {
                 //RED
                 int red = (pixels[i] >> 16) & 0xFF;
@@ -377,10 +381,8 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
             fullAvgRed = fullScreenRed / (height * width);// < 150
             fullAvgGreen = fullScreenGreen / (height * width);
             fullAvgBlue = fullScreenBlue / (height * width);
-            newFullAvgRed = fullAvgRed;
-            Log.d("yyyy", "RED: " + averageRedThreshold + "\nGREEN: " + averageGreenThreshold + "\nBLUE: " + averageBlueThreshold);
-            Log.d("tttt", "RED: " + fullAvgRed + "\nGREEN: " + fullAvgGreen + "\nBLUE: " + fullAvgBlue);
             Log.d("nnnn", "RED: " + fullAvgRed);
+            //表示鏡頭太暗
             if (fullAvgRed < 150) {
                 fixDarkRed = fullScreenRed * 2;
                 fixAvgRedThreshold = averageRedThreshold * 2;
@@ -388,43 +390,42 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
                 fixDarkRed = fullScreenRed;
                 fixAvgRedThreshold = averageRedThreshold;
             }
-            Log.d("gggg", "RED: " + fixAvgRedThreshold + "\nGREEN: " + averageGreenThreshold + "\nBLUE: " + averageBlueThreshold);
             //如果色素閥值是正確的才進行量測
             if (fixAvgRedThreshold == 2 && averageGreenThreshold == 0 && averageBlueThreshold == 0) { //改
+
                 // Waits 20 captures, to remove startup artifacts.  First average is the sum.
                 //等待前幾個取樣，以去除啟動過程中的初始偏差
                 if (numRateCaptured == setHeartDetectTime) {
                     mCurrentRollingAverage = fixDarkRed;//改
                 }
-                // Next 18 averages needs to incorporate the sum with the correct N multiplier
+                // Next averages needs to incorporate the sum with the correct N multiplier
                 // in rolling average.
-                //在接下來18個取樣之間，會使用前面的取樣和當前取樣的加權平均值來計算移動平均值
+                //在接下來取樣之間，會使用前面的取樣和當前取樣的加權平均值來計算移動平均值
                 else if (numRateCaptured > setHeartDetectTime && numRateCaptured < rollAvgStandard) {
                     mCurrentRollingAverage = (mCurrentRollingAverage * (numRateCaptured - setHeartDetectTime) + fixDarkRed) / (numRateCaptured - (setHeartDetectTime - 1));//改
                 }
-
                 // From 49 on, the rolling average incorporates the last 30 rolling averages.
                 else if (numRateCaptured >= rollAvgStandard) {
                     mCurrentRollingAverage = (mCurrentRollingAverage * 29 + fixDarkRed) / 30;//改
-                    if (mLastRollingAverage > mCurrentRollingAverage && mLastRollingAverage > mLastLastRollingAverage && mNumBeats < totalCaptureRate) {
+                    if (mLastRollingAverage > mCurrentRollingAverage && mLastRollingAverage > mLastLastRollingAverage && mNumBeats < totalCaptureRate && !isFirstTwoSeconds) {
                         mTimeArray[mNumBeats] = System.currentTimeMillis();
                         mNumBeats++;
-                        if (mNumBeats > prevNumBeats) {
-                            triggerHandler();
-                        }
-                        prevNumBeats = mNumBeats;
-                        initProgressBar();
+                        updateChartLimitHandler.postDelayed(updateChartLimitRunnable, 3000);
                         startChartRun();//開始跑圖表
-                        if (mNumBeats == totalCaptureRate) {
+                        initProgressBar();
+
+//                        if (mNumBeats > prevNumBeats) {
+//
+//                        }
+//                        prevNumBeats = mNumBeats;
+
+                        if (mNumBeats == totalCaptureRate) { //量測完成時
                             long elapsedTime = (mTimeArray[mNumBeats - 1] - mTimeArray[0]);
                             elapsedSecond = elapsedTime / 1000;
-                            chartIsRunning = false;
                             closeCamera();
                             calcBPM_RMMSD_SDNN();
                             removeRunnable();
-                            chart.setScaleEnabled(true);
-                        } else {
-                            chart.setScaleEnabled(false);
+                            chartIsRunning = false;
                         }
                     }
                 }
@@ -453,7 +454,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
             onPause();
             resetChartAndProgressBar();
             qualityHandler.removeCallbacks(qualityRunnable);
-            mUpdateChartHandler.removeCallbacks(mUpdateChartRunnable);
+            updateChartLimitHandler.removeCallbacks(updateChartLimitRunnable);
             chartIsRunning = false;//關閉畫圖
             txt_phoneMarquee.setText("訊號過差，量測失敗");
         }
@@ -483,10 +484,50 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         }
     };
 
+    /**
+     * 取中位數設定圖表上下界
+     */
+
+    private Handler updateChartLimitHandler = new Handler();
+    private Runnable updateChartLimitRunnable = new Runnable() {
+        @Override
+        public void run() {
+            fullAvgRedList.add((float) fullAvgRed);
+
+            if (fullAvgRedList.size() >= 30) {
+                // 計算四分位數
+                float[] quartiles = calculateHRV.calculateQuartiles(fullAvgRedList);
+                float Q1 = quartiles[0];
+                float Q2 = quartiles[1];
+                float Q3 = quartiles[2];
+
+                // 設定上下界，使用四分位距的1.5倍
+                float interQuartileRange = Q3 - Q1;
+                float upperBound = Q3 + 1.5f * interQuartileRange;
+                float lowerBound = Q1 - 1.5f * interQuartileRange;
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        YAxis y = chart.getAxisLeft();
+                        y.setAxisMaximum(upperBound);
+                        y.setAxisMinimum(lowerBound);
+                        isFirstTwoSeconds = false;
+                    }
+                });
+                fullAvgRedList.clear();
+            }
+
+            // 移除之前的 Runnable
+            updateChartLimitHandler.removeCallbacks(this);
+            // 新增新的 Runnable，使用常數 UPDATE_INTERVAL 來表示更新的時間間隔
+            updateChartLimitHandler.postDelayed(this, 3000);
+        }
+    };
+
     private void removeRunnable() {
         qualityHandler.removeCallbacks(qualityRunnable);
         idleHandler.removeCallbacks(idleRunnable);
-
     }
 
     /**
@@ -604,11 +645,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         for (int i = 0; i < time_dist.length - 1; i++) {
             time_dist[i] = mTimeArray[i + 1] - mTimeArray[i];
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            outlierRRI = calculateHRV.IQR(time_dist);//去掉離群值
-        } else {
-            outlierRRI = IQRForAPI23(time_dist);//去掉離群值
-        }
+        outlierRRI = calculateHRV.IQR(time_dist);//去掉離群值
         //calcBPM
         getBPMOutlier = outlierRRI;
 
@@ -767,8 +804,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
             e.printStackTrace();
         }
     }
-
-
+    
     //check camera and flash can be use
     protected void updatePreview() {
         if (null == cameraDevice) {
@@ -776,9 +812,6 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         }
         captureRequestBuilder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO);
         captureRequestBuilder.set(CaptureRequest.FLASH_MODE, CameraMetadata.FLASH_MODE_TORCH);
-//        Range<Integer> selectedFpsRange = new Range<>(30, 60);
-//        captureRequestBuilder.set(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE,selectedFpsRange);
-//        imageDimension = new Size(selectedFpsRange.getUpper(), selectedFpsRange.getUpper());
         try {
             cameraCaptureSessions.setRepeatingRequest(captureRequestBuilder.build(), null, mBackgroundHandler);
 
@@ -814,26 +847,6 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
             cameraDevice = null;
         }
     }
-
-    private Range<Integer>[] getCameraFpsRanges(CameraManager cameraManager, String cameraId) {
-        try {
-            CameraCharacteristics characteristics = cameraManager.getCameraCharacteristics(cameraId);
-            Range<Integer>[] fpsRanges = characteristics.get(CameraCharacteristics.CONTROL_AE_AVAILABLE_TARGET_FPS_RANGES);
-            if (fpsRanges != null && fpsRanges.length > 0) {
-                // 在這裡打印或處理可用的幀率範圍
-                for (Range<Integer> range : fpsRanges) {
-                    int minFps = range.getLower();
-                    int maxFps = range.getUpper();
-                    Log.d("CameraFpsRange", "Min FPS: " + minFps + ", Max FPS: " + maxFps);
-                }
-                return fpsRanges;
-            }
-        } catch (CameraAccessException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
     //check Permission
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -856,8 +869,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         //簡略寫法
         chartIsRunning = true;
         Runnable runnable = () -> {
-            addData(-fullAvgRed);
-//            addData(50);
+            addData(fullAvgRed);
         };
 
         //簡略寫法
@@ -890,78 +902,8 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         data.notifyDataChanged();
         data.setDrawValues(false);//是否繪製線條上的文字
         chart.notifyDataSetChanged();
-        chart.setVisibleXRange(0, 80);//設置可見範圍 預設0-60
+        chart.setVisibleXRange(0, 50);//設置可見範圍 預設0-80
         chart.moveViewToX(data.getEntryCount());//將可視焦點放在最新一個數據，使圖表可移動
-
-
-//        YAxis y = chart.getAxisLeft();
-//        y.setAxisMaximum(fullAvgRed*1.03f);//最高100
-//        y.setAxisMinimum(fullAvgRed*0.97f);//最低0
-
-
-    }
-
-    private Handler mUpdateChartHandler = new Handler();
-    private Runnable mUpdateChartRunnable = new Runnable() {
-        @Override
-        public void run() {
-            float upperBound = newFullAvgRed * 1.03f;
-            float lowerBound = newFullAvgRed * 0.97f;
-
-            YAxis y = chart.getAxisLeft();
-            y.setAxisMaximum(-lowerBound);
-            y.setAxisMinimum(-upperBound);
-
-            // 定時每3秒執行一次更新
-            mUpdateChartHandler.postDelayed(this, 3000);
-        }
-    };
-
-    /**
-     * 觸發心跳
-     */
-    public void triggerHandler() {
-//        addData(60);
-//        addData(40);
-    }
-
-
-    public long[] IQRForAPI23(long[] RRI) {
-
-        double[] arr = new double[RRI.length];
-        for (int i = 0; i < RRI.length; i++) {
-            arr[i] = (double) RRI[i];
-        }
-
-        Arrays.sort(arr);
-
-        double q1 = findMedian(arr, 0, arr.length / 2 - 1);
-        double q3 = findMedian(arr, arr.length / 2 + arr.length % 2, arr.length - 1);
-        // 計算 IQR
-        double iqr = q3 - q1;
-
-        // 計算上下界
-        double upperBound = q3 + 1 * iqr;
-        double lowerBound = q1 - 1 * iqr;
-
-        // 將超過上下界的值設為0
-        for (int i = 0; i < RRI.length; i++) {
-            if (RRI[i] > upperBound || RRI[i] < lowerBound) {
-                RRI[i] = 0;
-            }
-        }
-        ArrayList<Long> clearArrayList = new ArrayList<>();
-        // 找出所有不為0的值的平均數
-        for (int i = 0; i < RRI.length; i++) {
-            if (RRI[i] != 0 && RRI[i] > 300 && RRI[i] < 1100) {
-                clearArrayList.add(RRI[i]);
-            }
-        }
-        nonZeroValuesAPI23 = new long[clearArrayList.size()];
-        for (int i = 0; i < clearArrayList.size(); i++) {
-            nonZeroValuesAPI23[i] = clearArrayList.get(i);
-        }
-        return nonZeroValuesAPI23;
     }
 
     private void unpackJsonAndSave(String json) {
@@ -1045,8 +987,6 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
             }
         }).start();
     }
-
-
 }
 
 

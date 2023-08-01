@@ -5,6 +5,8 @@ import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class CalculateHRV {
     double rmssd;
@@ -61,6 +63,32 @@ public class CalculateHRV {
         } else {
             return arr[mid];
         }
+    }
+
+    public float[] calculateQuartiles(List<Float> values) {
+        // 先排序
+        Collections.sort(values);
+        // 計算中位數
+        float median;
+        int size = values.size();
+        if (size % 2 == 0) {
+            median = (values.get(size / 2 - 1) + values.get(size / 2)) / 2;
+        } else {
+            median = values.get(size / 2);
+        }
+
+        // 計算 Q1 和 Q3
+        float Q1, Q3;
+        int mid = size / 2;
+        if (size % 2 == 0) {
+            Q1 = (values.get(mid / 2 - 1) + values.get(mid / 2)) / 2;
+            Q3 = (values.get(mid + mid / 2 - 1) + values.get(mid + mid / 2)) / 2;
+        } else {
+            Q1 = values.get(mid / 2);
+            Q3 = values.get(mid + mid / 2);
+        }
+
+        return new float[]{Q1, median, Q3};
     }
 
     // 計算SDNN

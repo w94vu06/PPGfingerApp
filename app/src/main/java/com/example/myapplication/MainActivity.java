@@ -12,6 +12,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
@@ -21,6 +23,7 @@ import com.example.myapplication.Fragment.Profile;
 import com.example.myapplication.Fragment.Setting;
 import com.google.android.material.bottomappbar.BottomAppBar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationBarView;
 
 import org.greenrobot.eventbus.EventBus;
@@ -37,7 +40,7 @@ public class MainActivity extends AppCompatActivity implements MariaDBCallback {
     private FrameLayout fragmentContainer;
     private BottomAppBar bar;
     private BottomNavigationView navigationView;
-
+    private FloatingActionButton fab_measure;
     private String loginName, loginPhone;
     private String userId,userName, email, phone, birth;
     private int old, height, weight, sex, smokes, diabetes, hbp;
@@ -55,6 +58,7 @@ public class MainActivity extends AppCompatActivity implements MariaDBCallback {
         initPermission();
         fragmentContainer = findViewById(R.id.fragmentContainer);
         bar = findViewById(R.id.bar);
+        fab_measure = findViewById(R.id.fab_measure);
         setMain();//設定主畫面
         navigationView = findViewById(R.id.navigationView);
         navigationView.setOnItemSelectedListener(NaviSelectedListener);
@@ -62,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements MariaDBCallback {
         editor = preferences.edit();
         CheckInternetDialog checkInternetDialog = new CheckInternetDialog(MainActivity.this);
         checkInternetDialog.checkInternet();
+        enterPPG();
     }
 
     /**
@@ -224,6 +229,16 @@ public class MainActivity extends AppCompatActivity implements MariaDBCallback {
         editor.putInt("ProfileSmokes", smokes);
         editor.putInt("ProfileHbp", hbp);
         editor.apply();
+    }
+
+    public void enterPPG() {
+        fab_measure.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intentPPG = new Intent(MainActivity.this, CameraActivity.class);
+                startActivity(intentPPG);
+            }
+        });
     }
 
 

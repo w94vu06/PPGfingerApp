@@ -83,15 +83,16 @@
             <com.github.mikephil.charting.charts.LineChart
                 android:id="@+id/lineChart"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/dp_200"
+                android:layout_height="@dimen/dp_250"
                 android:layout_gravity="center"
                 android:layout_marginTop="@dimen/dp_0"/>
 
             <FrameLayout
-                android:layout_width="@dimen/dp_80"
-                android:layout_height="@dimen/dp_80"
+                android:layout_width="@dimen/dp_70"
+                android:layout_height="@dimen/dp_70"
                 android:layout_alignBottom="@id/lineChart"
-                android:layout_alignEnd="@id/lineChart">
+                android:layout_alignEnd="@id/lineChart"
+                android:layout_marginBottom="@dimen/dp_10">
 
                 <TextureView
                     android:id="@+id/texture"
