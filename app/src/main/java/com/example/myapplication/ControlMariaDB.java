@@ -29,11 +29,11 @@ public class ControlMariaDB {
     private static final OkHttpClient client = new OkHttpClient();
     Handler mHandler = new MHandler();
     Handler resHandler = new ResHandler();
-    String serverUrl = "https://8020-61-221-86-50.ngrok-free.app/"; //公司
+    String serverUrl = "https://b34b-59-126-42-176.ngrok-free.app/"; //公司
 //    String serverUrl = "http://192.168.0.102:5000/"; //家裡
 
     //    String calServerUrl = "http://192.168.2.97:8090";//計算用server
-    String calServerUrl = "https://8020-61-221-86-50.ngrok-free.app/";//計算用server
+    String calServerUrl = "https://b34b-59-126-42-176.ngrok-free.app/";//計算用server
     private final MariaDBCallback mCallback;
     private static final int MSG_REGISTER = 1;
     private static final int MSG_LOGIN = 2;
@@ -299,7 +299,8 @@ public class ControlMariaDB {
                             .build();
 
                     try (Response response = client.newCall(request).execute()) {
-                        String res = response.isSuccessful() ? Objects.requireNonNull(response.body()).string() : "open";
+                        String res = Objects.requireNonNull(response.body()).string();
+
                         Message msg = Message.obtain();
                         msg.what = MSG_TEST;
                         msg.obj = res;

@@ -1,5 +1,7 @@
 package com.example.myapplication.Data;
 
+import java.util.ArrayList;
+
 public class DataFeature {
 
     private final String name_feature;
@@ -16,5 +18,11 @@ public class DataFeature {
 
     public String getVal(){
         return val_feature.toString();
+    }
+    public static ArrayList<DataFeature> getList_Feature(){
+        ArrayList<DataFeature> list = new ArrayList<>();
+        list.add(new DataFeature("", 1.2));
+
+        return list;
     }
 }

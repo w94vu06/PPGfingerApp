@@ -43,14 +43,14 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 
-public class HomePage extends Fragment {
+public class HomePage extends Fragment{
 
     /** UI **/
     private View view;
     private Banner banner;
     private TextView txt_filename;
     private Button btn_choose,btn_count,btn_addSelect,btn_addCancel,btn_addDone;
-    private ImageButton imgbtn_add,imgbtn_close;
+//    private ImageButton imgbtn_add,imgbtn_close;
     private RecyclerView recycler_feature;
     private RecyclerView.Adapter adapter_feature;
     private ChooserDialog chooserDialog;
@@ -75,6 +75,24 @@ public class HomePage extends Fragment {
         initParameter();
         initChooser();
         return view;
+    }
+
+    /** Feature資料添加 **/
+    private void RecyclerViewFeature() {
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity(),
+                LinearLayoutManager.HORIZONTAL, false);
+        recycler_feature.setLayoutManager(linearLayoutManager);
+
+        ArrayList<DataFeature> featureList = new ArrayList<>();
+        featureList.add(new DataFeature("舒張壓", 0.0));
+        featureList.add(new DataFeature("收縮壓", 0.0));
+        featureList.add(new DataFeature("血糖L", 0.0));
+        featureList.add(new DataFeature("心率", 0.0));
+        featureList.add(new DataFeature("SDNN", 0.0));
+        featureList.add(new DataFeature("RMSSD", 0.0));
+
+        adapter_feature = new FeatureAdapter(featureList);
+        recycler_feature.setAdapter(adapter_feature);
     }
 
     @Override
@@ -107,9 +125,7 @@ public class HomePage extends Fragment {
         txt_filename = view.findViewById(R.id.txt_filename);
         btn_choose = view.findViewById(R.id.btn_choose);
         btn_count = view.findViewById(R.id.btn_count);
-        imgbtn_add = view.findViewById(R.id.imgbtn_add);
         btn_count.setOnClickListener(lis);
-        imgbtn_add.setOnClickListener(lis);
         useBanner();
         RecyclerViewFeature();
     }
@@ -176,7 +192,6 @@ public class HomePage extends Fragment {
         lp.height = ViewGroup.LayoutParams.WRAP_CONTENT;
         dialog.getWindow().setAttributes(lp);
         dialog.setCancelable(false);
-        imgbtn_close.setOnClickListener(lis);
         btn_addSelect.setOnClickListener(lis);
         btn_addDone.setOnClickListener(lis);
         btn_addCancel.setOnClickListener(lis);
@@ -202,10 +217,6 @@ public class HomePage extends Fragment {
                 case R.id.btn_choose:
                     break;
                 case R.id.btn_count:
-
-                    break;
-                case R.id.imgbtn_add:
-                    buildDialog();
                     break;
                 case R.id.btn_addCancel:
                     dialog.dismiss();
@@ -223,19 +234,6 @@ public class HomePage extends Fragment {
             }
         }
     };
-
-    private void RecyclerViewFeature(){
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity(),LinearLayoutManager.HORIZONTAL,false);
-        recycler_feature.setLayoutManager(new WrapContentLinearLayoutManager(getActivity(),LinearLayoutManager.HORIZONTAL,false));
-
-        featureList = new ArrayList<>();
-        if (checkFeature.size() == 0) {
-            featureList.add(new DataFeature("無資料", 0.0));
-        }
-        adapter_feature = new FeatureAdapter(featureList);
-        recycler_feature.setAdapter(adapter_feature);
-
-    }
 
     private void notifyDataChanged(){
         if (featureList != null){

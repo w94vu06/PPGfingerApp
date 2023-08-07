@@ -45,7 +45,7 @@ import java.util.List;
 
 public class Category extends Fragment implements RecordAdapter.OnItemListener, MariaDBCallback {
 
-//    private RecyclerView recycler_category, recycler_detail;
+    //    private RecyclerView recycler_category, recycler_detail;
 //    private RecyclerView.Adapter adapter_category, adapter_detail;
     private EditText edit_month;
     private RadioButton radiobtn_o2n, radiobtn_n2o;
@@ -114,12 +114,12 @@ public class Category extends Fragment implements RecordAdapter.OnItemListener, 
 
     }
 
-    public void createMonthDialog(final EditText edt){
+    public void createMonthDialog(final EditText edt) {
         MonthPickDialog dialog = new MonthPickDialog(getActivity());
         edt.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
-                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN){
+                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                     dialog.showDialog();
                     return true;
                 }
@@ -135,16 +135,17 @@ public class Category extends Fragment implements RecordAdapter.OnItemListener, 
         };
     }
 
-    private void RecyclerViewRecord(){
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity(),LinearLayoutManager.VERTICAL,false);
+    private void RecyclerViewRecord() {
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity(),
+                LinearLayoutManager.VERTICAL, false);
         recycler_record.setLayoutManager(linearLayoutManager);
 
         ArrayList<DataRecord> recordList = new ArrayList<>();
-        recordList.add(new DataRecord("2023-07-19","17:00"));
-        recordList.add(new DataRecord("2023-07-19","17:05"));
-        recordList.add(new DataRecord("2023-07-19","17:10"));
-        recordList.add(new DataRecord("2023-07-19","17:15"));
-        recordList.add(new DataRecord("2023-07-19","17:20"));
+        recordList.add(new DataRecord("2023-07-19", "17:00"));
+        recordList.add(new DataRecord("2023-07-19", "17:05"));
+        recordList.add(new DataRecord("2023-07-19", "17:10"));
+        recordList.add(new DataRecord("2023-07-19", "17:15"));
+        recordList.add(new DataRecord("2023-07-19", "17:20"));
 
         adapter_record = new RecordAdapter(recordList, this);
         recycler_record.setAdapter(adapter_record);
@@ -276,15 +277,15 @@ public class Category extends Fragment implements RecordAdapter.OnItemListener, 
 
 }
 
-class MonthPickDialog{
+class MonthPickDialog {
     private Activity activity;
     OnDialogRespond onDialogRespond;
 
-    public MonthPickDialog(Activity activity){
+    public MonthPickDialog(Activity activity) {
         this.activity = activity;
     }
 
-    public void showDialog(){
+    public void showDialog() {
         Dialog monthDialog = new Dialog(this.activity, R.style.MonthDialog);
         View contentView = LayoutInflater.from(this.activity).inflate(R.layout.dialog_month, null);
         monthDialog.setContentView(contentView);
@@ -295,8 +296,8 @@ class MonthPickDialog{
         monthDialog.getWindow().setWindowAnimations(R.style.dialogWindowAnim);
         monthDialog.show();
 
-        NumberPicker np_year,np_month;
-        Button btn_monthCancel,btn_monthDone;
+        NumberPicker np_year, np_month;
+        Button btn_monthCancel, btn_monthDone;
         np_year = contentView.findViewById(R.id.np_year);
         np_month = contentView.findViewById(R.id.np_month);
         btn_monthCancel = contentView.findViewById(R.id.btn_monthCancel);
@@ -305,8 +306,8 @@ class MonthPickDialog{
         Date date = new Date();
         int year = calendar.get(Calendar.YEAR);
 
-        np_year.setMaxValue(year+20);
-        np_year.setMinValue(year-20);
+        np_year.setMaxValue(year + 20);
+        np_year.setMinValue(year - 20);
         np_year.setValue(Integer.parseInt(new SimpleDateFormat("yyyy").format(date)));
         np_month.setMaxValue(12);
         np_month.setMinValue(1);
@@ -321,14 +322,14 @@ class MonthPickDialog{
         btn_monthDone.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String s = String.format("%04d-%02d",np_year.getValue(),np_month.getValue());
+                String s = String.format("%04d-%02d", np_year.getValue(), np_month.getValue());
                 onDialogRespond.onRespond(s);
                 monthDialog.dismiss();
             }
         });
     }
 
-    interface OnDialogRespond{
+    interface OnDialogRespond {
         void onRespond(String selected);
     }
 }

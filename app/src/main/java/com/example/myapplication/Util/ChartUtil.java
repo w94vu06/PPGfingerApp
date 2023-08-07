@@ -13,6 +13,7 @@ import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.listener.BarLineChartTouchListener;
 
+import java.util.List;
 import java.util.Locale;
 
 public class ChartUtil {

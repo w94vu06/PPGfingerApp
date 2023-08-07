@@ -14,7 +14,7 @@ public class CalculateHRV {
     long[] nonZeroValues;
 
     public long[] IQR(long[] RRI) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+
 //            double[] arr = Arrays.stream(RRI).asDoubleStream().toArray();
 
             double[] arr = new double[RRI.length];
@@ -50,7 +50,7 @@ public class CalculateHRV {
             for (int i = 0; i < clearArrayList.size(); i++) {
                 nonZeroValues[i] = clearArrayList.get(i);
             }
-        }
+
 
         return nonZeroValues;
     }
