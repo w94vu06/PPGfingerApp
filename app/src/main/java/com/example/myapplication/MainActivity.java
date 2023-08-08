@@ -251,7 +251,7 @@ public class MainActivity extends AppCompatActivity implements MariaDBCallback {
                 case R.id.record:
                     getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, new Record()).commit();
                     return true;
-                case R.id.category:
+                case R.id.record:
                     getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, new Category()).commit();
                     return true;
                 case R.id.profile:
