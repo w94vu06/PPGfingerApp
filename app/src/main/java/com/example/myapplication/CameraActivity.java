@@ -121,11 +121,13 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
     private ChartUtil chartUtil; // 圖表工具
     private LineChart chart; // 折線圖
     private Thread chartThread; // 圖表的執行緒
-    private int newFullAvgRed = 0; // 圖表上下界
-    private int maxFullAvgRed = Integer.MIN_VALUE;
-    private int minFullAvgRed = Integer.MAX_VALUE;
-    private boolean isFirstTwoSeconds = true;
     private List<Float> fullAvgRedList = new ArrayList<>();
+    private float fixedUpperBound = 0;
+    private float fixedLowerBound = 0;
+    private final float smoothFactor = 0.2f; // 調整平滑程度的因子
+    private List<Float> upperBoundDefault = new ArrayList<>();
+    private List<Float> lowerBoundDefault = new ArrayList<>();
+
 
     // 時間相關變數
     private String time = new SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault()).format(System.currentTimeMillis()); // 現在的時間字串
@@ -309,7 +311,6 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         initProgressBar();// 重置progressBar
         txt_phoneMarquee.setText("把手指靠近相機鏡頭，調整直到畫面\n充滿紅色，然後保持靜止。");
         txt_phoneCal.setText("");
-        isFirstTwoSeconds = true;
     }
 
     /**
@@ -391,7 +392,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
             if (fixAvgRedThreshold == 2 && averageGreenThreshold == 0 && averageBlueThreshold == 0) { //改
                 fullAvgRedList.add((float) fullAvgRed);
                 Log.d("zzzz", "run: " + fullAvgRedList.size());
-                setChartLimit();
+//                setChartLimit();
                 // Waits 20 captures, to remove startup artifacts.  First average is the sum.
                 //等待前幾個取樣，以去除啟動過程中的初始偏差
                 if (numRateCaptured == setHeartDetectTime) {
@@ -411,13 +412,6 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
                         mNumBeats++;
                         startChartRun();//開始跑圖表
                         initProgressBar();
-//                        if (!isFirstTwoSeconds) { // 如果不是前兩秒
-//
-//                        }
-//                        if (mNumBeats > prevNumBeats) {
-//
-//                        }
-//                        prevNumBeats = mNumBeats;
 
                         if (mNumBeats == totalCaptureRate) { //量測完成時
                             //計算量測秒數
@@ -427,9 +421,9 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
                             closeCamera();
                             calcBPM_RMMSD_SDNN();
                             removeRunnable();
-
                             chartIsRunning = false;
-                            isFirstTwoSeconds = true;
+                            chartUtil.calculateAndSetDefaultBounds(upperBoundDefault,lowerBoundDefault);
+
                         }
                     }
                 }
@@ -458,7 +452,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
             onPause();
             resetChartAndProgressBar();
             qualityHandler.removeCallbacks(qualityRunnable);
-            updateChartLimitHandler.removeCallbacks(updateChartLimitRunnable);
+//            updateChartLimitHandler.removeCallbacks(updateChartLimitRunnable);
             chartIsRunning = false;//關閉畫圖
             txt_phoneMarquee.setText("訊號過差，量測失敗");
         }
@@ -491,64 +485,117 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
     /**
      * 取中位數設定圖表上下界
      */
-    private Handler updateChartLimitHandler = new Handler();
-    private Runnable updateChartLimitRunnable = new Runnable() {
-        @Override
-        public void run() {
-            Log.d("hhhh", "取中位數正在執行");
-            if (fullAvgRedList.size() >= 30) {
-                // 計算四分位數
-                float[] quartiles = calculateHRV.calculateQuartiles(fullAvgRedList);
-                float Q1 = quartiles[0];
-                float Q3 = quartiles[2];
+//    private Handler updateChartLimitHandler = new Handler();
+//    private Runnable updateChartLimitRunnable = new Runnable() {
+//        @Override
+//        public void run() {
+//            Log.d("hhhh", "取中位數正在執行");
+//            if (fullAvgRedList.size() >= 45) {
+//                // 計算四分位數
+//                float[] quartiles = calculateHRV.calculateQuartiles(fullAvgRedList);
+//                float Q1 = quartiles[0];
+//                float Q2 = quartiles[1];
+//                float Q3 = quartiles[2];
+//
+//                // 設定上下界
+//                float interQuartileRange = Q3 - Q1;
+////                float upperBound = Q3 + 1.2f * interQuartileRange;
+//                float upperBound = Q2 * 1.2f;
+////                float lowerBound = Q1 - 1.2f * interQuartileRange;
+//                float lowerBound = upperBound - 50 ;
+//
+//                YAxis y = chart.getAxisLeft();
+//                y.setAxisMaximum(upperBound);
+//                y.setAxisMinimum(lowerBound);
+//
+//                fullAvgRedList.clear();
+//                isFirstTwoSeconds = false;
+//            }
+//            updateChartLimitHandler.postDelayed(this, 3000);
+//        }
+//    };
 
-                // 設定上下界
-                float interQuartileRange = Q3 - Q1;
-                float upperBound = Q3 + 1.2f * interQuartileRange;
-                float lowerBound = Q1 - 1.2f * interQuartileRange;
+//    private void setChartLimit() {
+//        YAxis y = chart.getAxisLeft();
+//
+//        if (fullAvgRedList.size() == 75) {
+//            // 計算四分位數
+//            float[] quartiles = calculateHRV.calculateQuartiles(fullAvgRedList);
+//            float Q1 = quartiles[0];
+//            float Q2 = quartiles[1];
+//            float Q3 = quartiles[2];
+//
+//            // 設定上下界
+//            float interQuartileRange = Q3 - Q1;
+//            float upperBound = Q1 + 4f * interQuartileRange;
+//            float lowerBound = Q3 - 4f * interQuartileRange;
+//
+//            runOnUiThread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    if (upperBound != 0 && lowerBound != 0 && upperBound > lowerBound) {
+//                        y.setAxisMaximum(upperBound);
+//                        y.setAxisMinimum(lowerBound);
+//                        Log.d("asdasd", "upperBound: "+upperBound+"\nlowerBound: "+lowerBound);
+//                    }
+//                }
+//            });
+////            fullAvgRedList.clear();
+//        }
+//
+//    }
 
-                YAxis y = chart.getAxisLeft();
-                y.setAxisMaximum(upperBound);
-                y.setAxisMinimum(lowerBound);
 
-                fullAvgRedList.clear();
-                isFirstTwoSeconds = false;
-            }
-            updateChartLimitHandler.postDelayed(this, 3000);
-        }
-    };
+
+
+
+    private void setFixedBounds(float upperBound, float lowerBound) {
+        fixedUpperBound = upperBound;
+        fixedLowerBound = lowerBound;
+    }
+
+    private void smoothBounds(float newUpperBound, float newLowerBound) {
+        fixedUpperBound = fixedUpperBound + (newUpperBound - fixedUpperBound) * smoothFactor;
+        fixedLowerBound = fixedLowerBound + (newLowerBound - fixedLowerBound) * smoothFactor;
+    }
 
     private void setChartLimit() {
         YAxis y = chart.getAxisLeft();
 
-        boolean isFirstSecond = true;
-        while (isFirstSecond) {
-            if (fullAvgRedList.size() >= 20) {
-
-            }
-        }
-
-        if (fullAvgRedList.size() >= 45) {
+        if (fullAvgRedList.size() >= 75) {
             // 計算四分位數
             float[] quartiles = calculateHRV.calculateQuartiles(fullAvgRedList);
             float Q1 = quartiles[0];
+            float Q2 = quartiles[1];
             float Q3 = quartiles[2];
 
             // 設定上下界
             float interQuartileRange = Q3 - Q1;
-            float upperBound = Q3 + 1.2f * interQuartileRange;
-            float lowerBound = Q1 - 1.2f * interQuartileRange;
+            float upperBound = Q1 + 4f * interQuartileRange;
+            float lowerBound = Q3 - 4f * interQuartileRange;
+
+            // 設定固定的上下界並執行平滑移動
+            setFixedBounds(upperBound, lowerBound);
+            smoothBounds(upperBound, lowerBound);
 
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    y.setAxisMaximum(upperBound);
-                    y.setAxisMinimum(lowerBound);
+                    if (fixedUpperBound != 0 && fixedLowerBound != 0 && fixedUpperBound > fixedLowerBound) {
+                        y.setAxisMaximum(fixedUpperBound * 1.02f);
+                        y.setAxisMinimum(fixedLowerBound * 0.98f);
+
+                        upperBoundDefault.add(fixedUpperBound);
+                        upperBoundDefault.add(fixedLowerBound);
+
+                        Log.d("asdasd", "fixedUpperBound: " + fixedUpperBound + "\nfixedLowerBound: " + fixedLowerBound);
+                    }
                 }
             });
             fullAvgRedList.clear();
         }
     }
+
 
 
     private void removeRunnable() {
@@ -568,6 +615,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
 
             //UI初始化
             chartUtil.initChart(chart);
+
             setSpinner_beats();
             spinner_beats.setSelection(lastSelectedItem);
             initDialog();
@@ -621,7 +669,6 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         spinner_beats.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-
                 lastSelectedItem = i;
                 switch (i) {
                     case 0:

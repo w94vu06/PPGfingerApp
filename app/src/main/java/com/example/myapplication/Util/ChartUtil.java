@@ -2,6 +2,7 @@ package com.example.myapplication.Util;
 
 import android.graphics.Color;
 
+import com.example.myapplication.CalculateHRV;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
@@ -18,6 +19,8 @@ import java.util.Locale;
 
 public class ChartUtil {
 
+    public float defaultUpperBound;
+    public float defaultLowerBound;
     /**
      * 設定圖表格式
      */
@@ -62,8 +65,9 @@ public class ChartUtil {
         y.setGridColor(Color.parseColor("#F2E5CC"));
         y.setGranularity(0.1f);
 
-        y.setAxisMaximum(255);//最高100
+        y.setAxisMaximum(255);//最高255
         y.setAxisMinimum(0);//最低0
+
         chart.getAxisRight().setEnabled(false);//右邊Y軸不可視
 //        chart.setVisibleXRange(0,50);//設置顯示範圍
         y.setInverted(true);
@@ -91,6 +95,31 @@ public class ChartUtil {
         set.setValueTextColor(Color.BLACK);
         set.setDrawValues(false);
         return set;
+    }
+    public void calculateAndSetDefaultBounds(List<Float> upperBoundDefault, List<Float> lowerBoundDefault) {
+        float totalUpperBound = 0;
+        float totalLowerBound = 0;
+
+        for (Float upperBound : upperBoundDefault) {
+            totalUpperBound += upperBound;
+        }
+
+        for (Float lowerBound : lowerBoundDefault) {
+            totalLowerBound += lowerBound;
+        }
+
+        if (!upperBoundDefault.isEmpty() && !lowerBoundDefault.isEmpty()) {
+            float avgUpperBound = totalUpperBound / upperBoundDefault.size();
+            float avgLowerBound = totalLowerBound / lowerBoundDefault.size();
+
+            // 設定為下次啟動量測時的預設上下界值
+            defaultUpperBound = avgUpperBound;
+            defaultLowerBound = avgLowerBound;
+        }
+
+        // 清空上下界值的列表
+        upperBoundDefault.clear();
+        lowerBoundDefault.clear();
     }
 
 }

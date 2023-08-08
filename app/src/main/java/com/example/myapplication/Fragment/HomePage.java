@@ -86,7 +86,7 @@ public class HomePage extends Fragment{
         ArrayList<DataFeature> featureList = new ArrayList<>();
         featureList.add(new DataFeature("舒張壓", 0.0));
         featureList.add(new DataFeature("收縮壓", 0.0));
-        featureList.add(new DataFeature("血糖L", 0.0));
+        featureList.add(new DataFeature("血糖", 0.0));
         featureList.add(new DataFeature("心率", 0.0));
         featureList.add(new DataFeature("SDNN", 0.0));
         featureList.add(new DataFeature("RMSSD", 0.0));

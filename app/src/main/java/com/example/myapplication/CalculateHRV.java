@@ -17,39 +17,39 @@ public class CalculateHRV {
 
 //            double[] arr = Arrays.stream(RRI).asDoubleStream().toArray();
 
-            double[] arr = new double[RRI.length];
-            for (int i = 0; i < RRI.length; i++) {
-                arr[i] = (double) RRI[i];
-            }
+        double[] arr = new double[RRI.length];
+        for (int i = 0; i < RRI.length; i++) {
+            arr[i] = (double) RRI[i];
+        }
 
-            Arrays.sort(arr);
+        Arrays.sort(arr);
 
-            double q1 = findMedian(arr, 0, arr.length / 2 - 1);
-            double q3 = findMedian(arr, arr.length / 2 + arr.length % 2, arr.length - 1);
-            // 計算 IQR
-            double iqr = q3 - q1;
+        double q1 = findMedian(arr, 0, arr.length / 2 - 1);
+        double q3 = findMedian(arr, arr.length / 2 + arr.length % 2, arr.length - 1);
+        // 計算 IQR
+        double iqr = q3 - q1;
 
-            // 計算上下界
-            double upperBound = q3 + 1 * iqr;
-            double lowerBound = q1 - 1 * iqr;
+        // 計算上下界
+        double upperBound = q3 + 1 * iqr;
+        double lowerBound = q1 - 1 * iqr;
 
-            // 將超過上下界的值設為0
-            for (int i = 0; i < RRI.length; i++) {
-                if (RRI[i] > upperBound || RRI[i] < lowerBound) {
-                    RRI[i] = 0;
-                }
+        // 將超過上下界的值設為0
+        for (int i = 0; i < RRI.length; i++) {
+            if (RRI[i] > upperBound || RRI[i] < lowerBound) {
+                RRI[i] = 0;
             }
-            ArrayList<Long> clearArrayList = new ArrayList<>();
-            // 找出所有不為0的值的平均數
-            for (int i = 0; i < RRI.length; i++) {
-                if (RRI[i] != 0 && RRI[i] > 300 && RRI[i] < 1100) {
-                    clearArrayList.add(RRI[i]);
-                }
+        }
+        ArrayList<Long> clearArrayList = new ArrayList<>();
+        // 找出所有不為0的值的平均數
+        for (int i = 0; i < RRI.length; i++) {
+            if (RRI[i] != 0 && RRI[i] > 300 && RRI[i] < 1100) {
+                clearArrayList.add(RRI[i]);
             }
-            nonZeroValues = new long[clearArrayList.size()];
-            for (int i = 0; i < clearArrayList.size(); i++) {
-                nonZeroValues[i] = clearArrayList.get(i);
-            }
+        }
+        nonZeroValues = new long[clearArrayList.size()];
+        for (int i = 0; i < clearArrayList.size(); i++) {
+            nonZeroValues[i] = clearArrayList.get(i);
+        }
 
 
         return nonZeroValues;
@@ -128,7 +128,7 @@ public class CalculateHRV {
         } else {
             medianNN = extendRRI[length / 2];
         }
-        return 60000/medianNN;
+        return 60000 / medianNN;
     }
 
     // 計算pNN50
@@ -157,7 +157,7 @@ public class CalculateHRV {
                 minNN = value;
             }
         }
-        return 60000/minNN;
+        return 60000 / minNN;
     }
 
     // 計算MinNN
@@ -168,7 +168,7 @@ public class CalculateHRV {
                 maxNN = value;
             }
         }
-        return 60000/maxNN;
+        return 60000 / maxNN;
     }
 
     // 計算平均值
@@ -187,4 +187,6 @@ public class CalculateHRV {
         med = (int) rri[rri.length / 2];
         return 60000 / med;
     }
+
+
 }
