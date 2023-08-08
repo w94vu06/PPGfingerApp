@@ -13,14 +13,13 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
-import com.example.myapplication.Fragment.Category;
+import com.example.myapplication.Fragment.Record;
 import com.example.myapplication.Fragment.HomePage;
 import com.example.myapplication.Fragment.Profile;
-import com.example.myapplication.Fragment.Setting;
+import com.example.myapplication.Fragment.Category;
 import com.google.android.material.bottomappbar.BottomAppBar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -249,11 +248,11 @@ public class MainActivity extends AppCompatActivity implements MariaDBCallback {
                 case R.id.homepage:
                     getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, new HomePage()).commit();
                     return true;
+                case R.id.record:
+                    getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, new Record()).commit();
+                    return true;
                 case R.id.category:
                     getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, new Category()).commit();
-                    return true;
-                case R.id.setting:
-                    getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, new Setting()).commit();
                     return true;
                 case R.id.profile:
                     getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, new Profile()).commit();
