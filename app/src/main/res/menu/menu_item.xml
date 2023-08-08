@@ -8,7 +8,7 @@
         android:icon="@drawable/home"/>
 
     <item
-        android:id="@+id/category"
+        android:id="@+id/record"
         android:title="RECORD"
         android:icon="@drawable/notes"/>
 
@@ -17,9 +17,9 @@
         android:title=""/>
 
     <item
-        android:id="@+id/setting"
-        android:title="SETTING"
-        android:icon="@drawable/setting"/>
+        android:id="@+id/category"
+        android:title="CATEGORY"
+        android:icon="@drawable/category"/>
 
     <item
         android:id="@+id/profile"
