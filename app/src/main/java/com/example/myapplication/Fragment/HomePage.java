@@ -224,7 +224,6 @@ public class HomePage extends Fragment{
 //                case R.id.btn_dialogCancel:
 //                    break;
                 case R.id.btn_addDone:
-//                    Toast.makeText(getContext(),checkFeature.toString(),Toast.LENGTH_SHORT).show();
                     if (checkFeature.size() == 0) {
                         dialog.dismiss();
                     }
