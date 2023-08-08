@@ -392,7 +392,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
             if (fixAvgRedThreshold == 2 && averageGreenThreshold == 0 && averageBlueThreshold == 0) { //改
                 fullAvgRedList.add((float) fullAvgRed);
                 Log.d("zzzz", "run: " + fullAvgRedList.size());
-//                setChartLimit();
+                setChartLimit();
                 // Waits 20 captures, to remove startup artifacts.  First average is the sum.
                 //等待前幾個取樣，以去除啟動過程中的初始偏差
                 if (numRateCaptured == setHeartDetectTime) {
@@ -544,11 +544,6 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
 //        }
 //
 //    }
-
-
-
-
-
     private void setFixedBounds(float upperBound, float lowerBound) {
         fixedUpperBound = upperBound;
         fixedLowerBound = lowerBound;
@@ -582,8 +577,8 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
                 @Override
                 public void run() {
                     if (fixedUpperBound != 0 && fixedLowerBound != 0 && fixedUpperBound > fixedLowerBound) {
-                        y.setAxisMaximum(fixedUpperBound * 1.02f);
-                        y.setAxisMinimum(fixedLowerBound * 0.98f);
+                        y.setAxisMaximum(fixedUpperBound * 1.01f);
+                        y.setAxisMinimum(fixedLowerBound * 0.99f);
 
                         upperBoundDefault.add(fixedUpperBound);
                         upperBoundDefault.add(fixedLowerBound);
@@ -995,43 +990,42 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
                 JSONObject jsonObject = new JSONObject(finalJson);
                 String userId = preferences.getString("ProfileId", "888889");
 
-                double AF_Similarity = jsonObject.getDouble("AF_Similarity");
-                double AI_Depression = jsonObject.getDouble("AI_Depression");
-                double AI_Heart_age = jsonObject.getDouble("AI_Heart_age");
-                double AI_bshl = jsonObject.getDouble("AI_bshl");
-                double AI_dis = jsonObject.getDouble("AI_dis");
-                double AI_medic = jsonObject.getDouble("AI_medic");
-                double BMI = jsonObject.getDouble("BMI");
-                double BPc_dia = jsonObject.getDouble("BPc_dia");
-                double BPc_sys = jsonObject.getDouble("BPc_sys");
-                double BSc = jsonObject.getDouble("BSc");
-                double Lf_Hf = jsonObject.getDouble("Lf/Hf");
+//                double AF_Similarity = jsonObject.getDouble("AF_Similarity");
+//                double AI_Heart_age = jsonObject.getDouble("AI_Heart_age");
+//                double AI_bshl = jsonObject.getDouble("AI_bshl");
+//                double AI_dis = jsonObject.getDouble("AI_dis");
+//                double AI_medic = jsonObject.getDouble("AI_medic");
+//                double BMI = jsonObject.getDouble("BMI");
+//                double BPc_dia = jsonObject.getDouble("BPc_dia");
+//                double BPc_sys = jsonObject.getDouble("BPc_sys");
+//                double BSc = jsonObject.getDouble("BSc");
+//                double Lf_Hf = jsonObject.getDouble("Lf/Hf");
                 double RMSSD = jsonObject.getDouble("RMSSD");
-                double Shannon_h = jsonObject.getDouble("Shannon_h");
-                double Total_Power = jsonObject.getDouble("Total_Power");
-                double ULF = jsonObject.getDouble("ULF");
-                double VHF = jsonObject.getDouble("VHF");
-                double VLF = jsonObject.getDouble("VLF");
-                double dis0bs1_0 = jsonObject.getDouble("dis0bs1_0");
-                double dis0bs1_1 = jsonObject.getDouble("dis0bs1_1");
-                double dis1bs1_0 = jsonObject.getDouble("dis1bs1_0");
-                double dis1bs1_1 = jsonObject.getDouble("dis1bs1_1");
-                double ecg_hr_max = jsonObject.getDouble("ecg_hr_max");
+//                double Shannon_h = jsonObject.getDouble("Shannon_h");
+//                double Total_Power = jsonObject.getDouble("Total_Power");
+//                double ULF = jsonObject.getDouble("ULF");
+//                double VHF = jsonObject.getDouble("VHF");
+//                double VLF = jsonObject.getDouble("VLF");
+//                double dis0bs1_0 = jsonObject.getDouble("dis0bs1_0");
+//                double dis0bs1_1 = jsonObject.getDouble("dis0bs1_1");
+//                double dis1bs1_0 = jsonObject.getDouble("dis1bs1_0");
+//                double dis1bs1_1 = jsonObject.getDouble("dis1bs1_1");
+//                double ecg_hr_max = jsonObject.getDouble("ecg_hr_max");
                 double ecg_hr_mean = jsonObject.getDouble("ecg_hr_mean");
-                double ecg_hr_min = jsonObject.getDouble("ecg_hr_min");
-                double ecg_rsp = jsonObject.getDouble("ecg_rsp");
-                double hbp = jsonObject.getDouble("hbp");
-                double hr_rsp_rate = jsonObject.getDouble("hr_rsp_rate");
-                double meanNN = jsonObject.getDouble("meanNN");
-                double pNN50 = jsonObject.getDouble("pNN50");
+//                double ecg_hr_min = jsonObject.getDouble("ecg_hr_min");
+//                double ecg_rsp = jsonObject.getDouble("ecg_rsp");
+//                double hbp = jsonObject.getDouble("hbp");
+//                double hr_rsp_rate = jsonObject.getDouble("hr_rsp_rate");
+//                double meanNN = jsonObject.getDouble("meanNN");
+//                double pNN50 = jsonObject.getDouble("pNN50");
                 double sdNN = jsonObject.getDouble("sdNN");
-                double total_scores = jsonObject.getDouble("total_scores");
-                double way_eat = jsonObject.getDouble("way_eat");
-                double way_eat_pa = jsonObject.getDouble("way_eat_pa");
-                double waybp1_0_dia = jsonObject.getDouble("waybp1_0_dia");
-                double waybp1_0_sys = jsonObject.getDouble("waybp1_0_sys");
-                double waybp1_1_dia = jsonObject.getDouble("waybp1_1_dia");
-                double year10scores = jsonObject.getDouble("year10scores");
+//                double total_scores = jsonObject.getDouble("total_scores");
+//                double way_eat = jsonObject.getDouble("way_eat");
+//                double way_eat_pa = jsonObject.getDouble("way_eat_pa");
+//                double waybp1_0_dia = jsonObject.getDouble("waybp1_0_dia");
+//                double waybp1_0_sys = jsonObject.getDouble("waybp1_0_sys");
+//                double waybp1_1_dia = jsonObject.getDouble("waybp1_1_dia");
+//                double year10scores = jsonObject.getDouble("year10scores");
 
                 String jsonString = jsonObject.toString();
                 runOnUiThread(new Runnable() {

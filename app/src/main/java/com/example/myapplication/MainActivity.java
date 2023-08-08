@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity implements MariaDBCallback {
     private BottomNavigationView navigationView;
     private FloatingActionButton fab_measure;
     private String loginName, loginPhone;
-    private String userId,userName, email, phone, birth;
+    private String userId, userName, email, phone, birth;
     private int old, height, weight, sex, smokes, diabetes, hbp;
 
     ControlMariaDB controlMariaDB = new ControlMariaDB(this);
@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements MariaDBCallback {
         setMain();//設定主畫面
         navigationView = findViewById(R.id.navigationView);
         navigationView.setOnItemSelectedListener(NaviSelectedListener);
-        preferences = getSharedPreferences( "my_preferences", MODE_PRIVATE);
+        preferences = getSharedPreferences("my_preferences", MODE_PRIVATE);
         editor = preferences.edit();
         CheckInternetDialog checkInternetDialog = new CheckInternetDialog(MainActivity.this);
         checkInternetDialog.checkInternet();
@@ -80,6 +80,7 @@ public class MainActivity extends AppCompatActivity implements MariaDBCallback {
             hasTask = true;
         }
     };
+
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         // 判斷是否按下Back
         if (keyCode == KeyEvent.KEYCODE_BACK) {
@@ -162,13 +163,15 @@ public class MainActivity extends AppCompatActivity implements MariaDBCallback {
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
+        boolean isLoggedIn = preferences.getBoolean("isLoggedIn", false);
         String jsonString = jsonData.toString();
         controlMariaDB.userRead(jsonString);
+
     }
 
     @Override
     public void onResult(String result) {
-        Log.d("resultLONG", "onResult: "+result);
+        Log.d("resultLONG", "onResult: " + result);
         if (result.equals("0")) {
             Toast.makeText(MainActivity.this, "請重新登入", Toast.LENGTH_SHORT).show();
             Intent it = new Intent(MainActivity.this, BeginActivity.class);
@@ -251,7 +254,7 @@ public class MainActivity extends AppCompatActivity implements MariaDBCallback {
                 case R.id.record:
                     getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, new Record()).commit();
                     return true;
-                case R.id.record:
+                case R.id.category:
                     getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, new Category()).commit();
                     return true;
                 case R.id.profile:
