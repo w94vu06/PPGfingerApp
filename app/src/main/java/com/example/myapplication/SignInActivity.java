@@ -3,12 +3,15 @@ package com.example.myapplication;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -39,7 +42,7 @@ public class SignInActivity extends AppCompatActivity implements MariaDBCallback
         setContentView(R.layout.activity_sign_in);
         closeTopBar();
         loginObject();
-        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN); //禁止自動彈出虛擬鍵盤
+//        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN); //禁止自動彈出虛擬鍵盤
     }
 
     public void loginObject() {
@@ -50,8 +53,22 @@ public class SignInActivity extends AppCompatActivity implements MariaDBCallback
         btn_login = findViewById(R.id.btn_login);
         remember = findViewById(R.id.rememberMe);
         setRememberAndLogin();
+        inputEditTextListener();
     }
 
+    private void inputEditTextListener() {
+        edit_phone.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
+                    // 虛擬鍵盤的回車鍵被按下
+                    btn_login.performClick(); // 觸發按鈕的點擊事件
+                    return true;
+                }
+                return false;
+            }
+        });
+    }
     public void setRememberAndLogin() {
         boolean isRemember = preferences.getBoolean("remember_phone", false);
         if (isRemember) {
@@ -59,6 +76,7 @@ public class SignInActivity extends AppCompatActivity implements MariaDBCallback
             String phone = preferences.getString("LoginPhone","");
             edit_userName.setText(name);
             edit_phone.setText(phone);
+
             remember.setChecked(true);
         }
         btn_login.setOnClickListener(new View.OnClickListener() {
@@ -70,12 +88,14 @@ public class SignInActivity extends AppCompatActivity implements MariaDBCallback
 
                 String name = edit_userName.getText().toString();
                 String phone = edit_phone.getText().toString();
+
                 if (TextUtils.isEmpty(edit_userName.getText().toString()) || TextUtils.isEmpty(edit_phone.getText().toString())) {
                     Toast.makeText(SignInActivity.this, "欄位不得為空", Toast.LENGTH_SHORT).show();
                     if (!TextUtil.isPhoneLegal(phone)) {
                         Toast.makeText(SignInActivity.this, "手機號碼格式錯誤", Toast.LENGTH_SHORT).show();
                     }
                 } else {
+                    Toast.makeText(SignInActivity.this, "驗證中...", Toast.LENGTH_SHORT).show();
                     editor = preferences.edit();
                     if (remember.isChecked()) {
                         editor.putBoolean("remember_phone", true);
@@ -87,6 +107,7 @@ public class SignInActivity extends AppCompatActivity implements MariaDBCallback
                     editor.apply();
                 }
                 packedJson();
+
                 controlMariaDB.userLogin(profileJson);
             }
         });
@@ -148,7 +169,7 @@ public class SignInActivity extends AppCompatActivity implements MariaDBCallback
             startActivity(goHomePage);
             finish();
         }else if (res == 0) {
-            Toast.makeText(SignInActivity.this, "登入失敗", Toast.LENGTH_SHORT).show();
+            Toast.makeText(SignInActivity.this, "帳號或密碼錯誤", Toast.LENGTH_SHORT).show();
         }
     }
 

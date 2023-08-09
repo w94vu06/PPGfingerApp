@@ -84,12 +84,15 @@ public class HomePage extends Fragment{
         recycler_feature.setLayoutManager(linearLayoutManager);
 
         ArrayList<DataFeature> featureList = new ArrayList<>();
-        featureList.add(new DataFeature("舒張壓", 0.0));
-        featureList.add(new DataFeature("收縮壓", 0.0));
-        featureList.add(new DataFeature("血糖", 0.0));
-        featureList.add(new DataFeature("心率", 0.0));
-        featureList.add(new DataFeature("SDNN", 0.0));
-        featureList.add(new DataFeature("RMSSD", 0.0));
+
+        featureList.add(new DataFeature("疲勞","0.0"+"/"+"0.1"));
+        featureList.add(new DataFeature("心情","0.0"+"/"+"0.1"));
+        featureList.add(new DataFeature("脈搏訊號","0.0"+"/"+"0.1"));
+//        featureList.add(new DataFeature("收縮壓", 0.0));
+        featureList.add(new DataFeature("飲食指標", "0.0"));
+        featureList.add(new DataFeature("心率", "0.0"));
+        featureList.add(new DataFeature("SDNN", "0.0"));
+        featureList.add(new DataFeature("RMSSD", "0.0"));
 
         adapter_feature = new FeatureAdapter(featureList);
         recycler_feature.setAdapter(adapter_feature);
@@ -227,24 +230,24 @@ public class HomePage extends Fragment{
                     if (checkFeature.size() == 0) {
                         dialog.dismiss();
                     }
-                    notifyDataChanged();
+//                    notifyDataChanged();
                     dialog.dismiss();
                     break;
             }
         }
     };
 
-    private void notifyDataChanged(){
-        if (featureList != null){
-            featureList.clear();
-            adapter_feature.notifyItemRangeRemoved(0,featureList.size());
-            //舒張壓:0、收縮壓:1、血糖:2、心率:3、SDNN:4、RMSSD:5
-            Random x = new Random();
-            for (int i=0; i<checkFeature.size(); i++){
-                Double y = (double)Math.round((x.nextDouble()*100.0)/100.0);
-                featureList.add(new DataFeature(checkFeature.get(i),y));
-            }
-            adapter_feature.notifyItemRangeInserted(0,checkFeature.size());
-        }
-    }
+//    private void notifyDataChanged(){
+//        if (featureList != null){
+//            featureList.clear();
+//            adapter_feature.notifyItemRangeRemoved(0,featureList.size());
+//            //舒張壓:0、收縮壓:1、血糖:2、心率:3、SDNN:4、RMSSD:5
+//            Random x = new Random();
+//            for (int i=0; i<checkFeature.size(); i++){
+//                Double y = (double)Math.round((x.nextDouble()*100.0)/100.0);
+//                featureList.add(new DataFeature(checkFeature.get(i),y));
+//            }
+//            adapter_feature.notifyItemRangeInserted(0,checkFeature.size());
+//        }
+//    }
 }

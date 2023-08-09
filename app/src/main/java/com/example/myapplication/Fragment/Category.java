@@ -87,7 +87,7 @@ public class Category extends Fragment implements CategoryAdapter.OnItemListener
         jsonObject.put("userId", userId);
 
         String json = jsonObject.toString();
-        controlMariaDB.userIdRead(json);
+//        controlMariaDB.userIdRead(json);
     }
 
     @Override

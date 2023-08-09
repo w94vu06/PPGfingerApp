@@ -46,6 +46,7 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
             super(itemView);
             txt_profileTitle = itemView.findViewById(R.id.txt_profileTitle);
             txt_profileData = itemView.findViewById(R.id.txt_profileData);
+            txt_profileData.setTextSize(15);
         }
     }
 }

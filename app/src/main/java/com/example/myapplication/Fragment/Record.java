@@ -67,15 +67,15 @@ public class Record extends Fragment implements RecordAdapter.OnItemListener, Ma
         createMonthDialog(edit_month);
         RecyclerViewRecord();
 
-        try {
-            boolean hasNewData = preferences.getBoolean("hasNewData", false);
-            if (hasNewData) {
-
-            }
-            setCategoryData();
-        } catch (JSONException e) {
-            throw new RuntimeException(e);
-        }
+//        try {
+//            boolean hasNewData = preferences.getBoolean("hasNewData", false);
+//            if (hasNewData) {
+//
+//            }
+//            setCategoryData();
+//        } catch (JSONException e) {
+//            throw new RuntimeException(e);
+//        }
         return view;
     }
 
@@ -86,7 +86,7 @@ public class Record extends Fragment implements RecordAdapter.OnItemListener, Ma
         jsonObject.put("userId", userId);
 
         String json = jsonObject.toString();
-        controlMariaDB.userIdRead(json);
+//        controlMariaDB.userIdRead(json);
     }
 
     @Override
@@ -269,8 +269,6 @@ public class Record extends Fragment implements RecordAdapter.OnItemListener, Ma
 //                break;
 //        }
 //    }
-
-
 }
 
 class MonthPickDialog {

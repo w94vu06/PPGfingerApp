@@ -169,6 +169,10 @@ public class MainActivity extends AppCompatActivity implements MariaDBCallback {
 
     }
 
+    private void searchNewData() {
+
+    }
+
     @Override
     public void onResult(String result) {
         Log.d("resultLONG", "onResult: " + result);

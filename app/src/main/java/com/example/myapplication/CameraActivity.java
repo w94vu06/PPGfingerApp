@@ -71,6 +71,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
     // 相機和使用者介面相關變數
     private ControlMariaDB controlMariaDB = new ControlMariaDB(this);
     private SharedPreferences preferences; // 儲存使用者設定的SharedPreferences
+    private SharedPreferences.Editor editor;
     private TextureView CameraView; // 相機預覽的TextureView
     private CameraDevice cameraDevice; // 相機設備
     private CameraCaptureSession cameraCaptureSessions; // 相機捕獲會話
@@ -557,6 +558,8 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
     private void setChartLimit() {
         YAxis y = chart.getAxisLeft();
 
+
+
         if (fullAvgRedList.size() >= 75) {
             // 計算四分位數
             float[] quartiles = calculateHRV.calculateQuartiles(fullAvgRedList);
@@ -747,6 +750,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
             for (String s : showHRVOnPhone) {
                 txt_phoneCal.append(s + "\n");
             }
+            editor.putBoolean("hasNewData", true);
             onPause();
         } catch (Exception e) {
             System.out.println(e);
@@ -772,8 +776,9 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
             String diabetes = String.valueOf(preferences.getInt("ProfileDiabetes", -1));
             String smokes = String.valueOf(preferences.getInt("ProfileSmokes", -1));
             String hbp = String.valueOf(preferences.getInt("ProfileHbp", -1));
-//            String morningdiabetes = String.valueOf(preferences.getInt("ProfileOld", 0));
-//            String aftermealdiabetes = String.valueOf(preferences.getInt("ProfileOld", 0));
+            String morningdiabetes = String.valueOf(preferences.getInt("ProfileOld", -1));
+            String aftermealdiabetes = String.valueOf(preferences.getInt("ProfileOld", -1));
+
 //            String userstatus = String.valueOf(preferences.getInt("ProfileOld", 0));
 //            String mealstatus = String.valueOf(preferences.getInt("ProfileOld", 0));
 //            String medicationstatus = String.valueOf(preferences.getInt("ProfileOld", 0));
@@ -796,9 +801,9 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
                 jsonData.put("smokes", smokes);
                 jsonData.put("hbp", hbp);
 
+                jsonData.put("morningdiabetes", morningdiabetes);
+                jsonData.put("aftermealdiabetes", aftermealdiabetes);
                 //not yet
-                jsonData.put("morningdiabetes", "-1");
-                jsonData.put("aftermealdiabetes", "-1");
                 jsonData.put("userstatus", "-1");
                 jsonData.put("mealstatus", "-1");
                 jsonData.put("medicationstatus", "-1");
@@ -991,9 +996,10 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
                 String userId = preferences.getString("ProfileId", "888889");
 
 //                double AF_Similarity = jsonObject.getDouble("AF_Similarity");
-//                double AI_Heart_age = jsonObject.getDouble("AI_Heart_age");
 //                double AI_bshl = jsonObject.getDouble("AI_bshl");
+//                double AI_bshl_pa = jsonObject.getDouble("AI_bshl_pa");
 //                double AI_dis = jsonObject.getDouble("AI_dis");
+//                double AI_dis_pa = jsonObject.getDouble("AI_dis_pa");
 //                double AI_medic = jsonObject.getDouble("AI_medic");
 //                double BMI = jsonObject.getDouble("BMI");
 //                double BPc_dia = jsonObject.getDouble("BPc_dia");
@@ -1014,17 +1020,19 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
                 double ecg_hr_mean = jsonObject.getDouble("ecg_hr_mean");
 //                double ecg_hr_min = jsonObject.getDouble("ecg_hr_min");
 //                double ecg_rsp = jsonObject.getDouble("ecg_rsp");
+//                double fatigue = jsonObject.getDouble("fatigue");
 //                double hbp = jsonObject.getDouble("hbp");
 //                double hr_rsp_rate = jsonObject.getDouble("hr_rsp_rate");
 //                double meanNN = jsonObject.getDouble("meanNN");
+//                double mood_state = jsonObject.getDouble("mood_state");
 //                double pNN50 = jsonObject.getDouble("pNN50");
                 double sdNN = jsonObject.getDouble("sdNN");
 //                double total_scores = jsonObject.getDouble("total_scores");
 //                double way_eat = jsonObject.getDouble("way_eat");
 //                double way_eat_pa = jsonObject.getDouble("way_eat_pa");
-//                double waybp1_0_dia = jsonObject.getDouble("waybp1_0_dia");
-//                double waybp1_0_sys = jsonObject.getDouble("waybp1_0_sys");
-//                double waybp1_1_dia = jsonObject.getDouble("waybp1_1_dia");
+//                double waybs1_0 = jsonObject.getDouble("waybs1_0");
+//                double waybs1_1 = jsonObject.getDouble("waybs1_1");
+
 //                double year10scores = jsonObject.getDouble("year10scores");
 
                 String jsonString = jsonObject.toString();

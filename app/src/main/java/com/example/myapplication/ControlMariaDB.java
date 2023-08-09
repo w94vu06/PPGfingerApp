@@ -260,8 +260,8 @@ public class ControlMariaDB {
                 MediaType mediaType = MediaType.parse("application/json; charset=utf-8");
                 RequestBody requestBody = RequestBody.create(mediaType, jsonString);
                 Request request = new Request.Builder()
-                        .url(calServerUrl + "calculate")
-//                        .url(calServerUrl)
+//                        .url(calServerUrl + "calculate")
+                        .url("http://59.126.42.176:8090")
                         .post(requestBody)
                         .build();
 

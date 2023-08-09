@@ -128,7 +128,7 @@ public class CalculateHRV {
         } else {
             medianNN = extendRRI[length / 2];
         }
-        return 60000 / medianNN;
+        return medianNN;
     }
 
     // 計算pNN50
