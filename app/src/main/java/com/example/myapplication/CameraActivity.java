@@ -23,6 +23,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.util.Size;
 import android.view.Surface;
@@ -70,7 +71,7 @@ import java.util.regex.Pattern;
 public class CameraActivity extends AppCompatActivity implements MariaDBCallback {
     // 相機和使用者介面相關變數
     private ControlMariaDB controlMariaDB = new ControlMariaDB(this);
-    private SharedPreferences preferences; // 儲存使用者設定的SharedPreferences
+    private SharedPreferences preferences;
     private SharedPreferences.Editor editor;
     private TextureView CameraView; // 相機預覽的TextureView
     private CameraDevice cameraDevice; // 相機設備
@@ -128,6 +129,8 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
     private final float smoothFactor = 0.2f; // 調整平滑程度的因子
     private List<Float> upperBoundDefault = new ArrayList<>();
     private List<Float> lowerBoundDefault = new ArrayList<>();
+    private float upperBound;
+    private float lowerBound;
 
 
     // 時間相關變數
@@ -142,9 +145,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ppg);
 
-        preferences = getSharedPreferences("my_preferences", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-
+        preferences = getSharedPreferences("my_preferences", MODE_PRIVATE);
         CameraView = findViewById(R.id.texture);
         CameraView.setSurfaceTextureListener(textureListener);
 
@@ -156,7 +157,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         chart = findViewById(R.id.lineChart);
         chartUtil = new ChartUtil();
         chartUtil.initChart(chart);//確保畫布初始化
-
+        setPreferChartLimit();
         spinner_beats = findViewById(R.id.spinner_beats);
         progressBar = findViewById(R.id.progressBar_Circle);
         progressBar_text = findViewById(R.id.progress_text);
@@ -180,6 +181,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         setScreenOn();
         startBackgroundThread();
         chartUtil.initChart(chart);//確保畫布初始化
+        setPreferChartLimit();
         idleHandler.removeCallbacks(idleRunnable);
         if (CameraView.isAvailable()) {
             openCamera();
@@ -308,6 +310,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
     private void resetChartAndProgressBar() {
         chart.clear(); // 畫布清除
         chartUtil.initChart(chart);//確保畫布初始化
+        setPreferChartLimit();
         initValue(); // 初始化量測用數值
         initProgressBar();// 重置progressBar
         txt_phoneMarquee.setText("把手指靠近相機鏡頭，調整直到畫面\n充滿紅色，然後保持靜止。");
@@ -420,10 +423,11 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
                             elapsedSecond = elapsedTime / 1000;
 
                             closeCamera();
+                            Toast.makeText(CameraActivity.this, "伺服端計算中...", Toast.LENGTH_SHORT).show();
                             calcBPM_RMMSD_SDNN();
                             removeRunnable();
                             chartIsRunning = false;
-                            chartUtil.calculateAndSetDefaultBounds(upperBoundDefault,lowerBoundDefault);
+                            calLastTimeChartLimit();
 
                         }
                     }
@@ -441,6 +445,25 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
 
         }
     };
+
+    private void calLastTimeChartLimit() {
+        chartUtil.calculateAndSetDefaultBounds(upperBoundDefault, lowerBoundDefault);
+        float upper = chartUtil.defaultUpperBound;
+        float lower = chartUtil.defaultLowerBound;
+
+        editor = preferences.edit();
+        editor.putFloat("lastUpper", upper);
+        editor.putFloat("lastLower", lower);
+        editor.apply();
+    }
+
+    private void setPreferChartLimit() {
+        float upper = preferences.getFloat("lastUpper", 255);
+        float lower = preferences.getFloat("lastLower", 0);
+        YAxis y = chart.getAxisLeft();
+        y.setAxisMaximum(upper);
+        y.setAxisMinimum(lower);
+    }
 
     /**
      * 閒置太久強制中止
@@ -558,8 +581,6 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
     private void setChartLimit() {
         YAxis y = chart.getAxisLeft();
 
-
-
         if (fullAvgRedList.size() >= 75) {
             // 計算四分位數
             float[] quartiles = calculateHRV.calculateQuartiles(fullAvgRedList);
@@ -569,13 +590,12 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
 
             // 設定上下界
             float interQuartileRange = Q3 - Q1;
-            float upperBound = Q1 + 4f * interQuartileRange;
-            float lowerBound = Q3 - 4f * interQuartileRange;
+            upperBound = Q1 + 4f * interQuartileRange;
+            lowerBound = Q3 - 4f * interQuartileRange;
 
             // 設定固定的上下界並執行平滑移動
             setFixedBounds(upperBound, lowerBound);
             smoothBounds(upperBound, lowerBound);
-
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -584,16 +604,16 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
                         y.setAxisMinimum(fixedLowerBound * 0.99f);
 
                         upperBoundDefault.add(fixedUpperBound);
-                        upperBoundDefault.add(fixedLowerBound);
+                        lowerBoundDefault.add(fixedLowerBound);
 
                         Log.d("asdasd", "fixedUpperBound: " + fixedUpperBound + "\nfixedLowerBound: " + fixedLowerBound);
                     }
                 }
             });
+
             fullAvgRedList.clear();
         }
     }
-
 
 
     private void removeRunnable() {
@@ -613,7 +633,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
 
             //UI初始化
             chartUtil.initChart(chart);
-
+            setPreferChartLimit();
             setSpinner_beats();
             spinner_beats.setSelection(lastSelectedItem);
             initDialog();
@@ -745,12 +765,12 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
             txt_phoneMarquee.append("手機端：RMSSD：" + phoneRMSSD + "\nSDNN：" + phoneSDNN + "\nBPM：" + phoneBPM);
             txt_phoneCal.setText("");
             String showHRV = "RMSSD：" + phoneRMSSD + ",SDNN：" + phoneSDNN + ",ecg_hr_mean：" + phoneBPM +
-                    ",MedianNN：" + phoneMedianNN + ",pNN50：" + phonePNN50 + ",minNN：" + phoneMinNN + ",maxNN：" + phoneMaxNN;
+                    ",MedianNN：" + phoneMedianNN + ",pNN50：" + phonePNN50 + ",min_hr：" + phoneMinNN + ",max_hr：" + phoneMaxNN;
             String[] showHRVOnPhone = showHRV.split(",");
             for (String s : showHRVOnPhone) {
                 txt_phoneCal.append(s + "\n");
             }
-            editor.putBoolean("hasNewData", true);
+
             onPause();
         } catch (Exception e) {
             System.out.println(e);
@@ -817,6 +837,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
             }
             String jsonString = jsonData.toString();
             controlMariaDB.jsonUploadToServer(jsonString);
+
         }
     }
 
@@ -995,45 +1016,81 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
                 JSONObject jsonObject = new JSONObject(finalJson);
                 String userId = preferences.getString("ProfileId", "888889");
 
-//                double AF_Similarity = jsonObject.getDouble("AF_Similarity");
-//                double AI_bshl = jsonObject.getDouble("AI_bshl");
-//                double AI_bshl_pa = jsonObject.getDouble("AI_bshl_pa");
-//                double AI_dis = jsonObject.getDouble("AI_dis");
-//                double AI_dis_pa = jsonObject.getDouble("AI_dis_pa");
-//                double AI_medic = jsonObject.getDouble("AI_medic");
-//                double BMI = jsonObject.getDouble("BMI");
-//                double BPc_dia = jsonObject.getDouble("BPc_dia");
-//                double BPc_sys = jsonObject.getDouble("BPc_sys");
-//                double BSc = jsonObject.getDouble("BSc");
-//                double Lf_Hf = jsonObject.getDouble("Lf/Hf");
+                double AF_Similarity = jsonObject.getDouble("AF_Similarity");
+                double AI_bshl = jsonObject.getDouble("AI_bshl");
+                double AI_bshl_pa = jsonObject.getDouble("AI_bshl_pa");
+                double AI_dis = jsonObject.getDouble("AI_dis");
+                double AI_dis_pa = jsonObject.getDouble("AI_dis_pa");
+                double AI_medic = jsonObject.getDouble("AI_medic");
+                double BMI = jsonObject.getDouble("BMI");
+                double BPc_dia = jsonObject.getDouble("BPc_dia");
+                double BPc_sys = jsonObject.getDouble("BPc_sys");
+                double BSc = jsonObject.getDouble("BSc");
+                double Lf_Hf = jsonObject.getDouble("Lf/Hf");
                 double RMSSD = jsonObject.getDouble("RMSSD");
-//                double Shannon_h = jsonObject.getDouble("Shannon_h");
-//                double Total_Power = jsonObject.getDouble("Total_Power");
-//                double ULF = jsonObject.getDouble("ULF");
-//                double VHF = jsonObject.getDouble("VHF");
-//                double VLF = jsonObject.getDouble("VLF");
-//                double dis0bs1_0 = jsonObject.getDouble("dis0bs1_0");
-//                double dis0bs1_1 = jsonObject.getDouble("dis0bs1_1");
-//                double dis1bs1_0 = jsonObject.getDouble("dis1bs1_0");
-//                double dis1bs1_1 = jsonObject.getDouble("dis1bs1_1");
-//                double ecg_hr_max = jsonObject.getDouble("ecg_hr_max");
+                double Shannon_h = jsonObject.getDouble("Shannon_h");
+                double Total_Power = jsonObject.getDouble("Total_Power");
+                double ULF = jsonObject.getDouble("ULF");
+                double VHF = jsonObject.getDouble("VHF");
+                double VLF = jsonObject.getDouble("VLF");
+                double dis0bs1_0 = jsonObject.getDouble("dis0bs1_0");
+                double dis0bs1_1 = jsonObject.getDouble("dis0bs1_1");
+                double dis1bs1_0 = jsonObject.getDouble("dis1bs1_0");
+                double dis1bs1_1 = jsonObject.getDouble("dis1bs1_1");
+                double ecg_hr_max = jsonObject.getDouble("ecg_hr_max");
                 double ecg_hr_mean = jsonObject.getDouble("ecg_hr_mean");
-//                double ecg_hr_min = jsonObject.getDouble("ecg_hr_min");
-//                double ecg_rsp = jsonObject.getDouble("ecg_rsp");
-//                double fatigue = jsonObject.getDouble("fatigue");
-//                double hbp = jsonObject.getDouble("hbp");
-//                double hr_rsp_rate = jsonObject.getDouble("hr_rsp_rate");
-//                double meanNN = jsonObject.getDouble("meanNN");
-//                double mood_state = jsonObject.getDouble("mood_state");
-//                double pNN50 = jsonObject.getDouble("pNN50");
+                double ecg_hr_min = jsonObject.getDouble("ecg_hr_min");
+                double ecg_rsp = jsonObject.getDouble("ecg_rsp");
+                String fatigue = jsonObject.getString("fatigue");
+                double hbp = jsonObject.getDouble("hbp");
+                double hr_rsp_rate = jsonObject.getDouble("hr_rsp_rate");
+                double meanNN = jsonObject.getDouble("meanNN");
+                double mood_state = jsonObject.getDouble("mood_state");
+                double pNN50 = jsonObject.getDouble("pNN50");
                 double sdNN = jsonObject.getDouble("sdNN");
-//                double total_scores = jsonObject.getDouble("total_scores");
-//                double way_eat = jsonObject.getDouble("way_eat");
-//                double way_eat_pa = jsonObject.getDouble("way_eat_pa");
-//                double waybs1_0 = jsonObject.getDouble("waybs1_0");
-//                double waybs1_1 = jsonObject.getDouble("waybs1_1");
+                double total_scores = jsonObject.getDouble("total_scores");
+                double way_eat = jsonObject.getDouble("way_eat");
+                double way_eat_pa = jsonObject.getDouble("way_eat_pa");
+                double year10scores = jsonObject.getDouble("year10scores");
 
-//                double year10scores = jsonObject.getDouble("year10scores");
+                editor = preferences.edit();
+                editor.putFloat("AF_Similarity", (float) AF_Similarity);
+                editor.putFloat("AI_bshl", (float) AI_bshl);
+                editor.putFloat("AI_bshl_pa", (float) AI_bshl_pa);
+                editor.putFloat("AI_dis", (float) AI_dis);
+                editor.putFloat("AI_dis_pa", (float) AI_dis_pa);
+                editor.putFloat("AI_medic", (float) AI_medic);
+                editor.putFloat("BMI", (float) BMI);
+                editor.putFloat("BPc_dia", (float) BPc_dia);
+                editor.putFloat("BPc_sys", (float) BPc_sys);
+                editor.putFloat("BSc", (float) BSc);
+                editor.putFloat("Lf/Hf", (float) Lf_Hf);
+                editor.putFloat("RMSSD", (float) RMSSD);
+                editor.putFloat("Shannon_h", (float) Shannon_h);
+                editor.putFloat("Total_Power", (float) Total_Power);
+                editor.putFloat("ULF", (float) ULF);
+                editor.putFloat("VHF", (float) VHF);
+                editor.putFloat("VLF", (float) VLF);
+                editor.putFloat("dis0bs1_0", (float) dis0bs1_0);
+                editor.putFloat("dis0bs1_1", (float) dis0bs1_1);
+                editor.putFloat("dis1bs1_0", (float) dis1bs1_0);
+                editor.putFloat("dis1bs1_1", (float) dis1bs1_1);
+                editor.putFloat("ecg_hr_max", (float) ecg_hr_max);
+                editor.putFloat("ecg_hr_mean", (float) ecg_hr_mean);
+                editor.putFloat("ecg_hr_min", (float) ecg_hr_min);
+                editor.putFloat("ecg_rsp", (float) ecg_rsp);
+                editor.putString("fatigue", fatigue);
+                editor.putFloat("hbp", (float) hbp);
+                editor.putFloat("hr_rsp_rate", (float) hr_rsp_rate);
+                editor.putFloat("meanNN", (float) meanNN);
+                editor.putFloat("mood_state", (float) mood_state);
+                editor.putFloat("pNN50", (float) pNN50);
+                editor.putFloat("sdNN", (float) sdNN);
+                editor.putFloat("total_scores", (float) total_scores);
+                editor.putFloat("way_eat", (float) way_eat);
+                editor.putFloat("way_eat_pa", (float) way_eat_pa);
+                editor.putFloat("year10scores", (float) year10scores);
+                editor.apply();
 
                 String jsonString = jsonObject.toString();
                 runOnUiThread(new Runnable() {
@@ -1049,7 +1106,6 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
                             String cleanedLine = pattern.matcher(line).replaceAll("");
                             txt_aiCal.append(cleanedLine + "\n");
                         }
-
                     }
                 });
 
@@ -1061,9 +1117,11 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
                 jsonObject.put("time", time);
 
                 String jsonString2 = jsonObject.toString();
-
                 controlMariaDB.userIdSave(jsonString2);
 
+                editor = preferences.edit();
+                editor.putBoolean("hasNewData", true);
+                editor.apply();
             } catch (JSONException e) {
                 e.printStackTrace();
             }

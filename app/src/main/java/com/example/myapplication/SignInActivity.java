@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
@@ -147,6 +148,7 @@ public class SignInActivity extends AppCompatActivity implements MariaDBCallback
 
     @Override
     public void onResult(String result) {
+
         int eventCode = Integer.parseInt(result);
         judgeEventCode(eventCode);
     }

@@ -2,6 +2,8 @@ package com.example.myapplication;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.Manifest;
 import android.content.Intent;
@@ -24,6 +26,7 @@ import com.google.android.material.bottomappbar.BottomAppBar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationBarView;
+import com.google.android.material.tabs.TabLayout;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -56,16 +59,16 @@ public class MainActivity extends AppCompatActivity implements MariaDBCallback {
         setContentView(R.layout.activity_main);
         initPermission();
         fragmentContainer = findViewById(R.id.fragmentContainer);
-        bar = findViewById(R.id.bar);
-        fab_measure = findViewById(R.id.fab_measure);
-        setMain();//設定主畫面
         navigationView = findViewById(R.id.navigationView);
         navigationView.setOnItemSelectedListener(NaviSelectedListener);
-        preferences = getSharedPreferences("my_preferences", MODE_PRIVATE);
-        editor = preferences.edit();
+        switchFragment(new HomePage()).commit();//設定主畫面
+        bar = findViewById(R.id.bar);
+        fab_measure = findViewById(R.id.fab_measure);
         CheckInternetDialog checkInternetDialog = new CheckInternetDialog(MainActivity.this);
         checkInternetDialog.checkInternet();
         enterPPG();
+        preferences = getSharedPreferences("my_preferences", MODE_PRIVATE);
+        editor = preferences.edit();
     }
 
     /**
@@ -126,13 +129,13 @@ public class MainActivity extends AppCompatActivity implements MariaDBCallback {
     @Override
     public void onStart() {
         super.onStart();
+
         String name = preferences.getString("userName", null);
         if (name == null) {
             readProfile();
         }
         EventBus.getDefault().register(this);
     }
-
     @Override
     public void onStop() {
         super.onStop();
@@ -152,10 +155,9 @@ public class MainActivity extends AppCompatActivity implements MariaDBCallback {
     /**
      * 透過preference裡的資料到資料庫查詢profile
      **/
-
     public void readProfile() {
-        loginName = preferences.getString("LoginName", "null");
-        loginPhone = preferences.getString("LoginPhone", "null");
+        loginName = preferences.getString("LoginName", null);
+        loginPhone = preferences.getString("LoginPhone", null);
         JSONObject jsonData = new JSONObject();
         try {
             jsonData.put("userName", loginName);
@@ -163,18 +165,15 @@ public class MainActivity extends AppCompatActivity implements MariaDBCallback {
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
-        boolean isLoggedIn = preferences.getBoolean("isLoggedIn", false);
-        String jsonString = jsonData.toString();
-        controlMariaDB.userRead(jsonString);
-
-    }
-
-    private void searchNewData() {
-
+        if (loginName == null) {
+            String jsonString = jsonData.toString();
+            controlMariaDB.userRead(jsonString);
+        }
     }
 
     @Override
     public void onResult(String result) {
+        //userRead
         Log.d("resultLONG", "onResult: " + result);
         if (result.equals("0")) {
             Toast.makeText(MainActivity.this, "請重新登入", Toast.LENGTH_SHORT).show();
@@ -190,7 +189,6 @@ public class MainActivity extends AppCompatActivity implements MariaDBCallback {
 
     @Override
     public void onSave(String result) {
-
     }
 
     @Override
@@ -247,30 +245,50 @@ public class MainActivity extends AppCompatActivity implements MariaDBCallback {
         });
     }
 
-
     private final NavigationBarView.OnItemSelectedListener NaviSelectedListener = new NavigationBarView.OnItemSelectedListener() {
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.homepage:
-                    getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, new HomePage()).commit();
+                    switchFragment(new HomePage()).commit();
+//                    getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, new HomePage()).commit();
                     return true;
                 case R.id.record:
-                    getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, new Record()).commit();
+                    switchFragment(new Record()).commit();
+//                    getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, new Record()).commit();
                     return true;
                 case R.id.category:
-                    getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, new Category()).commit();
+                    switchFragment(new Category()).commit();
+//                    getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, new Category()).commit();
                     return true;
                 case R.id.profile:
-                    getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, new Profile()).commit();
+                    switchFragment(new Profile()).commit();
+//                    getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, new Profile()).commit();
                     return true;
             }
             return false;
         }
     };
 
+    private Fragment currentFragment = new Fragment();
+
+    private FragmentTransaction switchFragment(Fragment targetFragment) {
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        if (!targetFragment.isAdded()) {
+            if (currentFragment != null) {
+                transaction.hide(currentFragment);
+            }
+            transaction.add(R.id.fragmentContainer, targetFragment, targetFragment.getClass().getName());
+        } else {
+            transaction.hide(currentFragment).show(targetFragment);
+        }
+        currentFragment = targetFragment;
+        return transaction;
+    }
+
+
     private void setMain() {
-        this.getSupportFragmentManager().beginTransaction().add(R.id.fragmentContainer, new HomePage()).commit();
+//        this.getSupportFragmentManager().beginTransaction().add(R.id.fragmentContainer, new HomePage()).commit();
     }
 
     private String decodeUnicode(String unicodeString) {
@@ -293,6 +311,5 @@ public class MainActivity extends AppCompatActivity implements MariaDBCallback {
         }
         return sb.toString();
     }
-
 
 }

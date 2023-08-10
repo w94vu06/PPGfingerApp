@@ -1,21 +1,12 @@
 package com.example.myapplication;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import org.greenrobot.eventbus.EventBus;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Locale;
 import java.util.Objects;
 
 import okhttp3.MediaType;
@@ -23,24 +14,23 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import okhttp3.ResponseBody;
 
 public class ControlMariaDB {
     private static final OkHttpClient client = new OkHttpClient();
     Handler mHandler = new MHandler();
     Handler resHandler = new ResHandler();
-    String serverUrl = "https://b34b-59-126-42-176.ngrok-free.app/"; //公司
+    String serverUrl = "https://7689-59-126-42-176.ngrok-free.app/"; //公司
 //    String serverUrl = "http://192.168.0.102:5000/"; //家裡
 
     //    String calServerUrl = "http://192.168.2.97:8090";//計算用server
-    String calServerUrl = "https://b34b-59-126-42-176.ngrok-free.app/";//計算用server
+    String calServerUrl = "https://7689-59-126-42-176.ngrok-free.app/";//計算用server
     private final MariaDBCallback mCallback;
     private static final int MSG_REGISTER = 1;
     private static final int MSG_LOGIN = 2;
     private static final int MSG_READ = 3;
     private static final int MSG_DELETE = 4;
     private static final int MSG_ID_SAVE = 5;
-    private static final int MSG_ID_READ = 6;
+    private static final int MSG_ID_DATE_READ_DATA = 6;
     private static final int MSG_AI_CAL = 7;
     private static final int MSG_TEST = 8;
 
@@ -195,7 +185,7 @@ public class ControlMariaDB {
     /**
      * 用userId讀
      **/
-    public void userIdRead(String jsonObject) {
+    public void IdAndDateReadData(String jsonObject) {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -204,7 +194,7 @@ public class ControlMariaDB {
 
                 // 註冊
                 Request readRequest = new Request.Builder()
-                        .url(serverUrl + "readData")
+                        .url(serverUrl + "idAndDate")
                         .post(requestBody)
                         .build();
                 try {
@@ -215,7 +205,7 @@ public class ControlMariaDB {
                         String readRes = Objects.requireNonNull(readResponse.body()).string();
                         // 0:讀取失敗
                         Message resMsg = Message.obtain();
-                        resMsg.what = MSG_ID_READ;
+                        resMsg.what = MSG_ID_DATE_READ_DATA;
                         resMsg.obj = readRes;
                         resHandler.sendMessage(resMsg);
                     } else {
@@ -240,10 +230,10 @@ public class ControlMariaDB {
                 case MSG_LOGIN:
                 case MSG_REGISTER:
                 case MSG_READ:
-                case MSG_DELETE:
-                case MSG_ID_READ: //讀取資料庫裡符合ID的資料
                     mCallback.onResult(resMsg.obj.toString());
                     break;
+                case MSG_DELETE:
+                case MSG_ID_DATE_READ_DATA: //讀取資料庫裡符合ID的資料
                 case MSG_ID_SAVE: //儲存量測資料到資料庫
                     mCallback.onSave(resMsg.obj.toString());
                     break;
@@ -262,6 +252,7 @@ public class ControlMariaDB {
                 Request request = new Request.Builder()
 //                        .url(calServerUrl + "calculate")
                         .url("http://59.126.42.176:8090")
+//                        .url("http://192.168.2.97:8090")
                         .post(requestBody)
                         .build();
 

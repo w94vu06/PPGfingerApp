@@ -20,7 +20,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="已驗證"
-        android:textSize="@dimen/sp_10"
+        android:textSize="@dimen/sp_13"
         android:fontFamily="@font/shipporimincho_bold"
         android:layout_toLeftOf="@+id/img_arrow"
         android:layout_marginEnd="@dimen/dp_10"

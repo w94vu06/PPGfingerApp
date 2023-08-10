@@ -1,8 +1,10 @@
 package com.example.myapplication.Fragment;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -34,6 +36,7 @@ import com.youth.banner.Banner;
 import com.youth.banner.indicator.CircleIndicator;
 
 import java.io.File;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -58,7 +61,11 @@ public class HomePage extends Fragment{
     private String filePath,xName;
     private List<String> checkFeature = new ArrayList<>();
 
-    ArrayList<DataFeature> featureList = new ArrayList<>();
+    private SharedPreferences preferences;
+
+    private SharedPreferences.Editor editor;
+
+//    ArrayList<DataFeature> featureList = new ArrayList<>();
     Unbinder unbinder;
     @BindViews({R.id.check_dbp, R.id.check_sbp, R.id.check_bs, R.id.check_hr, R.id.check_sdnn, R.id.check_rmssd})
     List<CheckBox> dialogCheck;
@@ -66,6 +73,9 @@ public class HomePage extends Fragment{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        preferences = getActivity().getSharedPreferences("my_preferences", Context.MODE_PRIVATE);
+        editor = preferences.edit();
     }
 
     @Override
@@ -84,24 +94,59 @@ public class HomePage extends Fragment{
         recycler_feature.setLayoutManager(linearLayoutManager);
 
         ArrayList<DataFeature> featureList = new ArrayList<>();
+        DecimalFormat df = new DecimalFormat("#.#");//設定輸出格式
 
-        featureList.add(new DataFeature("疲勞","0.0"+"/"+"0.1"));
-        featureList.add(new DataFeature("心情","0.0"+"/"+"0.1"));
-        featureList.add(new DataFeature("脈搏訊號","0.0"+"/"+"0.1"));
-//        featureList.add(new DataFeature("收縮壓", 0.0));
-        featureList.add(new DataFeature("飲食指標", "0.0"));
-        featureList.add(new DataFeature("心率", "0.0"));
-        featureList.add(new DataFeature("SDNN", "0.0"));
-        featureList.add(new DataFeature("RMSSD", "0.0"));
+        String fatigue = preferences.getString("fatigue", "null");
+        float mood_state =  preferences.getFloat("mood_state", 6);
+        float BPc_dia = Float.parseFloat(df.format(preferences.getFloat("BPc_dia", 0)));
+        float BPc_sys = Float.parseFloat(df.format(preferences.getFloat("BPc_sys", 0)));
+        float BSc = Float.parseFloat(df.format(preferences.getFloat("BSc", 0)));
+        float ecg_hr_mean = Float.parseFloat(df.format(preferences.getFloat("ecg_hr_mean", 0)));
+        float RMSSD = Float.parseFloat(df.format(preferences.getFloat("RMSSD", 0)));
+        float sdNN = Float.parseFloat(df.format(preferences.getFloat("sdNN", 0)));
+
+        String mood_state_transfer;
+        if ((int) mood_state == 0) {
+            mood_state_transfer = "精神耗弱";
+        } else if ((int) mood_state == 1) {
+            mood_state_transfer = "輕度焦慮";
+        }else if ((int) mood_state == 2) {
+            mood_state_transfer = "中度焦慮";
+        }else if ((int) mood_state == 3) {
+            mood_state_transfer = "重度焦慮";
+        } else if ((int) mood_state == 4) {
+            mood_state_transfer = "憂鬱";
+        } else if ((int) mood_state == 5) {
+            mood_state_transfer = "平常心";
+        } else {
+            mood_state_transfer = "未測量";
+        }
+
+        featureList.add(new DataFeature("疲勞",String.valueOf(fatigue)));
+        featureList.add(new DataFeature("心情",String.valueOf(mood_state_transfer)));
+        featureList.add(new DataFeature("脈搏訊號",String.valueOf(BPc_dia)+"/\n"+String.valueOf(BPc_sys)));
+        featureList.add(new DataFeature("飲食指標", String.valueOf(BSc)));
+        featureList.add(new DataFeature("心率", String.valueOf(ecg_hr_mean)));
+        featureList.add(new DataFeature("RMSSD", String.valueOf(RMSSD)));
+        featureList.add(new DataFeature("SDNN", String.valueOf(sdNN)));
 
         adapter_feature = new FeatureAdapter(featureList);
         recycler_feature.setAdapter(adapter_feature);
     }
 
     @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        if (hidden) {
+            RecyclerViewFeature();
+        }
+    }
+
+    @Override
     public void onResume(){
         super.onResume();
         banner.start();
+        RecyclerViewFeature();
     }
 
     @Override

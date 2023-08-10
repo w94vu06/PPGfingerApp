@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -26,12 +27,15 @@ import com.example.myapplication.Data.DataRecord;
 import com.example.myapplication.MariaDBCallback;
 import com.example.myapplication.R;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 
 public class Record extends Fragment implements RecordAdapter.OnItemListener, MariaDBCallback {
@@ -47,7 +51,8 @@ public class Record extends Fragment implements RecordAdapter.OnItemListener, Ma
     ControlMariaDB controlMariaDB = new ControlMariaDB(this);
     private SharedPreferences preferences;
     private SharedPreferences.Editor editor;
-
+    private String selectYear;
+    private String selectMonth;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -66,16 +71,6 @@ public class Record extends Fragment implements RecordAdapter.OnItemListener, Ma
         recycler_record = view.findViewById(R.id.recycler_record);
         createMonthDialog(edit_month);
         RecyclerViewRecord();
-
-//        try {
-//            boolean hasNewData = preferences.getBoolean("hasNewData", false);
-//            if (hasNewData) {
-//
-//            }
-//            setCategoryData();
-//        } catch (JSONException e) {
-//            throw new RuntimeException(e);
-//        }
         return view;
     }
 
@@ -95,10 +90,7 @@ public class Record extends Fragment implements RecordAdapter.OnItemListener, Ma
 //        RecyclerViewDetail();
     }
 
-    @Override
-    public void onSave(String result) {
 
-    }
 
     @Override
     public void onTest(String result) {
@@ -125,9 +117,48 @@ public class Record extends Fragment implements RecordAdapter.OnItemListener, Ma
             @Override
             public void onRespond(String selected) {
                 edt.setText(selected);
+                selectYear = selected.substring(0, 4);
+                selectMonth = selected.substring(5, 7);
+                readDateData();
             }
         };
     }
+
+    private void readDateData() {
+        JSONObject jsonObject = new JSONObject();
+        String userId = preferences.getString("ProfileId", "888889");
+        try {
+            jsonObject.put("userId", userId);
+            jsonObject.put("selectYear", selectYear);
+            jsonObject.put("selectMonth", selectMonth);
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+        String json = jsonObject.toString();
+        controlMariaDB.IdAndDateReadData(json);
+    }
+
+    @Override
+    public void onSave(String result) {
+        Log.d("dddd", "onSave: "+result);
+
+    }
+
+//    private void parseAndDisplayData(String jsonString) {
+//        try {
+//            JSONArray jsonArray = new JSONArray(jsonString);
+//            for (int i = 0; i < jsonArray.length(); i++) {
+//                JSONObject jsonObject = jsonArray.getJSONObject(i);
+//                DataItem dataItem = new DataItem(
+//                        jsonObject.getString("time")
+//                );
+//                dataList.add(dataItem);
+//            }
+//            adapter.notifyDataSetChanged();
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     /**
      * 紀錄顯示
