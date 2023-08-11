@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.myapplication.Data.DataRecord;
+import com.example.myapplication.Fragment.Record;
 import com.example.myapplication.R;
 
 import java.util.ArrayList;
@@ -17,7 +18,6 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.RecordView
 
     private final RecordAdapter.OnItemListener onItemListener;
     ArrayList<DataRecord> recordList;
-
     public RecordAdapter(ArrayList<DataRecord> recordList, RecordAdapter.OnItemListener onItemListener){
         this.recordList = recordList;
         this.onItemListener = onItemListener;

@@ -509,65 +509,6 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
     /**
      * 取中位數設定圖表上下界
      */
-//    private Handler updateChartLimitHandler = new Handler();
-//    private Runnable updateChartLimitRunnable = new Runnable() {
-//        @Override
-//        public void run() {
-//            Log.d("hhhh", "取中位數正在執行");
-//            if (fullAvgRedList.size() >= 45) {
-//                // 計算四分位數
-//                float[] quartiles = calculateHRV.calculateQuartiles(fullAvgRedList);
-//                float Q1 = quartiles[0];
-//                float Q2 = quartiles[1];
-//                float Q3 = quartiles[2];
-//
-//                // 設定上下界
-//                float interQuartileRange = Q3 - Q1;
-////                float upperBound = Q3 + 1.2f * interQuartileRange;
-//                float upperBound = Q2 * 1.2f;
-////                float lowerBound = Q1 - 1.2f * interQuartileRange;
-//                float lowerBound = upperBound - 50 ;
-//
-//                YAxis y = chart.getAxisLeft();
-//                y.setAxisMaximum(upperBound);
-//                y.setAxisMinimum(lowerBound);
-//
-//                fullAvgRedList.clear();
-//                isFirstTwoSeconds = false;
-//            }
-//            updateChartLimitHandler.postDelayed(this, 3000);
-//        }
-//    };
-
-//    private void setChartLimit() {
-//        YAxis y = chart.getAxisLeft();
-//
-//        if (fullAvgRedList.size() == 75) {
-//            // 計算四分位數
-//            float[] quartiles = calculateHRV.calculateQuartiles(fullAvgRedList);
-//            float Q1 = quartiles[0];
-//            float Q2 = quartiles[1];
-//            float Q3 = quartiles[2];
-//
-//            // 設定上下界
-//            float interQuartileRange = Q3 - Q1;
-//            float upperBound = Q1 + 4f * interQuartileRange;
-//            float lowerBound = Q3 - 4f * interQuartileRange;
-//
-//            runOnUiThread(new Runnable() {
-//                @Override
-//                public void run() {
-//                    if (upperBound != 0 && lowerBound != 0 && upperBound > lowerBound) {
-//                        y.setAxisMaximum(upperBound);
-//                        y.setAxisMinimum(lowerBound);
-//                        Log.d("asdasd", "upperBound: "+upperBound+"\nlowerBound: "+lowerBound);
-//                    }
-//                }
-//            });
-////            fullAvgRedList.clear();
-//        }
-//
-//    }
     private void setFixedBounds(float upperBound, float lowerBound) {
         fixedUpperBound = upperBound;
         fixedLowerBound = lowerBound;

@@ -2,6 +2,7 @@ package com.example.myapplication.Fragment;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -34,9 +35,8 @@ import org.json.JSONObject;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 
 public class Record extends Fragment implements RecordAdapter.OnItemListener, MariaDBCallback {
 
@@ -47,13 +47,14 @@ public class Record extends Fragment implements RecordAdapter.OnItemListener, Ma
     private RecyclerView recycler_record;
     private RecyclerView.Adapter adapter_record;
     private View view;
+    private ProgressDialog dialog;
 
     ControlMariaDB controlMariaDB = new ControlMariaDB(this);
     private SharedPreferences preferences;
     private SharedPreferences.Editor editor;
     private String selectYear;
     private String selectMonth;
-
+    ArrayList<HashMap<String, String>> recordArrayList = new ArrayList<>();
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,16 +73,6 @@ public class Record extends Fragment implements RecordAdapter.OnItemListener, Ma
         createMonthDialog(edit_month);
         RecyclerViewRecord();
         return view;
-    }
-
-    public void setCategoryData() throws JSONException {
-        JSONObject jsonObject = new JSONObject();
-
-        String userId = preferences.getString("ProfileId", null);
-        jsonObject.put("userId", userId);
-
-        String json = jsonObject.toString();
-//        controlMariaDB.userIdRead(json);
     }
 
     @Override
@@ -134,15 +125,85 @@ public class Record extends Fragment implements RecordAdapter.OnItemListener, Ma
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
-        String json = jsonObject.toString();
-        controlMariaDB.IdAndDateReadData(json);
+        dialog.show(getActivity(),"讀取中","請稍候",true);
+        new Thread(()->{
+            String json = jsonObject.toString();
+            controlMariaDB.IdAndDateReadData(json);
+        }).start();
     }
 
     @Override
     public void onSave(String result) {
+        dialog.dismiss();
         Log.d("dddd", "onSave: "+result);
-
     }
+
+    private void catchData(String json) {
+        json = json.replaceAll("NaN", "null");
+        json = json.replaceAll("null", "0.0");
+        String finalJson = json;
+        new Thread(()->{
+            try {
+                JSONArray jsonArray = new JSONArray(finalJson);
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                    double AF_Similarity = jsonObject.getDouble("AF_Similarity");
+                    double AI_bshl = jsonObject.getDouble("AI_bshl");
+                    double AI_bshl_pa = jsonObject.getDouble("AI_bshl_pa");
+                    double AI_dis = jsonObject.getDouble("AI_dis");
+                    double AI_dis_pa = jsonObject.getDouble("AI_dis_pa");
+                    double AI_medic = jsonObject.getDouble("AI_medic");
+                    double BMI = jsonObject.getDouble("BMI");
+                    double BPc_dia = jsonObject.getDouble("BPc_dia");
+                    double BPc_sys = jsonObject.getDouble("BPc_sys");
+                    double BSc = jsonObject.getDouble("BSc");
+                    double Lf_Hf = jsonObject.getDouble("Lf_Hf");
+                    double RMSSD = jsonObject.getDouble("RMSSD");
+                    double Shannon_h = jsonObject.getDouble("Shannon_h");
+                    double Total_Power = jsonObject.getDouble("Total_Power");
+                    double ULF = jsonObject.getDouble("ULF");
+                    double VHF = jsonObject.getDouble("VHF");
+                    double VLF = jsonObject.getDouble("VLF");
+                    double dis0bs1_0 = jsonObject.getDouble("dis0bs1_0");
+                    double dis0bs1_1 = jsonObject.getDouble("dis0bs1_1");
+                    double dis1bs1_0 = jsonObject.getDouble("dis1bs1_0");
+                    double dis1bs1_1 = jsonObject.getDouble("dis1bs1_1");
+                    double ecg_hr_max = jsonObject.getDouble("ecg_hr_max");
+                    double ecg_hr_mean = jsonObject.getDouble("ecg_hr_mean");
+                    double ecg_hr_min = jsonObject.getDouble("ecg_hr_min");
+                    double ecg_rsp = jsonObject.getDouble("ecg_rsp");
+                    String fatigue = jsonObject.getString("fatigue");
+                    double hbp = jsonObject.getDouble("hbp");
+                    double hr_rsp_rate = jsonObject.getDouble("hr_rsp_rate");
+                    double meanNN = jsonObject.getDouble("meanNN");
+                    double mood_state = jsonObject.getDouble("mood_state");
+                    double pNN50 = jsonObject.getDouble("pNN50");
+                    double sdNN = jsonObject.getDouble("sdNN");
+                    double total_scores = jsonObject.getDouble("total_scores");
+                    double way_eat = jsonObject.getDouble("way_eat");
+                    double way_eat_pa = jsonObject.getDouble("way_eat_pa");
+                    double year10scores = jsonObject.getDouble("year10scores");
+                    String time = jsonObject.getString("time");
+
+                    SimpleDateFormat dateFormat_date = new SimpleDateFormat("yyyy-MM-dd");
+                    SimpleDateFormat dateFormat_time = new SimpleDateFormat("HH:mm:ss");
+                    String dateStr_date = dateFormat_date.format(new Date(time));
+                    String dateStr_time = dateFormat_time.format(new Date(time));
+
+                    HashMap<String, String> hashMap = new HashMap<>();
+                    hashMap.put("recordDate", String.valueOf(dateStr_date));
+                    hashMap.put("recordTime", String.valueOf(dateStr_time));
+
+                    recordArrayList.add(hashMap);
+                }
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }).start();
+    }
+
+
 
 //    private void parseAndDisplayData(String jsonString) {
 //        try {
@@ -159,7 +220,6 @@ public class Record extends Fragment implements RecordAdapter.OnItemListener, Ma
 //            e.printStackTrace();
 //        }
 //    }
-
     /**
      * 紀錄顯示
      **/

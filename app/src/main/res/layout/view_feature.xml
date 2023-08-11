@@ -36,7 +36,7 @@
             android:textColor="@color/green"
             android:textStyle="bold"
             android:layout_marginEnd="@dimen/dp_10"
-            android:layout_marginTop="@dimen/dp_10"/>
+            android:layout_marginTop="@dimen/dp_2"/>
 
     </LinearLayout>
 
