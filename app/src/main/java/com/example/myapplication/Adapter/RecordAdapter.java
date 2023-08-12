@@ -13,12 +13,14 @@ import com.example.myapplication.Fragment.Record;
 import com.example.myapplication.R;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.RecordViewHolder>{
 
     private final RecordAdapter.OnItemListener onItemListener;
-    ArrayList<DataRecord> recordList;
-    public RecordAdapter(ArrayList<DataRecord> recordList, RecordAdapter.OnItemListener onItemListener){
+    //    ArrayList<DataRecord> recordList;
+    ArrayList<HashMap<String, String>> recordList;
+    public RecordAdapter(ArrayList<HashMap<String, String>> recordList, RecordAdapter.OnItemListener onItemListener){
         this.recordList = recordList;
         this.onItemListener = onItemListener;
     }
@@ -33,8 +35,10 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.RecordView
 
     @Override
     public void onBindViewHolder(@NonNull RecordViewHolder holder, int position) {
-        holder.txt_recordDate.setText(recordList.get(position).getDate());
-        holder.txt_recordTime.setText(recordList.get(position).getTime());
+        holder.txt_recordDate.setText(recordList.get(position).get("recordDate"));
+        holder.txt_recordTime.setText(recordList.get(position).get("recordTime"));
+//        holder.txt_recordDate.setText(recordList.get(position).getDate());
+//        holder.txt_recordTime.setText(recordList.get(position).getTime());
     }
 
     @Override

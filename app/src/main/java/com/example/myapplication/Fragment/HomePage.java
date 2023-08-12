@@ -139,6 +139,7 @@ public class HomePage extends Fragment{
         super.onHiddenChanged(hidden);
         if (hidden) {
             RecyclerViewFeature();
+            banner.stop();
         }
     }
 

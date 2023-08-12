@@ -1,18 +1,30 @@
 package com.example.myapplication.Data;
 
-public class DataRecord {
-    private String date,time;
+import androidx.lifecycle.ViewModel;
+
+public class DataRecord extends ViewModel {
+    private String date,time,preloadData;
+
+    public DataRecord() {
+    }
 
     public DataRecord(String date,String time){
         this.date = date;
         this.time = time;
     }
-
-    public String getDate(){
-        return date;
+    public void setData(String newData) {
+        preloadData = newData;
     }
 
-    public String getTime(){
-        return time;
+    public String getData() {
+        return preloadData;
     }
+//    public String getDate(){
+//        return date;
+//    }
+//
+//    public String getTime(){
+//        return time;
+//    }
+
 }

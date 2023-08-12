@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.Manifest;
 import android.content.Intent;
@@ -18,6 +19,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
+import com.example.myapplication.Data.DataRecord;
 import com.example.myapplication.Fragment.Record;
 import com.example.myapplication.Fragment.HomePage;
 import com.example.myapplication.Fragment.Profile;
@@ -34,6 +36,7 @@ import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Calendar;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -48,10 +51,10 @@ public class MainActivity extends AppCompatActivity implements MariaDBCallback {
     private int old, height, weight, sex, smokes, diabetes, hbp;
 
     ControlMariaDB controlMariaDB = new ControlMariaDB(this);
-
+    private DataRecord dataRecordViewModel;
     private SharedPreferences preferences;
-
     private SharedPreferences.Editor editor;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +72,8 @@ public class MainActivity extends AppCompatActivity implements MariaDBCallback {
         enterPPG();
         preferences = getSharedPreferences("my_preferences", MODE_PRIVATE);
         editor = preferences.edit();
+        dataRecordViewModel = new ViewModelProvider(this).get(DataRecord.class);
+        preloadRecord();
     }
 
     /**
@@ -129,12 +134,12 @@ public class MainActivity extends AppCompatActivity implements MariaDBCallback {
     @Override
     public void onStart() {
         super.onStart();
-
         String name = preferences.getString("userName", null);
         if (name == null) {
             readProfile();
         }
         EventBus.getDefault().register(this);
+
     }
     @Override
     public void onStop() {
@@ -165,10 +170,31 @@ public class MainActivity extends AppCompatActivity implements MariaDBCallback {
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
-        if (loginName == null) {
-            String jsonString = jsonData.toString();
-            controlMariaDB.userRead(jsonString);
+        String jsonString = jsonData.toString();
+        controlMariaDB.userRead(jsonString);
+//        if (loginName == null) {
+//
+//        }
+    }
+
+    private void preloadRecord() {
+        Calendar calendar = Calendar.getInstance();
+        JSONObject jsonObject = new JSONObject();
+        String userId = preferences.getString("ProfileId", "888889");
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH) + 1;
+        Log.d("dddd", "preloadRecord: "+month);
+        try {
+            jsonObject.put("userId", userId);
+            jsonObject.put("selectYear", year);
+            jsonObject.put("selectMonth", month);
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
         }
+        new Thread(() -> {
+            String json = jsonObject.toString();
+            controlMariaDB.IdAndDateReadData(json);
+        }).start();
     }
 
     @Override
@@ -189,6 +215,9 @@ public class MainActivity extends AppCompatActivity implements MariaDBCallback {
 
     @Override
     public void onSave(String result) {
+        if (!result.equals("noData")) {
+            dataRecordViewModel.setData(result);
+        }
     }
 
     @Override

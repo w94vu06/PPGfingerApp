@@ -64,6 +64,7 @@
             android:layout_weight="0.1"/>
 
         <RadioGroup
+            android:id="@+id/sortRadioGroup"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1">
@@ -82,6 +83,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="由新至舊排序"
+                android:checked="true"
                 android:textSize="@dimen/sp_18"
                 android:textColor="@color/green"
                 android:fontFamily="@font/glowsanssc_condensed_medium"/>

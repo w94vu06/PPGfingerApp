@@ -164,7 +164,6 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
 
         mTimeArray = new long[totalCaptureRate];
         calculateHRV = new CalculateHRV();
-
         closeTopBar();
     }
 

@@ -1,5 +1,6 @@
 package com.example.myapplication.Fragment;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -8,6 +9,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -21,67 +23,93 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.NumberPicker;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.Toast;
 
 import com.example.myapplication.Adapter.RecordAdapter;
+import com.example.myapplication.CameraActivity;
 import com.example.myapplication.ControlMariaDB;
 import com.example.myapplication.Data.DataRecord;
 import com.example.myapplication.MariaDBCallback;
 import com.example.myapplication.R;
+import com.example.myapplication.SignInActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
+import java.util.TimeZone;
 
 public class Record extends Fragment implements RecordAdapter.OnItemListener, MariaDBCallback {
 
     //    private RecyclerView recycler_category, recycler_detail;
 //    private RecyclerView.Adapter adapter_category, adapter_detail;
     private EditText edit_month;
-    private RadioButton radiobtn_o2n, radiobtn_n2o;
+    private RadioGroup sortRadioGroup;
+    private RadioButton radioBtn_o2n, radioBtn_n2o;
     private RecyclerView recycler_record;
     private RecyclerView.Adapter adapter_record;
     private View view;
-    private ProgressDialog dialog;
 
+    private ProgressDialog progressDialog;
     ControlMariaDB controlMariaDB = new ControlMariaDB(this);
+    private DataRecord dataRecordViewModel;
     private SharedPreferences preferences;
     private SharedPreferences.Editor editor;
     private String selectYear;
     private String selectMonth;
+    private String dateStr_date;
+    private String dateStr_time;
+
+
     ArrayList<HashMap<String, String>> recordArrayList = new ArrayList<>();
+    LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         preferences = requireActivity().getSharedPreferences("my_preferences", Context.MODE_PRIVATE);
         editor = preferences.edit();
+
+        progressDialog = new ProgressDialog(getActivity());
+        progressDialog.setCancelable(false);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_record, container, false);
-        edit_month = view.findViewById(R.id.edit_month);
-        radiobtn_o2n = view.findViewById(R.id.radiobtn_o2n);
-        radiobtn_n2o = view.findViewById(R.id.radiobtn_n2o);
+        dataRecordViewModel = new ViewModelProvider(requireActivity()).get(DataRecord.class);
         recycler_record = view.findViewById(R.id.recycler_record);
+        edit_month = view.findViewById(R.id.edit_month);
+
+        sortRadioGroup = view.findViewById(R.id.sortRadioGroup);
+        radioBtn_o2n = view.findViewById(R.id.radiobtn_o2n);
+        radioBtn_n2o = view.findViewById(R.id.radiobtn_n2o);
+        setSortRadioGroup();
+
+        progressDialog = new ProgressDialog(getActivity());
         createMonthDialog(edit_month);
-        RecyclerViewRecord();
+        getPreloadData();
         return view;
+    }
+
+    private void getPreloadData() {
+        progressDialog.show();
+        String preloadData = dataRecordViewModel.getData();
+        catchData(preloadData);
     }
 
     @Override
     public void onResult(String result) {
-//        RecyclerViewCategory();
-//        RecyclerViewDetail();
     }
-
-
 
     @Override
     public void onTest(String result) {
@@ -91,28 +119,36 @@ public class Record extends Fragment implements RecordAdapter.OnItemListener, Ma
     /**
      * 選擇月份
      **/
+    @SuppressLint("ClickableViewAccessibility")
     public void createMonthDialog(final EditText edt) {
-        MonthPickDialog dialog = new MonthPickDialog(getActivity());
+        MonthPickDialog monthPickDialog = new MonthPickDialog(getActivity());
         edt.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                    dialog.showDialog();
+                    monthPickDialog.showDialog();
                     return true;
                 }
                 return false;
             }
         });
 
-        dialog.onDialogRespond = new MonthPickDialog.OnDialogRespond() {
+        monthPickDialog.onDialogRespond = new MonthPickDialog.OnDialogRespond() {
             @Override
             public void onRespond(String selected) {
                 edt.setText(selected);
                 selectYear = selected.substring(0, 4);
                 selectMonth = selected.substring(5, 7);
                 readDateData();
+                progressDialog.show();
             }
         };
+    }
+
+    private void hideProgressDialog() {
+        if (progressDialog != null && progressDialog.isShowing()) {
+            progressDialog.dismiss();
+        }
     }
 
     private void readDateData() {
@@ -125,8 +161,7 @@ public class Record extends Fragment implements RecordAdapter.OnItemListener, Ma
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
-        dialog.show(getActivity(),"讀取中","請稍候",true);
-        new Thread(()->{
+        new Thread(() -> {
             String json = jsonObject.toString();
             controlMariaDB.IdAndDateReadData(json);
         }).start();
@@ -134,16 +169,22 @@ public class Record extends Fragment implements RecordAdapter.OnItemListener, Ma
 
     @Override
     public void onSave(String result) {
-        dialog.dismiss();
-        Log.d("dddd", "onSave: "+result);
+        if (result.equals("noData")) {
+            hideProgressDialog();
+            Toast.makeText(getActivity(), "查無量測資料", Toast.LENGTH_SHORT).show();
+        } else {
+            dataRecordViewModel.setData(result);
+            catchData(result);
+        }
     }
 
     private void catchData(String json) {
         json = json.replaceAll("NaN", "null");
         json = json.replaceAll("null", "0.0");
         String finalJson = json;
-        new Thread(()->{
+        new Thread(() -> {
             try {
+                recordArrayList.clear();
                 JSONArray jsonArray = new JSONArray(finalJson);
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject jsonObject = jsonArray.getJSONObject(i);
@@ -184,28 +225,79 @@ public class Record extends Fragment implements RecordAdapter.OnItemListener, Ma
                     double way_eat_pa = jsonObject.getDouble("way_eat_pa");
                     double year10scores = jsonObject.getDouble("year10scores");
                     String time = jsonObject.getString("time");
-
-                    SimpleDateFormat dateFormat_date = new SimpleDateFormat("yyyy-MM-dd");
-                    SimpleDateFormat dateFormat_time = new SimpleDateFormat("HH:mm:ss");
-                    String dateStr_date = dateFormat_date.format(new Date(time));
-                    String dateStr_time = dateFormat_time.format(new Date(time));
+                    formatDateTime(time);
 
                     HashMap<String, String> hashMap = new HashMap<>();
                     hashMap.put("recordDate", String.valueOf(dateStr_date));
                     hashMap.put("recordTime", String.valueOf(dateStr_time));
 
                     recordArrayList.add(hashMap);
-                }
+                    getActivity().runOnUiThread(() -> {
+                        recycler_record.setLayoutManager(linearLayoutManager);
+                        adapter_record = new RecordAdapter(recordArrayList, this);
+                        recycler_record.setAdapter(adapter_record);
 
+                        int lastItemPosition = adapter_record.getItemCount() - 1;
+                        linearLayoutManager.setReverseLayout(true);
+                        linearLayoutManager.scrollToPosition(lastItemPosition);
+                        hideProgressDialog();
+                    });
+                }
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }).start();
     }
 
+    private void formatDateTime(String time) {
+        try {
+            SimpleDateFormat inputDateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss 'GMT'", Locale.US);
+            Date date = inputDateFormat.parse(time);
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
+            dateFormat.setTimeZone(TimeZone.getTimeZone("Asia/Taipei"));
+            timeFormat.setTimeZone(TimeZone.getTimeZone("Asia/Taipei"));
 
+            String str_date = dateFormat.format(date);
+            String str_time = timeFormat.format(date);
+            dateStr_date = str_date;
+            dateStr_time = str_time;
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
 
-//    private void parseAndDisplayData(String jsonString) {
+    }
+
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        if (hidden) {
+            Log.d("hhhh", "I'm hiding: ");
+        } else {
+            Log.d("hhhh", "I'm not hiding: ");
+        }
+    }
+
+    public void setSortRadioGroup() {
+        sortRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup radioGroup, int i) {
+                if (adapter_record != null) {
+                    int lastItemPosition = adapter_record.getItemCount() - 1;
+                    if (radioBtn_o2n.isChecked()) {
+                        linearLayoutManager.setReverseLayout(false);
+                        linearLayoutManager.scrollToPosition(0);
+                    } else if (radioBtn_n2o.isChecked() && lastItemPosition > 0) {
+                        linearLayoutManager.setReverseLayout(true);
+                        linearLayoutManager.scrollToPosition(lastItemPosition);
+                    }
+                }
+
+            }
+        });
+    }
+
+    //    private void parseAndDisplayData(String jsonString) {
 //        try {
 //            JSONArray jsonArray = new JSONArray(jsonString);
 //            for (int i = 0; i < jsonArray.length(); i++) {
@@ -220,6 +312,7 @@ public class Record extends Fragment implements RecordAdapter.OnItemListener, Ma
 //            e.printStackTrace();
 //        }
 //    }
+
     /**
      * 紀錄顯示
      **/
@@ -227,21 +320,22 @@ public class Record extends Fragment implements RecordAdapter.OnItemListener, Ma
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
         recycler_record.setLayoutManager(linearLayoutManager);
 
-        ArrayList<DataRecord> recordList = new ArrayList<>();
-        recordList.add(new DataRecord("2023-07-19", "17:00"));
-        recordList.add(new DataRecord("2023-07-19", "17:05"));
-        recordList.add(new DataRecord("2023-07-19", "17:10"));
-        recordList.add(new DataRecord("2023-07-19", "17:15"));
-        recordList.add(new DataRecord("2023-07-19", "17:20"));
+//        ArrayList<DataRecord> recordList = new ArrayList<>();
+//        recordList.add(new DataRecord("2023-07-19", "17:00"));
+//        recordList.add(new DataRecord("2023-07-19", "17:05"));
+//        recordList.add(new DataRecord("2023-07-19", "17:10"));
+//        recordList.add(new DataRecord("2023-07-19", "17:15"));
+//        recordList.add(new DataRecord("2023-07-19", "17:20"));
 
-        adapter_record = new RecordAdapter(recordList, this);
-        recycler_record.setAdapter(adapter_record);
+//        adapter_record = new RecordAdapter(recordList, this);
+//        recycler_record.setAdapter(adapter_record);
     }
 
     @Override
     public void onItemClick(int position) {
 
     }
+
 
     /** Category資料添加 **/
 //    private void RecyclerViewCategory() {
@@ -391,9 +485,7 @@ class MonthPickDialog {
         Date date = new Date();
         int year = calendar.get(Calendar.YEAR);
 
-        np_year.setMaxValue(year + 20);
-        np_year.setMinValue(year - 20);
-        np_year.setMaxValue(year + 20);
+        np_year.setMaxValue(year);
         np_year.setMinValue(year - 20);
         np_year.setValue(Integer.parseInt(new SimpleDateFormat("yyyy").format(date)));
         np_month.setMaxValue(12);
