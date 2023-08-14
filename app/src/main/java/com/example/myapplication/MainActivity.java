@@ -64,16 +64,20 @@ public class MainActivity extends AppCompatActivity implements MariaDBCallback {
         fragmentContainer = findViewById(R.id.fragmentContainer);
         navigationView = findViewById(R.id.navigationView);
         navigationView.setOnItemSelectedListener(NaviSelectedListener);
-        switchFragment(new HomePage()).commit();//設定主畫面
         bar = findViewById(R.id.bar);
         fab_measure = findViewById(R.id.fab_measure);
+
+        switchFragment(new HomePage()).commit();//設定主畫面
+
         CheckInternetDialog checkInternetDialog = new CheckInternetDialog(MainActivity.this);
         checkInternetDialog.checkInternet();
-        enterPPG();
+
         preferences = getSharedPreferences("my_preferences", MODE_PRIVATE);
         editor = preferences.edit();
+
         dataRecordViewModel = new ViewModelProvider(this).get(DataRecord.class);
         preloadRecord();
+        enterPPG();
     }
 
     /**
@@ -147,6 +151,18 @@ public class MainActivity extends AppCompatActivity implements MariaDBCallback {
         EventBus.getDefault().unregister(this);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        boolean hasNewData = preferences.getBoolean("hasNewData", false);
+        if (hasNewData) {
+            preloadRecord();
+            editor = preferences.edit();
+            editor.putBoolean("hasNewData", false);
+            editor.apply();
+        }
+    }
+
     /**
      * 接收profile
      **/
@@ -183,7 +199,6 @@ public class MainActivity extends AppCompatActivity implements MariaDBCallback {
         String userId = preferences.getString("ProfileId", "888889");
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH) + 1;
-        Log.d("dddd", "preloadRecord: "+month);
         try {
             jsonObject.put("userId", userId);
             jsonObject.put("selectYear", year);
@@ -200,7 +215,6 @@ public class MainActivity extends AppCompatActivity implements MariaDBCallback {
     @Override
     public void onResult(String result) {
         //userRead
-        Log.d("resultLONG", "onResult: " + result);
         if (result.equals("0")) {
             Toast.makeText(MainActivity.this, "請重新登入", Toast.LENGTH_SHORT).show();
             Intent it = new Intent(MainActivity.this, BeginActivity.class);
@@ -307,9 +321,11 @@ public class MainActivity extends AppCompatActivity implements MariaDBCallback {
             if (currentFragment != null) {
                 transaction.hide(currentFragment);
             }
-            transaction.add(R.id.fragmentContainer, targetFragment, targetFragment.getClass().getName());
+            transaction.add(R.id.fragmentContainer, targetFragment, targetFragment.getClass()
+                    .getName());
         } else {
-            transaction.hide(currentFragment).show(targetFragment);
+            transaction.hide(currentFragment)
+                    .show(targetFragment);
         }
         currentFragment = targetFragment;
         return transaction;

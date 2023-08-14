@@ -394,7 +394,6 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
             //如果色素閥值是正確的才進行量測
             if (fixAvgRedThreshold == 2 && averageGreenThreshold == 0 && averageBlueThreshold == 0) { //改
                 fullAvgRedList.add((float) fullAvgRed);
-                Log.d("zzzz", "run: " + fullAvgRedList.size());
                 setChartLimit();
                 // Waits 20 captures, to remove startup artifacts.  First average is the sum.
                 //等待前幾個取樣，以去除啟動過程中的初始偏差

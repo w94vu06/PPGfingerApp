@@ -85,18 +85,21 @@ public class Record extends Fragment implements RecordAdapter.OnItemListener, Ma
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_record, container, false);
-        dataRecordViewModel = new ViewModelProvider(requireActivity()).get(DataRecord.class);
-        recycler_record = view.findViewById(R.id.recycler_record);
-        edit_month = view.findViewById(R.id.edit_month);
+        if (view == null) {
+            view = inflater.inflate(R.layout.fragment_record, container, false);
+            dataRecordViewModel = new ViewModelProvider(requireActivity()).get(DataRecord.class);
+            recycler_record = view.findViewById(R.id.recycler_record);
+            edit_month = view.findViewById(R.id.edit_month);
 
-        sortRadioGroup = view.findViewById(R.id.sortRadioGroup);
-        radioBtn_o2n = view.findViewById(R.id.radiobtn_o2n);
-        radioBtn_n2o = view.findViewById(R.id.radiobtn_n2o);
-        setSortRadioGroup();
+            sortRadioGroup = view.findViewById(R.id.sortRadioGroup);
+            radioBtn_o2n = view.findViewById(R.id.radiobtn_o2n);
+            radioBtn_n2o = view.findViewById(R.id.radiobtn_n2o);
+            setSortRadioGroup();
 
-        progressDialog = new ProgressDialog(getActivity());
-        createMonthDialog(edit_month);
+            progressDialog = new ProgressDialog(getActivity());
+            createMonthDialog(edit_month);
+            Log.d("eeee", "onCreateView: ");
+        }
         getPreloadData();
         return view;
     }
@@ -105,6 +108,12 @@ public class Record extends Fragment implements RecordAdapter.OnItemListener, Ma
         progressDialog.show();
         String preloadData = dataRecordViewModel.getData();
         catchData(preloadData);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d("eeee", "onResume: ");
     }
 
     @Override
@@ -273,8 +282,6 @@ public class Record extends Fragment implements RecordAdapter.OnItemListener, Ma
         super.onHiddenChanged(hidden);
         if (hidden) {
             Log.d("hhhh", "I'm hiding: ");
-        } else {
-            Log.d("hhhh", "I'm not hiding: ");
         }
     }
 

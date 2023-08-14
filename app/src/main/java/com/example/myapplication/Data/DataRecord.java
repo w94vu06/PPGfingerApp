@@ -19,12 +19,5 @@ public class DataRecord extends ViewModel {
     public String getData() {
         return preloadData;
     }
-//    public String getDate(){
-//        return date;
-//    }
-//
-//    public String getTime(){
-//        return time;
-//    }
 
 }
