@@ -46,9 +46,86 @@
         android:layout_gravity="center"
         android:src="@drawable/line"/>
 
-    <Space
+    <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1"/>
+        android:layout_weight="0.3"
+        android:layout_gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="心率"
+            android:textSize="@dimen/sp_14"
+            android:textColor="@color/green"
+            android:fontFamily="@font/glowsanssc_condensed_medium"/>
+
+        <TextView
+            android:id="@+id/txt_heartbeat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="157.5"
+            android:textSize="@dimen/sp_22"
+            android:textColor="@color/green"
+            android:fontFamily="@font/glowsanssc_condensed_medium"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.3"
+        android:layout_gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="飲食指標"
+            android:textSize="@dimen/sp_14"
+            android:textColor="@color/green"
+            android:fontFamily="@font/glowsanssc_condensed_medium"/>
+
+        <TextView
+            android:id="@+id/txt_eatIndex"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="157.5"
+            android:textSize="@dimen/sp_22"
+            android:textColor="@color/green"
+            android:fontFamily="@font/glowsanssc_condensed_medium"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.3"
+        android:layout_gravity="center"
+        android:layout_marginEnd="@dimen/dp_10"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="脈波訊號"
+            android:textSize="@dimen/sp_14"
+            android:textColor="@color/green"
+            android:fontFamily="@font/glowsanssc_condensed_medium"/>
+
+        <TextView
+            android:id="@+id/txt_brain"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="157.5"
+            android:textSize="@dimen/sp_22"
+            android:textColor="@color/green"
+            android:fontFamily="@font/glowsanssc_condensed_medium"/>
+
+    </LinearLayout>
 
 </LinearLayout>
