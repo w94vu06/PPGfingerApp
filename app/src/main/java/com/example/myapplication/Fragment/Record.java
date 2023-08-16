@@ -65,6 +65,7 @@ public class Record extends Fragment implements RecordAdapter.OnItemListener, Ma
     private SharedPreferences.Editor editor;
     private String selectYear;
     private String selectMonth;
+    private String selectDay;
     private String dateStr_date;
     private String dateStr_time;
 
@@ -85,35 +86,41 @@ public class Record extends Fragment implements RecordAdapter.OnItemListener, Ma
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        if (view == null) {
-            view = inflater.inflate(R.layout.fragment_record, container, false);
-            dataRecordViewModel = new ViewModelProvider(requireActivity()).get(DataRecord.class);
-            recycler_record = view.findViewById(R.id.recycler_record);
-            edit_month = view.findViewById(R.id.edit_month);
 
-            sortRadioGroup = view.findViewById(R.id.sortRadioGroup);
-            radioBtn_o2n = view.findViewById(R.id.radiobtn_o2n);
-            radioBtn_n2o = view.findViewById(R.id.radiobtn_n2o);
-            setSortRadioGroup();
+        view = inflater.inflate(R.layout.fragment_record, container, false);
+        dataRecordViewModel = new ViewModelProvider(requireActivity()).get(DataRecord.class);
+        recycler_record = view.findViewById(R.id.recycler_record);
+        edit_month = view.findViewById(R.id.edit_month);
 
-            progressDialog = new ProgressDialog(getActivity());
-            createMonthDialog(edit_month);
-            Log.d("eeee", "onCreateView: ");
-        }
+        sortRadioGroup = view.findViewById(R.id.sortRadioGroup);
+        radioBtn_o2n = view.findViewById(R.id.radiobtn_o2n);
+        radioBtn_n2o = view.findViewById(R.id.radiobtn_n2o);
+        setSortRadioGroup();
+
+        progressDialog = new ProgressDialog(getActivity());
+        createMonthDialog(edit_month);
+        Log.d("eeee", "onCreateView: ");
+
         getPreloadData();
         return view;
     }
 
     private void getPreloadData() {
-        progressDialog.show();
-        String preloadData = dataRecordViewModel.getData();
-        catchData(preloadData);
+        String preloadData = preferences.getString("recordData",null);
+        Log.d("hhhh", "getPreloadData: "+preloadData);
+        if (preloadData != null) {
+            catchData(preloadData);
+        }
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        Log.d("eeee", "onResume: ");
+        Log.d("123456789", "onResume: ");
+        boolean hasNewData = preferences.getBoolean("hasNewData", false);
+        if (hasNewData) {
+            readDateData();
+        }
     }
 
     @Override
@@ -148,6 +155,7 @@ public class Record extends Fragment implements RecordAdapter.OnItemListener, Ma
                 edt.setText(selected);
                 selectYear = selected.substring(0, 4);
                 selectMonth = selected.substring(5, 7);
+                selectDay = selected.substring(8, 10);
                 readDateData();
                 progressDialog.show();
             }
@@ -159,7 +167,6 @@ public class Record extends Fragment implements RecordAdapter.OnItemListener, Ma
             progressDialog.dismiss();
         }
     }
-
     private void readDateData() {
         JSONObject jsonObject = new JSONObject();
         String userId = preferences.getString("ProfileId", "888889");
@@ -167,6 +174,7 @@ public class Record extends Fragment implements RecordAdapter.OnItemListener, Ma
             jsonObject.put("userId", userId);
             jsonObject.put("selectYear", selectYear);
             jsonObject.put("selectMonth", selectMonth);
+            jsonObject.put("selectDay", selectDay);
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
@@ -182,14 +190,21 @@ public class Record extends Fragment implements RecordAdapter.OnItemListener, Ma
             hideProgressDialog();
             Toast.makeText(getActivity(), "查無量測資料", Toast.LENGTH_SHORT).show();
         } else {
-            dataRecordViewModel.setData(result);
+            editor = preferences.edit();
+            editor.putString("recordData", result);
+            editor.apply();
+
             catchData(result);
         }
     }
 
     private void catchData(String json) {
-        json = json.replaceAll("NaN", "null");
-        json = json.replaceAll("null", "0.0");
+        if (json != null) {
+            json = json.replaceAll("NaN", "null");
+            json = json.replaceAll("null", "0.0");
+        } else {
+            return;
+        }
         String finalJson = json;
         new Thread(() -> {
             try {
@@ -240,22 +255,29 @@ public class Record extends Fragment implements RecordAdapter.OnItemListener, Ma
                     hashMap.put("recordDate", String.valueOf(dateStr_date));
                     hashMap.put("recordTime", String.valueOf(dateStr_time));
 
+                    hashMap.put("ecg_hr_mean", String.valueOf(ecg_hr_mean));
+                    hashMap.put("BSc", String.valueOf(BSc));
+                    hashMap.put("BPc_dia", String.valueOf(BPc_dia));
+                    hashMap.put("BPc_sys", String.valueOf(BPc_sys));
+
                     recordArrayList.add(hashMap);
                     getActivity().runOnUiThread(() -> {
                         recycler_record.setLayoutManager(linearLayoutManager);
+                        linearLayoutManager.setStackFromEnd(true);
+                        linearLayoutManager.setReverseLayout(true);
+                        if (adapter_record != null) {
+                            int lastItemPosition = adapter_record.getItemCount() - 1;
+                            linearLayoutManager.scrollToPosition(lastItemPosition);
+                        }
                         adapter_record = new RecordAdapter(recordArrayList, this);
                         recycler_record.setAdapter(adapter_record);
-
-                        int lastItemPosition = adapter_record.getItemCount() - 1;
-                        linearLayoutManager.setReverseLayout(true);
-                        linearLayoutManager.scrollToPosition(lastItemPosition);
-                        hideProgressDialog();
                     });
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }).start();
+        hideProgressDialog();
     }
 
     private void formatDateTime(String time) {
@@ -281,7 +303,6 @@ public class Record extends Fragment implements RecordAdapter.OnItemListener, Ma
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
         if (hidden) {
-            Log.d("hhhh", "I'm hiding: ");
         }
     }
 
@@ -292,14 +313,15 @@ public class Record extends Fragment implements RecordAdapter.OnItemListener, Ma
                 if (adapter_record != null) {
                     int lastItemPosition = adapter_record.getItemCount() - 1;
                     if (radioBtn_o2n.isChecked()) {
+                        linearLayoutManager.setStackFromEnd(false);
                         linearLayoutManager.setReverseLayout(false);
                         linearLayoutManager.scrollToPosition(0);
                     } else if (radioBtn_n2o.isChecked() && lastItemPosition > 0) {
+                        linearLayoutManager.setStackFromEnd(true);
                         linearLayoutManager.setReverseLayout(true);
                         linearLayoutManager.scrollToPosition(lastItemPosition);
                     }
                 }
-
             }
         });
     }
@@ -326,7 +348,6 @@ public class Record extends Fragment implements RecordAdapter.OnItemListener, Ma
     private void RecyclerViewRecord() {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
         recycler_record.setLayoutManager(linearLayoutManager);
-
 //        ArrayList<DataRecord> recordList = new ArrayList<>();
 //        recordList.add(new DataRecord("2023-07-19", "17:00"));
 //        recordList.add(new DataRecord("2023-07-19", "17:05"));
@@ -340,7 +361,7 @@ public class Record extends Fragment implements RecordAdapter.OnItemListener, Ma
 
     @Override
     public void onItemClick(int position) {
-
+        Toast.makeText(getActivity(), ""+position, Toast.LENGTH_SHORT).show();
     }
 
 
@@ -482,22 +503,32 @@ class MonthPickDialog {
         monthDialog.getWindow().setWindowAnimations(R.style.dialogWindowAnim);
         monthDialog.show();
 
-        NumberPicker np_year, np_month;
+        NumberPicker np_year, np_month, np_day;
         Button btn_monthCancel, btn_monthDone;
         np_year = contentView.findViewById(R.id.np_year);
         np_month = contentView.findViewById(R.id.np_month);
+        np_day = contentView.findViewById(R.id.np_day);
+
         btn_monthCancel = contentView.findViewById(R.id.btn_monthCancel);
         btn_monthDone = contentView.findViewById(R.id.btn_monthDone);
+
         Calendar calendar = Calendar.getInstance();
         Date date = new Date();
         int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH) + 1;
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
 
         np_year.setMaxValue(year);
         np_year.setMinValue(year - 20);
         np_year.setValue(Integer.parseInt(new SimpleDateFormat("yyyy").format(date)));
+
         np_month.setMaxValue(12);
         np_month.setMinValue(1);
         np_month.setValue(Integer.parseInt(new SimpleDateFormat("MM").format(date)));
+
+        np_day.setMaxValue(31);
+        np_day.setMinValue(1);
+        np_day.setValue(Integer.parseInt(new SimpleDateFormat("dd").format(date)));
 
         btn_monthCancel.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -508,7 +539,7 @@ class MonthPickDialog {
         btn_monthDone.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String s = String.format("%04d-%02d", np_year.getValue(), np_month.getValue());
+                String s = String.format("%04d-%02d-%02d", np_year.getValue(), np_month.getValue(), np_day.getValue());
                 onDialogRespond.onRespond(s);
                 monthDialog.dismiss();
             }

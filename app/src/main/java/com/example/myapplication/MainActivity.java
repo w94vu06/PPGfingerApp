@@ -41,7 +41,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity implements MariaDBCallback {
-
+    ControlMariaDB controlMariaDB = new ControlMariaDB(this);
     private FrameLayout fragmentContainer;
     private BottomAppBar bar;
     private BottomNavigationView navigationView;
@@ -50,7 +50,6 @@ public class MainActivity extends AppCompatActivity implements MariaDBCallback {
     private String userId, userName, email, phone, birth;
     private int old, height, weight, sex, smokes, diabetes, hbp;
 
-    ControlMariaDB controlMariaDB = new ControlMariaDB(this);
     private DataRecord dataRecordViewModel;
     private SharedPreferences preferences;
     private SharedPreferences.Editor editor;
@@ -76,7 +75,7 @@ public class MainActivity extends AppCompatActivity implements MariaDBCallback {
         editor = preferences.edit();
 
         dataRecordViewModel = new ViewModelProvider(this).get(DataRecord.class);
-        preloadRecord();
+//        preloadRecord();
         enterPPG();
     }
 
@@ -188,9 +187,6 @@ public class MainActivity extends AppCompatActivity implements MariaDBCallback {
         }
         String jsonString = jsonData.toString();
         controlMariaDB.userRead(jsonString);
-//        if (loginName == null) {
-//
-//        }
     }
 
     private void preloadRecord() {
@@ -199,10 +195,12 @@ public class MainActivity extends AppCompatActivity implements MariaDBCallback {
         String userId = preferences.getString("ProfileId", "888889");
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH) + 1;
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
         try {
             jsonObject.put("userId", userId);
             jsonObject.put("selectYear", year);
             jsonObject.put("selectMonth", month);
+            jsonObject.put("selectDay", day);
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }

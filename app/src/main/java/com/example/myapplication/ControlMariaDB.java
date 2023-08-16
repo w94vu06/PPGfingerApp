@@ -200,16 +200,19 @@ public class ControlMariaDB {
                 try {
                     // 發送讀取請求
                     Response readResponse = client.newCall(readRequest).execute();
+                    Message resMsg = Message.obtain();
+                    resMsg.what = MSG_ID_DATE_READ_DATA;
                     if (readResponse.isSuccessful()) {
                         // 讀取回應
                         String readRes = Objects.requireNonNull(readResponse.body()).string();
                         // 0:讀取失敗
-                        Message resMsg = Message.obtain();
-                        resMsg.what = MSG_ID_DATE_READ_DATA;
                         resMsg.obj = readRes;
                         resHandler.sendMessage(resMsg);
                     } else {
+                        resMsg.obj = "noData";
+                        resHandler.sendMessage(resMsg);
                         throw new IOException("Unexpected code " + readResponse);
+
                     }
                 } catch (IOException e) {
                     e.printStackTrace();

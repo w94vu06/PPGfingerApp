@@ -2,8 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="@dimen/dp_10"
     android:layout_marginStart="@dimen/dp_10"
+    android:layout_marginTop="@dimen/dp_10"
     android:layout_marginEnd="@dimen/dp_10"
     android:background="@drawable/background_record"
     android:orientation="horizontal">
@@ -11,121 +11,127 @@
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="0.4"
         android:layout_gravity="center"
+        android:layout_marginStart="@dimen/dp_10"
         android:layout_marginTop="@dimen/dp_10"
         android:layout_marginBottom="@dimen/dp_10"
-        android:layout_marginStart="@dimen/dp_10"
+        android:layout_weight="0.4"
         android:orientation="vertical">
 
         <TextView
             android:id="@+id/txt_recordDate"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:fontFamily="@font/rajdhani_bold"
             android:text="2023-07-15"
-            android:textSize="@dimen/sp_15"
             android:textColor="@color/green"
-            android:fontFamily="@font/rajdhani_bold"/>
+            android:textSize="@dimen/sp_15" />
 
         <TextView
             android:id="@+id/txt_recordTime"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="17:05"
-            android:textSize="@dimen/sp_28"
-            android:textColor="@color/green"
+
             android:fontFamily="@font/rajdhani_bold"
-            android:layout_gravity="right"/>
+            android:gravity="right"
+            android:text="17:05"
+            android:textColor="@color/green"
+            android:textSize="@dimen/sp_28" />
 
     </LinearLayout>
 
     <ImageView
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
         android:layout_weight="0.1"
-        android:layout_gravity="center"
-        android:src="@drawable/line"/>
+        android:src="@drawable/line" />
 
     <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
         android:layout_weight="0.3"
-        android:layout_gravity="center"
         android:orientation="vertical">
 
-        <TextView
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="心率"
-            android:textSize="@dimen/sp_14"
-            android:textColor="@color/green"
-            android:fontFamily="@font/glowsanssc_condensed_medium"/>
+            android:orientation="horizontal"
+            android:layout_marginTop="@dimen/dp_5">
 
-        <TextView
-            android:id="@+id/txt_heartbeat"
-            android:layout_width="wrap_content"
+            <!-- 第一個 TextView -->
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="@font/glowsanssc_condensed_medium"
+                android:text="心率-BPM"
+                android:textColor="@color/green"
+                android:textSize="@dimen/sp_14" />
+
+            <!-- 第二個 TextView -->
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="@font/glowsanssc_condensed_medium"
+                android:text="飲食指標"
+                android:textColor="@color/green"
+                android:textSize="@dimen/sp_14" />
+
+            <!-- 第三個 TextView -->
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.4"
+                android:fontFamily="@font/glowsanssc_condensed_medium"
+                android:text="脈波訊號"
+                android:textColor="@color/green"
+                android:textSize="@dimen/sp_14" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="157.5"
-            android:textSize="@dimen/sp_22"
-            android:textColor="@color/green"
-            android:fontFamily="@font/glowsanssc_condensed_medium"/>
+            android:orientation="horizontal">
 
+            <!-- 第一個 TextView -->
+            <TextView
+                android:id="@+id/txt_bpm"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:fontFamily="@font/glowsanssc_condensed_medium"
+                android:text="157.5"
+                android:gravity="center"
+                android:textColor="@color/green"
+                android:textSize="@dimen/sp_22" />
+
+            <!-- 第二個 TextView -->
+            <TextView
+                android:id="@+id/txt_eatIndex"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:fontFamily="@font/glowsanssc_condensed_medium"
+                android:text="157.5"
+                android:gravity="center"
+                android:textColor="@color/green"
+                android:textSize="@dimen/sp_20" />
+
+            <!-- 第三個 TextView -->
+            <TextView
+                android:id="@+id/txt_BPC"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1.4"
+                android:fontFamily="@font/glowsanssc_condensed_medium"
+                android:text="157.5/157.5"
+                android:gravity="left"
+                android:textColor="@color/green"
+                android:textSize="@dimen/sp_18"/>
+        </LinearLayout>
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="0.3"
-        android:layout_gravity="center"
-        android:orientation="vertical">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="飲食指標"
-            android:textSize="@dimen/sp_14"
-            android:textColor="@color/green"
-            android:fontFamily="@font/glowsanssc_condensed_medium"/>
-
-        <TextView
-            android:id="@+id/txt_eatIndex"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="157.5"
-            android:textSize="@dimen/sp_22"
-            android:textColor="@color/green"
-            android:fontFamily="@font/glowsanssc_condensed_medium"/>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="0.3"
-        android:layout_gravity="center"
-        android:layout_marginEnd="@dimen/dp_10"
-        android:orientation="vertical">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="脈波訊號"
-            android:textSize="@dimen/sp_14"
-            android:textColor="@color/green"
-            android:fontFamily="@font/glowsanssc_condensed_medium"/>
-
-        <TextView
-            android:id="@+id/txt_brain"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="157.5"
-            android:textSize="@dimen/sp_22"
-            android:textColor="@color/green"
-            android:fontFamily="@font/glowsanssc_condensed_medium"/>
-
-    </LinearLayout>
 
 </LinearLayout>

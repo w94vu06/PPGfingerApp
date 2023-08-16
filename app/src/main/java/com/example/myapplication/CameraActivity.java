@@ -25,6 +25,7 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.util.Range;
 import android.util.Size;
 import android.view.Surface;
 import android.view.TextureView;
@@ -36,6 +37,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -76,6 +78,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
     private TextureView CameraView; // 相機預覽的TextureView
     private CameraDevice cameraDevice; // 相機設備
     private CameraCaptureSession cameraCaptureSessions; // 相機捕獲會話
+    private static Range<Integer>[] fpsRanges;
     private CaptureRequest.Builder captureRequestBuilder; // 捕獲請求的Builder
     private Size imageDimension; // 相片尺寸
     private static final int REQUEST_CAMERA_PERMISSION = 420; // 請求相機權限的請求碼
@@ -95,6 +98,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
     private int numRateCaptured = 0; // 目前已捕獲的心跳數量
     private int mNumBeats = 0; // 當前捕獲的心跳數量
     private int prevNumBeats = 0; // 上一個捕獲的心跳數量
+    private JSONArray jsonTimeDist,jsonRedPixel;
 
     // 心跳變異性計算相關變數
     private CalculateHRV calculateHRV; // 心跳變異性計算工具
@@ -124,6 +128,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
     private LineChart chart; // 折線圖
     private Thread chartThread; // 圖表的執行緒
     private List<Float> fullAvgRedList = new ArrayList<>();
+    private List<Float> saveRedPixelList = new ArrayList<>();
     private float fixedUpperBound = 0;
     private float fixedLowerBound = 0;
     private final float smoothFactor = 0.2f; // 調整平滑程度的因子
@@ -133,11 +138,13 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
     private float lowerBound;
 
 
+
     // 時間相關變數
     private String time = new SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault()).format(System.currentTimeMillis()); // 現在的時間字串
 
     // 手機計算的特徵
     private String phoneRMSSD, phoneSDNN, phoneMedianNN, phonePNN50, phoneMinNN, phoneMaxNN, phoneBPM;
+
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -171,7 +178,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
     protected void onStart() {
         super.onStart();
         setScreenOn();
-        controlMariaDB.testServer("test");
+//        controlMariaDB.testServer("test");
     }
 
     @Override
@@ -304,6 +311,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         prevNumBeats = 0;
         mNumBeats = 0;
         fullAvgRedList.clear();
+        saveRedPixelList.clear();
     }
 
     private void resetChartAndProgressBar() {
@@ -394,6 +402,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
             //如果色素閥值是正確的才進行量測
             if (fixAvgRedThreshold == 2 && averageGreenThreshold == 0 && averageBlueThreshold == 0) { //改
                 fullAvgRedList.add((float) fullAvgRed);
+                saveRedPixelList.add((float) fullAvgRed);
                 setChartLimit();
                 // Waits 20 captures, to remove startup artifacts.  First average is the sum.
                 //等待前幾個取樣，以去除啟動過程中的初始偏差
@@ -426,7 +435,6 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
                             removeRunnable();
                             chartIsRunning = false;
                             calLastTimeChartLimit();
-
                         }
                     }
                 }
@@ -721,9 +729,13 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
      */
     private void uploadResult(long[] time_dist) {
         if (outlierRRI != null) {
-            JSONArray jsonTimeDist = new JSONArray();
+            jsonTimeDist = new JSONArray();
             for (int i = 0; i < time_dist.length; i++) {
                 jsonTimeDist.put(time_dist[i]);
+            }
+            jsonRedPixel = new JSONArray();
+            for (int i = 0; i < saveRedPixelList.size(); i++) {
+                jsonRedPixel.put(saveRedPixelList.get(i));
             }
             JSONObject jsonData = new JSONObject();
 
@@ -809,7 +821,6 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
      */
     @Override
     public void onTest(String result) {
-        Log.d("gggg", "onTest: " + result);
         if (Objects.equals(result, "200")) {
             txt_serverInfo.setText("ai伺服器已開啟");
         } else if (Objects.equals(result, "400")) {
@@ -824,6 +835,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
             texture.setDefaultBufferSize(imageDimension.getWidth(), imageDimension.getHeight());
             Surface surface = new Surface(texture);
             captureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+            captureRequestBuilder.set(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE,fpsRanges[fpsRanges.length - 1]);
             captureRequestBuilder.addTarget(surface);
             cameraDevice.createCaptureSession(Collections.singletonList(surface), new CameraCaptureSession.StateCallback() {
                 @Override
@@ -850,6 +862,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         if (null == cameraDevice) {
             System.out.println("updatePreview error, return");
         }
+
         captureRequestBuilder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO);
         captureRequestBuilder.set(CaptureRequest.FLASH_MODE, CameraMetadata.FLASH_MODE_TORCH);
         try {
@@ -865,7 +878,14 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         System.out.println("is camera open");
         try {
             String cameraId = manager.getCameraIdList()[0];
+
             CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
+            fpsRanges = characteristics.get(CameraCharacteristics.CONTROL_AE_AVAILABLE_TARGET_FPS_RANGES);
+
+            for (int i = 0; i < fpsRanges.length; i++) {
+                Log.d("gggg", "openCamera: "+fpsRanges[i]);
+            }
+
             StreamConfigurationMap map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
             assert map != null;
             imageDimension = map.getOutputSizes(SurfaceTexture.class)[0];
@@ -875,6 +895,10 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
                 return;
             }
             manager.openCamera(cameraId, stateCallback, null);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                manager.turnOnTorchWithStrengthLevel(cameraId,1);
+            }
+
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
@@ -1029,6 +1053,9 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
                 editor.putFloat("way_eat", (float) way_eat);
                 editor.putFloat("way_eat_pa", (float) way_eat_pa);
                 editor.putFloat("year10scores", (float) year10scores);
+
+                editor.putFloat("redPixel", (float) year10scores);
+                editor.putFloat("rri", (float) year10scores);
                 editor.apply();
 
                 String jsonString = jsonObject.toString();
@@ -1055,7 +1082,11 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
                 jsonObject.put("userId", userId);
                 jsonObject.put("time", time);
 
+                jsonObject.put("redPixel", jsonRedPixel);
+                jsonObject.put("rri", jsonTimeDist);
+
                 String jsonString2 = jsonObject.toString();
+                Log.d("bbbb", "unpackJsonAndSave: "+jsonString2);
                 controlMariaDB.userIdSave(jsonString2);
 
                 editor = preferences.edit();

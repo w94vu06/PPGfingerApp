@@ -124,7 +124,7 @@ public class HomePage extends Fragment{
 
         featureList.add(new DataFeature("疲勞",String.valueOf(fatigue)));
         featureList.add(new DataFeature("心情",String.valueOf(mood_state_transfer)));
-        featureList.add(new DataFeature("脈搏訊號",String.valueOf(BPc_dia)+"/\n"+String.valueOf(BPc_sys)));
+        featureList.add(new DataFeature("脈搏訊號",String.valueOf(BPc_sys)+"/\n"+String.valueOf(BPc_dia)));
         featureList.add(new DataFeature("飲食指標", String.valueOf(BSc)));
         featureList.add(new DataFeature("心率", String.valueOf(ecg_hr_mean)));
         featureList.add(new DataFeature("RMSSD", String.valueOf(RMSSD)));
