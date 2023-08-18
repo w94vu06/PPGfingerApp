@@ -3,14 +3,13 @@ package com.example.myapplication.Data;
 import androidx.lifecycle.ViewModel;
 
 public class DataRecord extends ViewModel {
-    private String date,time,heartbeat,index,brain,preloadData;
+    private String date,heartbeat,index,brain,preloadData;
 
     public DataRecord() {
     }
 
-    public DataRecord(String date,String time,String heartbeat,String index,String brain){
+    public DataRecord(String date,String heartbeat,String index,String brain){
         this.date = date;
-        this.time = time;
         this.heartbeat = heartbeat;
         this.index = index;
         this.brain = brain;

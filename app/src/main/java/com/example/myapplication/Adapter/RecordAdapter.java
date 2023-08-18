@@ -36,7 +36,6 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.RecordView
     @Override
     public void onBindViewHolder(@NonNull RecordViewHolder holder, int position) {
         holder.txt_recordDate.setText(recordList.get(position).get("recordDate"));
-        holder.txt_recordTime.setText(recordList.get(position).get("recordTime"));
         holder.txt_bpm.setText((recordList.get(position).get("ecg_hr_mean")));
         holder.txt_eatIndex.setText((recordList.get(position).get("BSc")));
         holder.txt_BPC.setText((recordList.get(position).get("BPc_sys")+"/"+recordList.get(position).get("BPc_dia")));
@@ -55,13 +54,12 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.RecordView
     }
 
     public class RecordViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        private final TextView txt_recordDate,txt_recordTime,txt_bpm,txt_eatIndex,txt_BPC;
+        private final TextView txt_recordDate,txt_bpm,txt_eatIndex,txt_BPC;
         private final RecordAdapter.OnItemListener onItemListener;
 
         public RecordViewHolder(@NonNull View itemView, RecordAdapter.OnItemListener onItemListener) {
             super(itemView);
             txt_recordDate = itemView.findViewById(R.id.txt_recordDate);
-            txt_recordTime = itemView.findViewById(R.id.txt_recordTime);
 
             txt_bpm = itemView.findViewById(R.id.txt_bpm);
             txt_eatIndex = itemView.findViewById(R.id.txt_eatIndex);
