@@ -1,5 +1,6 @@
 package com.example.myapplication.Fragment;
 
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
@@ -33,6 +34,8 @@ import com.example.myapplication.Data.DataRecord;
 import com.example.myapplication.MariaDBCallback;
 import com.example.myapplication.R;
 import com.example.myapplication.SignInActivity;
+import com.google.android.material.bottomappbar.BottomAppBar;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -57,6 +60,7 @@ public class Record extends Fragment implements RecordAdapter.OnItemListener, Ma
     private RecyclerView recycler_record;
     private RecyclerView.Adapter adapter_record;
     private View view;
+    private BottomAppBar bottomAppBar;
 
     private ProgressDialog progressDialog;
     ControlMariaDB controlMariaDB = new ControlMariaDB(this);
@@ -92,9 +96,12 @@ public class Record extends Fragment implements RecordAdapter.OnItemListener, Ma
         recycler_record = view.findViewById(R.id.recycler_record);
         edit_month = view.findViewById(R.id.edit_month);
 
+        bottomAppBar = getActivity().findViewById(R.id.bar);
+
         sortRadioGroup = view.findViewById(R.id.sortRadioGroup);
         radioBtn_o2n = view.findViewById(R.id.radiobtn_o2n);
         radioBtn_n2o = view.findViewById(R.id.radiobtn_n2o);
+
         setSortRadioGroup();
 
         progressDialog = new ProgressDialog(getActivity());
@@ -156,6 +163,7 @@ public class Record extends Fragment implements RecordAdapter.OnItemListener, Ma
                 selectYear = selected.substring(0, 4);
                 selectMonth = selected.substring(5, 7);
                 selectDay = selected.substring(8, 10);
+                Log.d("vvvv", "selectYear: "+selectYear+"\nselectMonth: "+selectMonth+"\nselectDay: "+selectDay);
                 readDateData();
                 progressDialog.show();
             }
@@ -248,6 +256,7 @@ public class Record extends Fragment implements RecordAdapter.OnItemListener, Ma
                     double way_eat = jsonObject.getDouble("way_eat");
                     double way_eat_pa = jsonObject.getDouble("way_eat_pa");
                     double year10scores = jsonObject.getDouble("year10scores");
+
                     String time = jsonObject.getString("time");
                     formatDateTime(time);
 
@@ -256,10 +265,25 @@ public class Record extends Fragment implements RecordAdapter.OnItemListener, Ma
                     hashMap.put("recordTime", String.valueOf(dateStr_time));
 
                     hashMap.put("ecg_hr_mean", String.valueOf(ecg_hr_mean));
-                    hashMap.put("BSc", String.valueOf(BSc));
-                    hashMap.put("BPc_dia", String.valueOf(BPc_dia));
-                    hashMap.put("BPc_sys", String.valueOf(BPc_sys));
 
+                    if (BSc == 6666.0) {
+                        BSc = 0.0;
+                        hashMap.put("BSc", String.valueOf(BSc));
+                    } else {
+                        hashMap.put("BSc", String.valueOf(BSc));
+                    }
+                    if (BPc_dia == 6666.0) {
+                        BPc_dia = 0.0;
+                        hashMap.put("BPc_dia", String.valueOf(BPc_dia));
+                    } else {
+                        hashMap.put("BPc_dia", String.valueOf(BPc_dia));
+                    }
+                    if (BPc_sys == 6666.0) {
+                        BPc_sys = 0.0;
+                        hashMap.put("BPc_sys", String.valueOf(BPc_sys));
+                    } else {
+                        hashMap.put("BPc_sys", String.valueOf(BPc_sys));
+                    }
                     recordArrayList.add(hashMap);
                     getActivity().runOnUiThread(() -> {
                         recycler_record.setLayoutManager(linearLayoutManager);
@@ -286,8 +310,6 @@ public class Record extends Fragment implements RecordAdapter.OnItemListener, Ma
             Date date = inputDateFormat.parse(time);
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
             SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
-            dateFormat.setTimeZone(TimeZone.getTimeZone("Asia/Taipei"));
-            timeFormat.setTimeZone(TimeZone.getTimeZone("Asia/Taipei"));
 
             String str_date = dateFormat.format(date);
             String str_time = timeFormat.format(date);
@@ -296,7 +318,6 @@ public class Record extends Fragment implements RecordAdapter.OnItemListener, Ma
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
-
     }
 
     @Override
@@ -487,6 +508,7 @@ public class Record extends Fragment implements RecordAdapter.OnItemListener, Ma
 class MonthPickDialog {
     private Activity activity;
     OnDialogRespond onDialogRespond;
+    NumberPicker np_year, np_month, np_day;
 
     public MonthPickDialog(Activity activity) {
         this.activity = activity;
@@ -503,7 +525,7 @@ class MonthPickDialog {
         monthDialog.getWindow().setWindowAnimations(R.style.dialogWindowAnim);
         monthDialog.show();
 
-        NumberPicker np_year, np_month, np_day;
+
         Button btn_monthCancel, btn_monthDone;
         np_year = contentView.findViewById(R.id.np_year);
         np_month = contentView.findViewById(R.id.np_month);
@@ -534,6 +556,7 @@ class MonthPickDialog {
             @Override
             public void onClick(View view) {
                 monthDialog.dismiss();
+
             }
         });
         btn_monthDone.setOnClickListener(new View.OnClickListener() {

@@ -212,8 +212,8 @@ public class ControlMariaDB {
                         resMsg.obj = "noData";
                         resHandler.sendMessage(resMsg);
                         throw new IOException("Unexpected code " + readResponse);
-
                     }
+                    readResponse.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
