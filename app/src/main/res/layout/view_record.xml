@@ -6,131 +6,109 @@
     android:layout_marginTop="@dimen/dp_10"
     android:layout_marginEnd="@dimen/dp_10"
     android:background="@drawable/background_record"
-    android:orientation="horizontal">
+    android:orientation="vertical">
 
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginStart="@dimen/dp_10"
-        android:layout_marginTop="@dimen/dp_10"
-        android:layout_marginBottom="@dimen/dp_10"
-        android:layout_weight="0.4"
-        android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/txt_recordDate"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/rajdhani_bold"
-            android:text="2023-07-15"
-            android:gravity="left"
-            android:textColor="@color/green"
-            android:textSize="@dimen/sp_15" />
-
-        <TextView
-            android:id="@+id/txt_recordTime"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-
-            android:fontFamily="@font/rajdhani_bold"
-            android:gravity="center"
-            android:text="17:05"
-            android:textColor="@color/green"
-            android:textSize="@dimen/sp_28" />
-
-    </LinearLayout>
-
-    <ImageView
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_gravity="center"
-        android:layout_weight="0.1"
-        android:src="@drawable/line" />
-
-    <LinearLayout
+    <TextView
+        android:id="@+id/txt_recordDate"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_weight="0.3"
-        android:orientation="vertical">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dp_10"
+        android:layout_marginStart="@dimen/dp_10"
+        android:text="2023-07-15 17:05"
+        android:textSize="@dimen/sp_15"
+        android:textColor="@color/gray_2"
+        android:fontFamily="@font/rajdhani_bold"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dp_10"
+        android:layout_marginEnd="@dimen/dp_10"
+        android:layout_marginBottom="@dimen/dp_10"
+        android:orientation="horizontal">
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="@dimen/dp_5">
+            android:layout_weight="0.3"
+            android:layout_gravity="center"
+            android:orientation="vertical">
 
-            <!-- 第一個 TextView -->
             <TextView
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:fontFamily="@font/glowsanssc_condensed_medium"
-                android:text="心率-BPM"
-                android:textColor="@color/green"
-                android:textSize="@dimen/sp_14" />
+                android:text="心率(bpm)"
+                android:textSize="@dimen/sp_12"
+                android:textColor="@color/gray_2"
+                android:fontFamily="@font/glowsanssc_condensed_medium"/>
 
-            <!-- 第二個 TextView -->
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:fontFamily="@font/glowsanssc_condensed_medium"
-                android:text="飲食指標"
-                android:textColor="@color/green"
-                android:textSize="@dimen/sp_14" />
-
-            <!-- 第三個 TextView -->
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1.4"
-                android:fontFamily="@font/glowsanssc_condensed_medium"
-                android:text="脈波訊號"
-                android:textColor="@color/green"
-                android:textSize="@dimen/sp_14" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <!-- 第一個 TextView -->
             <TextView
                 android:id="@+id/txt_bpm"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:fontFamily="@font/glowsanssc_condensed_medium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:text="157.5"
-                android:gravity="center"
+                android:textSize="@dimen/sp_20"
                 android:textColor="@color/green"
-                android:textSize="@dimen/sp_20" />
+                android:fontFamily="@font/glowsanssc_condensed_medium"/>
 
-            <!-- 第二個 TextView -->
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.3"
+            android:layout_gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="飲食指標"
+                android:textSize="@dimen/sp_12"
+                android:textColor="@color/gray_2"
+                android:fontFamily="@font/glowsanssc_condensed_medium"/>
+
             <TextView
                 android:id="@+id/txt_eatIndex"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:fontFamily="@font/glowsanssc_condensed_medium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:text="157.5"
-                android:gravity="center"
+                android:textSize="@dimen/sp_20"
                 android:textColor="@color/green"
-                android:textSize="@dimen/sp_20" />
+                android:fontFamily="@font/glowsanssc_condensed_medium"/>
 
-            <!-- 第三個 TextView -->
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.3"
+            android:layout_gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="脈波訊號"
+                android:textSize="@dimen/sp_12"
+                android:textColor="@color/gray_2"
+                android:fontFamily="@font/glowsanssc_condensed_medium"/>
+
             <TextView
                 android:id="@+id/txt_BPC"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1.4"
-                android:fontFamily="@font/glowsanssc_condensed_medium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:text="157.5/157.5"
-                android:gravity="center"
+                android:textSize="@dimen/sp_20"
                 android:textColor="@color/green"
-                android:textSize="@dimen/sp_18"/>
+                android:fontFamily="@font/glowsanssc_condensed_medium"/>
+
         </LinearLayout>
+
     </LinearLayout>
+
+
 </LinearLayout>
