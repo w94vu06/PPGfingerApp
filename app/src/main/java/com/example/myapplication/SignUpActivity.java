@@ -1,12 +1,16 @@
 package com.example.myapplication;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -16,11 +20,15 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.NumberPicker;
 import android.widget.Toast;
 
+import com.example.myapplication.SignUpFragment.Habit;
+import com.example.myapplication.SignUpFragment.Health;
+import com.example.myapplication.SignUpFragment.Info;
 import com.example.myapplication.Util.CommonUtil;
 import com.example.myapplication.Util.FastClickUtil;
 import com.example.myapplication.Util.TextUtil;
@@ -41,25 +49,16 @@ import butterknife.OnClick;
 
 public class SignUpActivity extends AppCompatActivity implements MariaDBCallback {
 
-    EditText edit_userName, edit_email, edit_phone, edit_birth, edit_height, edit_weight;
-    ImageButton imgbtn_signUp;
-    ImageView img_signup, img_signUpback;
-    @BindViews({R.id.check_sexMale, R.id.check_sexFemale})
-    List<CheckBox> radiosSex;
-    @BindViews({R.id.check_smokeY, R.id.check_smokeN})
-    List<CheckBox> radiosSmoke;
-    @BindViews({R.id.check_diaY, R.id.check_diaN})
-    List<CheckBox> radiosDia;
-    @BindViews({R.id.check_hbpY, R.id.check_hbpN})
-    List<CheckBox> radiosHbp;
+    Button btn_nextPage,btn_upPage;
+    ImageView img_signup,img_signUpback;
+    Info info = new Info();
+    Health health = new Health();
+    Habit habit = new Habit();
+    private Fragment currentFragment;
+    private FrameLayout container_signup;
+    private FragmentManager fragmentManager;
+    private FragmentTransaction transaction;
 
-    Boolean isValid = true; //判斷欄位是否為空
-    ControlMariaDB controlMariaDB = new ControlMariaDB(this);
-
-    String profileJson; //profile的JSON
-
-    String userName, email, phone, birth, old, height, weight,
-            checkedSex, checkedSmoke, checkedDia, checkedHbp = "";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,160 +69,110 @@ public class SignUpActivity extends AppCompatActivity implements MariaDBCallback
     }
 
     private void initWidget() {
-        edit_userName = findViewById(R.id.edit_userName);
-        edit_email = findViewById(R.id.edit_email);
-        edit_phone = findViewById(R.id.edit_phone);
-        edit_birth = findViewById(R.id.edit_birth);
-        edit_height = findViewById(R.id.edit_height);
-        edit_weight = findViewById(R.id.edit_weight);
         img_signup = findViewById(R.id.img_signup);
-        imgbtn_signUp = findViewById(R.id.imgbtn_signUp);
+        img_signUpback = findViewById(R.id.img_signUpback);
+        btn_nextPage = findViewById(R.id.btn_nextPage);
+        btn_upPage = findViewById(R.id.btn_upPage);
+        container_signup = findViewById(R.id.container_signup);
+        fragmentManager = getSupportFragmentManager();
         img_signup.setImageResource(R.drawable.sign_up2);
-        imgbtn_signUp.setImageResource(R.drawable.btn_signup);
-        imgbtn_signUp.setOnClickListener(lis);
-        createMonthDialog(edit_birth);
-    }
-
-    /**
-     * 性別單選
-     **/
-    @OnClick({R.id.check_sexMale, R.id.check_sexFemale})
-    void changeSex(CheckBox checkBox) {
-        CommonUtil.unCheck(radiosSex);
-        checkBox.setChecked(true);
-        checkedSex = CommonUtil.getOne(radiosSex);
-    }
-
-    /**
-     * 抽菸單選
-     **/
-    @OnClick({R.id.check_smokeY, R.id.check_smokeN})
-    void changeSmoke(CheckBox checkBox) {
-        CommonUtil.unCheck(radiosSmoke);
-        checkBox.setChecked(true);
-        checkedSmoke = CommonUtil.getOne(radiosSmoke);
-    }
-
-    /**
-     * 糖尿病單選
-     **/
-    @OnClick({R.id.check_diaY, R.id.check_diaN})
-    void changeDia(CheckBox checkBox) {
-        CommonUtil.unCheck(radiosDia);
-        checkBox.setChecked(true);
-        checkedDia = CommonUtil.getOne(radiosDia);
-    }
-
-    /**
-     * 高血壓單選
-     **/
-    @OnClick({R.id.check_hbpY, R.id.check_hbpN})
-    void changeHbp(CheckBox checkBox) {
-        CommonUtil.unCheck(radiosHbp);
-        checkBox.setChecked(true);
-        checkedHbp = CommonUtil.getOne(radiosHbp);
-    }
-
-    /**
-     * 出生日期欄點擊事件
-     **/
-    public void createMonthDialog(final EditText edt){
-        BirthPickDialog dialog = new BirthPickDialog(this);
-        edt.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN){
-                    dialog.showDialog();
-                    return true;
-                }
-                return false;
-            }
-        });
-
-        dialog.onDialogRespond = new BirthPickDialog.OnDialogRespond() {
-            @Override
-            public void onRespond(String selected) {
-                edt.setText(selected);
-            }
-        };
-    }
-
-    /**
-     * 取欄位值
-     **/
-    private void getValue() {
-        userName = edit_userName.getText().toString();
-        email = edit_email.getText().toString();
-        phone = edit_phone.getText().toString();
-        birth = edit_birth.getText().toString();
-        height = edit_height.getText().toString();
-        weight = edit_weight.getText().toString();
-        checkedSex = CommonUtil.getOne(radiosSex);
-        checkedSmoke = CommonUtil.getOne(radiosSmoke);
-        checkedDia = CommonUtil.getOne(radiosDia);
-        checkedHbp = CommonUtil.getOne(radiosHbp);
-        checkEmpty();
-        calAge();
-        packedJson();
-    }
-
-    /**
-     * 打包JSON
-     **/
-    public String packedJson() {
-        JSONObject jsonObject = new JSONObject();
+        img_signUpback.setImageResource(R.drawable.art);
+        btn_upPage.setVisibility(View.INVISIBLE);
+        btn_upPage.setClickable(false);
+        btn_nextPage.setOnClickListener(lis);
+        btn_upPage.setOnClickListener(lis);
         try {
-            jsonObject.put("userName", userName);
-            jsonObject.put("email", email);
-            jsonObject.put("phone", phone);
-            jsonObject.put("birth", birth);
-            jsonObject.put("old", old);
-            jsonObject.put("height", height);
-            jsonObject.put("weight", weight);
-            jsonObject.put("sex", checkedSex);
-            jsonObject.put("smokes", checkedSmoke);
-            jsonObject.put("diabetes", checkedDia);
-            jsonObject.put("hbp", checkedHbp);
-        } catch (JSONException e) {
-            e.printStackTrace();
+            setFragment();
+        }catch (Exception e){
+            Log.e("tessttt",e.toString());
         }
-        profileJson = String.valueOf(jsonObject);
-
-        return profileJson;
     }
 
-    /**
-     * 註冊
-     **/
+    private void setFragment(){
+        transaction = fragmentManager.beginTransaction();
+        transaction.add(R.id.container_signup,info);
+        transaction.commit();
+    }
+
     View.OnClickListener lis = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            if (FastClickUtil.isFastDoubleClick()) {
-                Toast.makeText(SignUpActivity.this, "請勿快速點擊", Toast.LENGTH_SHORT).show();
-            } else {
-                try {
-                    //確認網路連線
-                    CheckInternetDialog checkInternetDialog = new CheckInternetDialog(SignUpActivity.this);
-                    checkInternetDialog.checkInternet();
-                    getValue();
-                    if (isValid) {
-                        /**註冊按鈕按下後，用UserRegister，會回傳事件代碼 */
-                        controlMariaDB.userRegister(profileJson);
+            Fragment nowFragment = checkFragment();
+            switch (view.getId()){
+                case R.id.btn_nextPage:
+                    if (nowFragment == info){
+                        btn_upPage.setClickable(true);
+                        btn_upPage.setVisibility(View.VISIBLE);
+                        currentFragment = info;
+                        try {
+                            FragmentHideShow(health);
+                            info.sendValue(new Info.DataReturn() {
+                                @Override
+                                public void getResult(String value) {
+                                    Log.d("getvalue",value);
+                                }
+                            });
+                        }catch (Exception e){
+                            Log.e("change",e.toString());
+                        }
+                    }else if(nowFragment == health){
+                        btn_upPage.setClickable(true);
+                        btn_upPage.setVisibility(View.VISIBLE);
+                        btn_nextPage.setText("註冊");
+                        FragmentHideShow(habit);
+                    }else if(nowFragment == habit){
+                        try {
+                            Intent intent = new Intent(SignUpActivity.this, MainActivity.class);
+                            startActivity(intent);
+                        }catch (Exception e){
+                            Log.e("errrr",e.toString());
+                        }
                     }
-                } catch (Exception e) {
-                    System.out.println(e);
-                }
+                    break;
+                case R.id.btn_upPage:
+                    if (nowFragment == habit){
+                        btn_nextPage.setText("下一頁");
+                        FragmentHideShow(health);
+                    }else if(nowFragment == health){
+                        btn_upPage.setClickable(false);
+                        btn_upPage.setVisibility(View.INVISIBLE);
+                        FragmentHideShow(info);
+                    }
+                    break;
             }
         }
     };
+
+    private Fragment checkFragment(){
+        FragmentManager fm = this.getSupportFragmentManager();
+        List<Fragment> fragments = fm.getFragments();
+        for (Fragment fragment:fragments){
+            if (fragment != null && fragment.isVisible()){
+                return fragment;
+            }
+        }
+        return null;
+    }
+
+    private void FragmentHideShow(Fragment fg){
+        fragmentManager = getSupportFragmentManager();
+        transaction= fragmentManager.beginTransaction();
+        if(!fg.isAdded()){
+            transaction.hide(currentFragment);
+            transaction.add(R.id.container_signup,fg);
+        }else{
+            transaction.hide(currentFragment);
+            transaction.show(fg);
+        }
+        currentFragment=fg;
+        transaction.commit();
+    }
 
     /**
      * 註冊按鈕按下後，從MariaDBCallback，回傳事件代碼
      */
     @Override
     public void onResult(String result) {
-        int eventCode = Integer.parseInt(result);
-        judgeEventCode(eventCode);
     }
 
     @Override
@@ -238,20 +187,6 @@ public class SignUpActivity extends AppCompatActivity implements MariaDBCallback
     /**
      * 判斷事件代碼
      */
-    public void judgeEventCode(int res) {
-        if (res == 1) {
-            Toast.makeText(SignUpActivity.this, "註冊成功，請重新登入", Toast.LENGTH_SHORT).show();
-            EventBus.getDefault().postSticky(new MessageEvent(profileJson));//把profile資料送去MainActivity
-            Intent goHomePage = new Intent(SignUpActivity.this, SignInActivity.class);
-            startActivity(goHomePage);
-            finish();
-        }
-        if (res == 2) {
-            Toast.makeText(SignUpActivity.this, "帳戶已經存在", Toast.LENGTH_SHORT).show();
-        } else if (res == 0) {
-            Toast.makeText(SignUpActivity.this, "註冊失敗", Toast.LENGTH_SHORT).show();
-        }
-    }
 
     /**
      * 註冊成功後傳profile到MainActivity
@@ -268,77 +203,6 @@ public class SignUpActivity extends AppCompatActivity implements MariaDBCallback
         }
     }
 
-    /**
-     * 算年齡
-     **/
-    private void calAge() {
-        //get current time
-        SimpleDateFormat dtf = new SimpleDateFormat("yyyy");
-        Calendar calendar = Calendar.getInstance();
-        Date date = calendar.getTime();
-        String formattedDate = dtf.format(date);
-
-        //get birth's year
-        String years = birth.substring(0, 4);
-        int pastYear = Integer.parseInt(years);
-        int currentYear = Integer.parseInt(formattedDate);
-        int howOldAreYou = currentYear - pastYear;
-        old = String.valueOf(howOldAreYou);
-    }
-
-    /**
-     * 判斷輸入欄是否空白
-     **/
-    private boolean checkEmpty() {
-        isValid = true;
-        try {
-            if (userName.isEmpty()) {
-                Toast.makeText(SignUpActivity.this, "用戶名稱欄不得空白", Toast.LENGTH_SHORT).show();
-                isValid = false;
-            }
-            if (birth.isEmpty()) {
-                Toast.makeText(SignUpActivity.this, "出生日期欄不得空白", Toast.LENGTH_SHORT).show();
-                isValid = false;
-            }
-            if (height.isEmpty()) {
-                Toast.makeText(SignUpActivity.this, "身高欄不得空白", Toast.LENGTH_SHORT).show();
-                isValid = false;
-            }
-            if (weight.isEmpty()) {
-                Toast.makeText(SignUpActivity.this, "體重欄不得空白", Toast.LENGTH_SHORT).show();
-                isValid = false;
-            }
-            if (checkedSex.isEmpty()) {
-                Toast.makeText(SignUpActivity.this, "性別欄不得空白", Toast.LENGTH_SHORT).show();
-                isValid = false;
-            }
-            if (checkedSmoke.isEmpty()) {
-                Toast.makeText(SignUpActivity.this, "抽菸欄不得空白", Toast.LENGTH_SHORT).show();
-                isValid = false;
-            }
-            if (checkedDia.isEmpty()) {
-                Toast.makeText(SignUpActivity.this, "糖尿病欄不得空白", Toast.LENGTH_SHORT).show();
-                isValid = false;
-            }
-            if (checkedHbp.isEmpty()) {
-                Toast.makeText(SignUpActivity.this, "高血壓欄不得空白", Toast.LENGTH_SHORT).show();
-                isValid = false;
-            }
-            if (!TextUtil.isValidEmailFormat(email)) {
-                Toast.makeText(SignUpActivity.this, "Email格式錯誤", Toast.LENGTH_SHORT).show();
-                isValid = false;
-            }
-            if (!TextUtil.isPhoneLegal(phone)) {
-                Toast.makeText(SignUpActivity.this, "手機號碼格式錯誤", Toast.LENGTH_SHORT).show();
-                isValid = false;
-            }
-        } catch (Exception e) {
-            Toast.makeText(SignUpActivity.this, "請正確填寫資料", Toast.LENGTH_SHORT).show();
-            System.out.println(e);
-        }
-        return isValid;
-    }
-
     @Override
     protected void onStart() {
         super.onStart();
@@ -352,86 +216,5 @@ public class SignUpActivity extends AppCompatActivity implements MariaDBCallback
     @Override
     protected void onDestroy() {
         super.onDestroy();
-    }
-}
-
-/** 日期選擇Dialog **/
-class BirthPickDialog {
-    private Activity activity;
-    BirthPickDialog.OnDialogRespond onDialogRespond;
-    private NumberPicker np_birthY,np_birthM,np_birthD;
-    private Button btn_birthCancel,btn_birthDone;
-    private DatePickerDialog datePickerDialog;
-
-    public BirthPickDialog(Activity activity){
-        this.activity = activity;
-    }
-
-    public void showDialog(){
-        Dialog monthDialog = new Dialog(this.activity, R.style.MonthDialog);
-        View contentView = LayoutInflater.from(this.activity).inflate(R.layout.dialog_birth, null);
-        monthDialog.setContentView(contentView);
-        ViewGroup.LayoutParams params = contentView.getLayoutParams();
-        params.width = activity.getResources().getDisplayMetrics().widthPixels;
-        contentView.setLayoutParams(params);
-        monthDialog.getWindow().setGravity(Gravity.BOTTOM);
-        monthDialog.getWindow().setWindowAnimations(R.style.dialogWindowAnim);
-        monthDialog.show();
-
-        np_birthY = contentView.findViewById(R.id.np_birthY);
-        np_birthM = contentView.findViewById(R.id.np_birthM);
-        np_birthD = contentView.findViewById(R.id.np_birthD);
-        btn_birthCancel = contentView.findViewById(R.id.btn_birthCancel);
-        btn_birthDone = contentView.findViewById(R.id.btn_birthDone);
-        Calendar calendar = Calendar.getInstance();
-        Date date = new Date();
-        int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH)+1;
-        int day = calendar.get(Calendar.DAY_OF_MONTH);
-
-        np_birthY.setMaxValue(year);
-        np_birthY.setMinValue(year-150);
-        np_birthY.setValue(Integer.parseInt(new SimpleDateFormat("yyyy").format(date)));
-        np_birthM.setMaxValue(12);
-        np_birthM.setMinValue(1);
-        np_birthM.setValue(Integer.parseInt(new SimpleDateFormat("MM").format(date)));
-
-        np_birthY.setOnValueChangedListener((picker, oldVal, newVal) -> setDaysInDayPicker(newVal,np_birthM.getValue()));
-        np_birthM.setOnValueChangedListener((picker, oldVal, newVal) -> setDaysInDayPicker(np_birthY.getValue(),newVal));
-
-        np_birthY.setValue(year);
-        np_birthM.setValue(month);
-        np_birthD.setValue(day);
-
-        // 設置當前月份的天數
-        setDaysInDayPicker(year,month);
-
-        btn_birthCancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                monthDialog.dismiss();
-            }
-        });
-        btn_birthDone.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String s = String.format("%04d-%02d-%02d",np_birthY.getValue(),np_birthM.getValue(),np_birthD.getValue());
-                onDialogRespond.onRespond(s);
-                monthDialog.dismiss();
-            }
-        });
-    }
-
-    private void setDaysInDayPicker(int year, int month) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.YEAR, year);
-        calendar.set(Calendar.MONTH, month - 1);
-        int maxDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
-        np_birthD.setMaxValue(maxDay);
-        np_birthD.setMinValue(1);
-    }
-
-    interface OnDialogRespond{
-        void onRespond(String selected);
     }
 }

@@ -262,7 +262,6 @@ public class Record extends Fragment implements RecordAdapter.OnItemListener, Ma
 
                     HashMap<String, String> hashMap = new HashMap<>();
                     hashMap.put("recordDate", String.valueOf(dateStr_date));
-                    hashMap.put("recordTime", String.valueOf(dateStr_time));
 
                     hashMap.put("ecg_hr_mean", String.valueOf(ecg_hr_mean));
 
@@ -308,13 +307,10 @@ public class Record extends Fragment implements RecordAdapter.OnItemListener, Ma
         try {
             SimpleDateFormat inputDateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss 'GMT'", Locale.US);
             Date date = inputDateFormat.parse(time);
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
             String str_date = dateFormat.format(date);
-            String str_time = timeFormat.format(date);
             dateStr_date = str_date;
-            dateStr_time = str_time;
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }

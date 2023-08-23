@@ -4,443 +4,462 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/shironeri"
-    tools:context=".SignUpActivity">
+    android:background="@color/shironeri">
 
     <ImageView
         android:id="@+id/img_signup"
         android:layout_width="@dimen/dp_198"
         android:layout_height="@dimen/dp_55"
-        android:layout_centerHorizontal="true"
         android:layout_marginTop="@dimen/dp_20"
         android:scaleType="fitXY"
-        android:src="@drawable/sign_up" />
+        android:layout_centerHorizontal="true"/>
 
-    <LinearLayout
+    <ImageView
+        android:id="@+id/img_signUpback"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/img_signup"
-        android:background="@drawable/sign_background">
+        android:layout_marginTop="@dimen/dp_15"
+        android:layout_below="@+id/img_signup"
+        android:orientation="vertical"
+        android:scaleType="fitXY"/>
 
+    <LinearLayout
+        android:id="@+id/linear"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dp_25"
+        android:orientation="horizontal"
+        android:layout_alignTop="@+id/img_signUpback">
 
-        <!--    <ImageView-->
-        <!--        android:id="@+id/img_signUpBack"-->
-        <!--        android:layout_width="match_parent"-->
-        <!--        android:layout_height="match_parent"-->
-        <!--        android:layout_marginTop="@dimen/dp_15"-->
-        <!--        android:layout_below="@+id/img_signup"-->
-        <!--        android:orientation="vertical"-->
-        <!--        android:scaleType="fitXY"/>-->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_25"
+            android:text="個人資料"
+            android:textSize="@dimen/sp_20"
+            android:textColor="@color/gray"
+            android:fontFamily="@font/glowsanssc_condensed_book"/>
 
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginTop="@dimen/dp_20">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_10"
+            android:text="*為必填欄位"
+            android:textSize="@dimen/sp_12"
+            android:textColor="#707070"
+            android:fontFamily="@font/glowsanssc_condensed_book"/>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/dp_50"
-                        android:layout_marginTop="@dimen/dp_25"
-                        android:fontFamily="@font/glowsanssc_condensed_book"
-                        android:text="個人資料"
-                        android:textColor="#707070"
-                        android:textSize="@dimen/sp_20" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/dp_10"
-                        android:layout_marginTop="@dimen/dp_25"
-                        android:fontFamily="@font/glowsanssc_condensed_book"
-                        android:text="*為必填欄位"
-                        android:textColor="#707070"
-                        android:textSize="@dimen/sp_12" />
-
-                </LinearLayout>
-
-                <!-- 用戶名稱、email、手機號碼、出生日期 -->
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/dp_5"
-                    android:orientation="vertical">
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/input_userName"
-                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/dp_55"
-                        android:layout_marginEnd="@dimen/dp_55"
-                        android:ellipsize="end"
-                        android:lines="1"
-                        android:textColorHint="#C9C9C9">
-
-                        <EditText
-                            android:id="@+id/edit_userName"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="@font/glowsanssc_condensed_book"
-                            android:hint="使用者名稱*"
-                            android:inputType="text"
-                            android:maxLines="1"
-                            android:padding="@dimen/dp_5"
-                            android:textColor="#707070"
-                            android:textSize="@dimen/sp_18" />
-
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/input_email"
-                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@+id/input_userName"
-                        android:layout_marginStart="@dimen/dp_55"
-                        android:layout_marginTop="@dimen/dp_5"
-                        android:layout_marginEnd="@dimen/dp_55"
-                        android:textColorHint="#C9C9C9">
-
-                        <EditText
-                            android:id="@+id/edit_email"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:ellipsize="end"
-                            android:fontFamily="@font/glowsanssc_condensed_book"
-                            android:hint="E-mail*(將會作為帳號使用)"
-                            android:inputType="textEmailAddress"
-                            android:lines="1"
-                            android:maxLines="1"
-                            android:padding="@dimen/dp_5"
-                            android:textColor="#707070"
-                            android:textSize="@dimen/sp_18" />
-
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/input_phone"
-                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@+id/input_email"
-                        android:layout_marginStart="@dimen/dp_55"
-                        android:layout_marginTop="@dimen/dp_5"
-                        android:layout_marginEnd="@dimen/dp_55"
-                        android:textColorHint="#C9C9C9">
-
-                        <EditText
-                            android:id="@+id/edit_phone"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:ellipsize="end"
-                            android:fontFamily="@font/glowsanssc_condensed_book"
-                            android:hint="手機號碼*(將作為預設密碼)"
-                            android:inputType="number"
-                            android:lines="1"
-                            android:maxLength="10"
-                            android:maxLines="1"
-                            android:padding="@dimen/dp_5"
-                            android:textColor="#707070"
-                            android:textSize="@dimen/sp_18" />
-
-                    </com.google.android.material.textfield.TextInputLayout>
-
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/input_birth"
-                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_marginStart="@dimen/dp_55"
-                        android:layout_marginTop="@dimen/dp_5"
-                        android:layout_marginEnd="@dimen/dp_55"
-                        android:textColorHint="#C9C9C9"
-                        android:layout_below="@id/input_phone">
-
-                        <EditText
-                            android:id="@+id/edit_birth"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="@font/glowsanssc_condensed_book"
-                            android:hint="出生日期*"
-                            android:maxLines="1"
-                            android:padding="@dimen/dp_5"
-                            android:textColor="#707070"
-                            android:textSize="@dimen/sp_18"
-                            android:focusable="false" />
-                    </com.google.android.material.textfield.TextInputLayout>
-                </RelativeLayout>
-
-                <!-- 身高、體重 -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/dp_55"
-                    android:layout_marginTop="@dimen/dp_5"
-                    android:layout_marginEnd="@dimen/dp_55"
-                    android:orientation="horizontal">
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/input_height"
-                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_weight="0.5"
-                        android:textColorHint="#C9C9C9">
-
-                        <EditText
-                            android:id="@+id/edit_height"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:ellipsize="end"
-                            android:fontFamily="@font/glowsanssc_condensed_book"
-                            android:hint="身高*(公分cm)"
-                            android:inputType="number"
-                            android:lines="1"
-                            android:maxLines="1"
-                            android:padding="@dimen/dp_5"
-                            android:textColor="#707070"
-                            android:textSize="@dimen/sp_18" />
-
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <Space
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="0.05" />
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/input_weight"
-                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@+id/input_birth"
-                        android:layout_gravity="center"
-                        android:layout_weight="0.5"
-                        android:textColorHint="#C9C9C9">
-
-                        <EditText
-                            android:id="@+id/edit_weight"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:ellipsize="end"
-                            android:fontFamily="@font/glowsanssc_condensed_book"
-                            android:hint="體重*(公斤kg)"
-                            android:inputType="number"
-                            android:lines="1"
-                            android:maxLines="1"
-                            android:padding="@dimen/dp_5"
-                            android:textColor="#707070"
-                            android:textSize="@dimen/sp_18" />
-
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                </LinearLayout>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/dp_55"
-                    android:layout_marginTop="@dimen/dp_5"
-                    android:fontFamily="@font/glowsanssc_condensed_book"
-                    android:text="性別*"
-                    android:textColor="#C9C9C9"
-                    android:textSize="@dimen/sp_18" />
-
-                <!-- 性別 -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/dp_55"
-                    android:layout_marginEnd="@dimen/dp_55"
-                    android:orientation="horizontal">
-
-                    <CheckBox
-                        android:id="@+id/check_sexMale"
-                        style="@style/checkBox_style"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="0.5"
-                        android:tag="1"
-                        android:text="男 Male"
-                        android:textSize="@dimen/sp_18" />
-
-                    <Space
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="0.05" />
-
-                    <CheckBox
-                        android:id="@+id/check_sexFemale"
-                        style="@style/checkBox_style"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="0.5"
-                        android:tag="2"
-                        android:text="女 Female"
-                        android:textSize="@dimen/sp_18" />
-
-                </LinearLayout>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/dp_55"
-                    android:layout_marginTop="@dimen/dp_5"
-                    android:fontFamily="@font/glowsanssc_condensed_book"
-                    android:text="是否有抽菸*"
-                    android:textColor="#C9C9C9"
-                    android:textSize="@dimen/sp_18" />
-
-                <!-- 抽菸 -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/dp_55"
-                    android:layout_marginEnd="@dimen/dp_55"
-                    android:orientation="horizontal">
-
-                    <CheckBox
-                        android:id="@+id/check_smokeY"
-                        style="@style/checkBox_style"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="0.5"
-                        android:tag="1"
-                        android:text="有 Yes"
-                        android:textSize="@dimen/sp_18" />
-
-                    <Space
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="0.05" />
-
-                    <CheckBox
-                        android:id="@+id/check_smokeN"
-                        style="@style/checkBox_style"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="0.5"
-                        android:tag="0"
-                        android:text="沒有 No"
-                        android:textSize="@dimen/sp_18" />
-
-                </LinearLayout>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/dp_55"
-                    android:layout_marginTop="@dimen/dp_5"
-                    android:fontFamily="@font/glowsanssc_condensed_book"
-                    android:text="是否有糖尿病*"
-                    android:textColor="#C9C9C9"
-                    android:textSize="@dimen/sp_18" />
-
-                <!-- 糖尿病 -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/dp_55"
-                    android:layout_marginEnd="@dimen/dp_55"
-                    android:orientation="horizontal">
-
-                    <CheckBox
-                        android:id="@+id/check_diaY"
-                        style="@style/checkBox_style"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="0.5"
-                        android:tag="1"
-                        android:text="有 Yes"
-                        android:textSize="@dimen/sp_18" />
-
-                    <Space
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="0.05" />
-
-                    <CheckBox
-                        android:id="@+id/check_diaN"
-                        style="@style/checkBox_style"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="0.5"
-                        android:tag="0"
-                        android:text="沒有 No"
-                        android:textSize="@dimen/sp_18" />
-
-                </LinearLayout>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/dp_55"
-                    android:layout_marginTop="@dimen/dp_5"
-                    android:fontFamily="@font/glowsanssc_condensed_book"
-                    android:text="是否有高血壓*"
-                    android:textColor="#C9C9C9"
-                    android:textSize="@dimen/sp_18" />
-
-                <!-- 高血壓 -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/dp_55"
-                    android:layout_marginEnd="@dimen/dp_55"
-                    android:orientation="horizontal">
-
-                    <CheckBox
-                        android:id="@+id/check_hbpY"
-                        style="@style/checkBox_style"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="0.5"
-                        android:tag="1"
-                        android:text="有 Yes"
-                        android:textSize="@dimen/sp_18" />
-
-                    <Space
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="0.05" />
-
-                    <CheckBox
-                        android:id="@+id/check_hbpN"
-                        style="@style/checkBox_style"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="0.5"
-                        android:tag="0"
-                        android:text="沒有 No"
-                        android:textSize="@dimen/sp_18" />
-
-                </LinearLayout>
-
-                <ImageButton
-                    android:id="@+id/imgbtn_signUp"
-                    android:layout_width="@dimen/dp_120"
-                    android:layout_height="@dimen/dp_40"
-                    android:layout_gravity="right"
-                    android:layout_marginTop="@dimen/dp_10"
-                    android:layout_marginEnd="@dimen/dp_30"
-                    android:layout_marginBottom="@dimen/dp_30"
-                    android:background="@null"
-                    android:backgroundTint="@null"
-                    android:scaleType="fitXY" />
-            </LinearLayout>
-        </ScrollView>
     </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/container_signup"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/linear"
+        android:layout_marginTop="@dimen/dp_10"
+        android:layout_marginBottom="@dimen/dp_80"/>
+
+    <Button
+        android:id="@+id/btn_upPage"
+        android:layout_width="@dimen/dp_120"
+        android:layout_height="@dimen/dp_40"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="@dimen/dp_10"
+        android:layout_marginStart="@dimen/dp_20"
+        android:layout_marginBottom="@dimen/dp_20"
+        android:padding="@dimen/dp_0"
+        android:minHeight="0dp"
+        android:text="上一頁"
+        android:textSize="@dimen/sp_20"
+        android:textColor="@color/green"
+        android:fontFamily="@font/glowsanssc_condensed_medium"
+        android:background="@null"
+        android:backgroundTint="@null"/>
+
+    <Button
+        android:id="@+id/btn_nextPage"
+        android:layout_width="@dimen/dp_120"
+        android:layout_height="@dimen/dp_40"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="@dimen/dp_10"
+        android:layout_marginEnd="@dimen/dp_20"
+        android:layout_marginBottom="@dimen/dp_20"
+        android:padding="@dimen/dp_0"
+        android:text="下一頁"
+        android:textSize="@dimen/sp_20"
+        android:textColor="@color/green"
+        android:fontFamily="@font/glowsanssc_condensed_medium"
+        android:background="@null"
+        android:backgroundTint="@null"/>
+
+<!--    <ScrollView-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent"-->
+<!--        android:layout_marginTop="@dimen/dp_10"-->
+<!--        android:layout_marginBottom="@dimen/dp_80"-->
+<!--        android:layout_below="@+id/linear">-->
+
+<!--        <LinearLayout-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:orientation="vertical">-->
+
+<!--            &lt;!&ndash; 用戶名稱、email、手機號碼、出生日期 &ndash;&gt;-->
+<!--            <RelativeLayout-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginTop="@dimen/dp_5"-->
+<!--                android:orientation="vertical">-->
+
+<!--                <com.google.android.material.textfield.TextInputLayout-->
+<!--                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"-->
+<!--                    android:id="@+id/input_userName"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginStart="@dimen/dp_25"-->
+<!--                    android:layout_marginEnd="@dimen/dp_25"-->
+<!--                    android:textColorHint="#707070"-->
+<!--                    android:ellipsize="end"-->
+<!--                    android:lines="1">-->
+
+<!--                    <EditText-->
+<!--                        android:id="@+id/edit_userName"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:padding="@dimen/dp_5"-->
+<!--                        android:textSize="@dimen/sp_18"-->
+<!--                        android:textColor="#707070"-->
+<!--                        android:hint="用戶名稱*"-->
+<!--                        android:fontFamily="@font/glowsanssc_condensed_book"/>-->
+
+<!--                </com.google.android.material.textfield.TextInputLayout>-->
+
+<!--                <com.google.android.material.textfield.TextInputLayout-->
+<!--                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"-->
+<!--                    android:id="@+id/input_email"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginTop="@dimen/dp_5"-->
+<!--                    android:layout_marginStart="@dimen/dp_25"-->
+<!--                    android:layout_marginEnd="@dimen/dp_25"-->
+<!--                    android:textColorHint="#707070"-->
+<!--                    android:layout_below="@+id/input_userName">-->
+
+<!--                    <EditText-->
+<!--                        android:id="@+id/edit_email"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:padding="@dimen/dp_5"-->
+<!--                        android:textSize="@dimen/sp_18"-->
+<!--                        android:textColor="#707070"-->
+<!--                        android:hint="E-mail"-->
+<!--                        android:fontFamily="@font/glowsanssc_condensed_book"-->
+<!--                        android:inputType="textEmailAddress"-->
+<!--                        android:ellipsize="end"-->
+<!--                        android:lines="1"/>-->
+
+<!--                </com.google.android.material.textfield.TextInputLayout>-->
+
+<!--                <com.google.android.material.textfield.TextInputLayout-->
+<!--                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"-->
+<!--                    android:id="@+id/input_phone"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginTop="@dimen/dp_5"-->
+<!--                    android:layout_marginStart="@dimen/dp_25"-->
+<!--                    android:layout_marginEnd="@dimen/dp_25"-->
+<!--                    android:textColorHint="#707070"-->
+<!--                    android:layout_below="@+id/input_email">-->
+
+<!--                    <EditText-->
+<!--                        android:id="@+id/edit_phone"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:padding="@dimen/dp_5"-->
+<!--                        android:textSize="@dimen/sp_18"-->
+<!--                        android:textColor="#707070"-->
+<!--                        android:hint="手機號碼"-->
+<!--                        android:fontFamily="@font/glowsanssc_condensed_book"-->
+<!--                        android:ellipsize="end"-->
+<!--                        android:lines="1"/>-->
+
+<!--                </com.google.android.material.textfield.TextInputLayout>-->
+
+<!--                <com.google.android.material.textfield.TextInputLayout-->
+<!--                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"-->
+<!--                    android:id="@+id/input_birth"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginTop="@dimen/dp_5"-->
+<!--                    android:layout_marginStart="@dimen/dp_25"-->
+<!--                    android:layout_marginEnd="@dimen/dp_25"-->
+<!--                    android:textColorHint="#707070"-->
+<!--                    android:layout_below="@+id/input_phone">-->
+
+<!--                    <EditText-->
+<!--                        android:id="@+id/edit_birth"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:padding="@dimen/dp_5"-->
+<!--                        android:textSize="@dimen/sp_18"-->
+<!--                        android:textColor="#707070"-->
+<!--                        android:hint="出生日期*"-->
+<!--                        android:fontFamily="@font/glowsanssc_condensed_book"/>-->
+
+<!--                </com.google.android.material.textfield.TextInputLayout>-->
+
+<!--            </RelativeLayout>-->
+
+<!--            &lt;!&ndash; 身高、體重 &ndash;&gt;-->
+<!--            <LinearLayout-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginTop="@dimen/dp_5"-->
+<!--                android:layout_marginStart="@dimen/dp_25"-->
+<!--                android:layout_marginEnd="@dimen/dp_25"-->
+<!--                android:orientation="horizontal">-->
+
+<!--                <com.google.android.material.textfield.TextInputLayout-->
+<!--                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"-->
+<!--                    android:id="@+id/input_height"-->
+<!--                    android:layout_width="0dp"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_weight="0.5"-->
+<!--                    android:layout_gravity="center"-->
+<!--                    android:textColorHint="#C9C9C9">-->
+
+<!--                    <EditText-->
+<!--                        android:id="@+id/edit_height"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:padding="@dimen/dp_5"-->
+<!--                        android:textSize="@dimen/sp_18"-->
+<!--                        android:textColor="#707070"-->
+<!--                        android:hint="身高(公分cm)*"-->
+<!--                        android:fontFamily="@font/glowsanssc_condensed_book"-->
+<!--                        android:inputType="number"-->
+<!--                        android:ellipsize="end"-->
+<!--                        android:lines="1"/>-->
+
+<!--                </com.google.android.material.textfield.TextInputLayout>-->
+
+<!--                <Space-->
+<!--                    android:layout_width="0dp"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_weight="0.05"/>-->
+
+<!--                <com.google.android.material.textfield.TextInputLayout-->
+<!--                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"-->
+<!--                    android:id="@+id/input_weight"-->
+<!--                    android:layout_width="0dp"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_weight="0.5"-->
+<!--                    android:layout_gravity="center"-->
+<!--                    android:textColorHint="#C9C9C9"-->
+<!--                    android:layout_below="@+id/input_birth">-->
+
+<!--                    <EditText-->
+<!--                        android:id="@+id/edit_weight"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:padding="@dimen/dp_5"-->
+<!--                        android:textSize="@dimen/sp_18"-->
+<!--                        android:textColor="#707070"-->
+<!--                        android:hint="體重(公斤kg)*"-->
+<!--                        android:fontFamily="@font/glowsanssc_condensed_book"-->
+<!--                        android:inputType="number"-->
+<!--                        android:ellipsize="end"-->
+<!--                        android:lines="1"/>-->
+
+<!--                </com.google.android.material.textfield.TextInputLayout>-->
+
+<!--            </LinearLayout>-->
+
+<!--            <TextView-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginTop="@dimen/dp_5"-->
+<!--                android:layout_marginStart="@dimen/dp_25"-->
+<!--                android:text="性別*"-->
+<!--                android:textSize="@dimen/sp_18"-->
+<!--                android:textColor="#707070"-->
+<!--                android:fontFamily="@font/glowsanssc_condensed_book"/>-->
+
+<!--            &lt;!&ndash; 性別 &ndash;&gt;-->
+<!--            <LinearLayout-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginStart="@dimen/dp_25"-->
+<!--                android:layout_marginEnd="@dimen/dp_25"-->
+<!--                android:orientation="horizontal">-->
+
+<!--                <CheckBox-->
+<!--                    android:id="@+id/check_sexMale"-->
+<!--                    android:layout_width="0dp"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_weight="0.5"-->
+<!--                    android:text="男 Male"-->
+<!--                    android:textSize="@dimen/sp_18"-->
+<!--                    android:tag="rd1"-->
+<!--                    style="@style/checkBox_style"/>-->
+
+<!--                <Space-->
+<!--                    android:layout_width="0dp"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_weight="0.05"/>-->
+
+<!--                <CheckBox-->
+<!--                    android:id="@+id/check_sexFemale"-->
+<!--                    android:layout_width="0dp"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_weight="0.5"-->
+<!--                    android:text="女 Female"-->
+<!--                    android:textSize="@dimen/sp_18"-->
+<!--                    android:tag="rd2"-->
+<!--                    style="@style/checkBox_style"/>-->
+
+<!--            </LinearLayout>-->
+
+<!--            <TextView-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginTop="@dimen/dp_5"-->
+<!--                android:layout_marginStart="@dimen/dp_25"-->
+<!--                android:text="是否有抽菸*"-->
+<!--                android:textSize="@dimen/sp_18"-->
+<!--                android:textColor="#707070"-->
+<!--                android:fontFamily="@font/glowsanssc_condensed_book"/>-->
+
+<!--            &lt;!&ndash; 抽菸 &ndash;&gt;-->
+<!--            <LinearLayout-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginStart="@dimen/dp_25"-->
+<!--                android:layout_marginEnd="@dimen/dp_25"-->
+<!--                android:orientation="horizontal">-->
+
+<!--                <CheckBox-->
+<!--                    android:id="@+id/check_smokeY"-->
+<!--                    android:layout_width="0dp"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_weight="0.5"-->
+<!--                    android:text="有 Yes"-->
+<!--                    android:textSize="@dimen/sp_18"-->
+<!--                    android:tag="rd3"-->
+<!--                    style="@style/checkBox_style"/>-->
+
+<!--                <Space-->
+<!--                    android:layout_width="0dp"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_weight="0.05"/>-->
+
+<!--                <CheckBox-->
+<!--                    android:id="@+id/check_smokeN"-->
+<!--                    android:layout_width="0dp"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_weight="0.5"-->
+<!--                    android:text="沒有 No"-->
+<!--                    android:textSize="@dimen/sp_18"-->
+<!--                    android:tag="rd4"-->
+<!--                    style="@style/checkBox_style"/>-->
+
+<!--            </LinearLayout>-->
+
+<!--            <TextView-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginTop="@dimen/dp_5"-->
+<!--                android:layout_marginStart="@dimen/dp_25"-->
+<!--                android:text="是否有糖尿病*"-->
+<!--                android:textSize="@dimen/sp_18"-->
+<!--                android:textColor="#707070"-->
+<!--                android:fontFamily="@font/glowsanssc_condensed_book"/>-->
+
+<!--            &lt;!&ndash; 糖尿病 &ndash;&gt;-->
+<!--            <LinearLayout-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginStart="@dimen/dp_25"-->
+<!--                android:layout_marginEnd="@dimen/dp_25"-->
+<!--                android:orientation="horizontal">-->
+
+<!--                <CheckBox-->
+<!--                    android:id="@+id/check_diaY"-->
+<!--                    android:layout_width="0dp"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_weight="0.5"-->
+<!--                    android:text="有 Yes"-->
+<!--                    android:textSize="@dimen/sp_18"-->
+<!--                    android:tag="rd5"-->
+<!--                    style="@style/checkBox_style"/>-->
+
+<!--                <Space-->
+<!--                    android:layout_width="0dp"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_weight="0.05"/>-->
+
+<!--                <CheckBox-->
+<!--                    android:id="@+id/check_diaN"-->
+<!--                    android:layout_width="0dp"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_weight="0.5"-->
+<!--                    android:text="沒有 No"-->
+<!--                    android:textSize="@dimen/sp_18"-->
+<!--                    android:tag="rd6"-->
+<!--                    style="@style/checkBox_style"/>-->
+
+<!--            </LinearLayout>-->
+
+<!--            <TextView-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginTop="@dimen/dp_5"-->
+<!--                android:layout_marginStart="@dimen/dp_25"-->
+<!--                android:text="是否有高血壓*"-->
+<!--                android:textSize="@dimen/sp_18"-->
+<!--                android:textColor="#707070"-->
+<!--                android:fontFamily="@font/glowsanssc_condensed_book"/>-->
+
+<!--            &lt;!&ndash; 高血壓 &ndash;&gt;-->
+<!--            <LinearLayout-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginStart="@dimen/dp_15"-->
+<!--                android:layout_marginBottom="@dimen/dp_15"-->
+<!--                android:layout_marginEnd="@dimen/dp_15"-->
+<!--                android:orientation="horizontal">-->
+
+<!--                <CheckBox-->
+<!--                    android:id="@+id/check_hbpY"-->
+<!--                    android:layout_width="0dp"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_weight="0.5"-->
+<!--                    android:text="有 Yes"-->
+<!--                    android:textSize="@dimen/sp_18"-->
+<!--                    android:tag="rd7"-->
+<!--                    style="@style/checkBox_style"/>-->
+
+<!--                <Space-->
+<!--                    android:layout_width="0dp"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_weight="0.05"/>-->
+
+<!--                <CheckBox-->
+<!--                    android:id="@+id/check_hbpN"-->
+<!--                    android:layout_width="0dp"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_weight="0.5"-->
+<!--                    android:text="沒有 No"-->
+<!--                    android:textSize="@dimen/sp_18"-->
+<!--                    android:tag="rd8"-->
+<!--                    style="@style/checkBox_style"/>-->
+
+<!--            </LinearLayout>-->
+
+<!--        </LinearLayout>-->
+
+<!--    </ScrollView>-->
+
 </RelativeLayout>

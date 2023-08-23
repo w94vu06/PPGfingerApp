@@ -1,0 +1,703 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@null"
+    android:backgroundTint="@null"
+    tools:context=".SignUpFragment.Health">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!-- 心血管疾病 -->
+        <TextView
+            android:id="@+id/txt_heart"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_5"
+            android:layout_marginStart="@dimen/dp_25"
+            android:text="是否有心血管疾病*"
+            android:textSize="@dimen/sp_18"
+            android:textColor="#707070"
+            android:fontFamily="@font/glowsanssc_condensed_book"/>
+
+        <CheckBox
+            android:id="@+id/check_heartY"
+            android:layout_width="@dimen/dp_147"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_25"
+            android:layout_below="@+id/txt_heart"
+            android:paddingTop="@dimen/dp_3"
+            android:paddingBottom="@dimen/dp_3"
+            android:text="是 Yes"
+            android:textSize="@dimen/sp_18"
+            android:tag="rd3"
+            style="@style/checkBox_style"/>
+
+        <CheckBox
+            android:id="@+id/check_heartN"
+            android:layout_width="@dimen/dp_147"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_15"
+            android:layout_below="@+id/txt_heart"
+            android:layout_toRightOf="@+id/check_heartY"
+            android:paddingTop="@dimen/dp_3"
+            android:paddingBottom="@dimen/dp_3"
+            android:text="否 No"
+            android:textSize="@dimen/sp_18"
+            android:tag="rd4"
+            style="@style/checkBox_style"/>
+
+        <!-- 高血壓 -->
+        <TextView
+            android:id="@+id/txt_hbp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/check_heartY"
+            android:layout_marginTop="@dimen/dp_5"
+            android:layout_marginStart="@dimen/dp_25"
+            android:text="是否有高血壓*"
+            android:textSize="@dimen/sp_18"
+            android:textColor="#707070"
+            android:fontFamily="@font/glowsanssc_condensed_book"/>
+
+        <CheckBox
+            android:id="@+id/check_hbpY"
+            android:layout_width="@dimen/dp_147"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_25"
+            android:layout_below="@+id/txt_hbp"
+            android:paddingTop="@dimen/dp_3"
+            android:paddingBottom="@dimen/dp_3"
+            android:text="是 Yes"
+            android:textSize="@dimen/sp_18"
+            android:tag="rd7"
+            style="@style/checkBox_style"/>
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.05"/>
+
+        <CheckBox
+            android:id="@+id/check_hbpN"
+            android:layout_width="@dimen/dp_147"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_15"
+            android:layout_below="@+id/txt_hbp"
+            android:layout_toRightOf="@+id/check_hbpY"
+            android:paddingTop="@dimen/dp_3"
+            android:paddingBottom="@dimen/dp_3"
+            android:text="否 No"
+            android:textSize="@dimen/sp_18"
+            android:tag="rd8"
+            style="@style/checkBox_style"/>
+
+        <!-- 收縮壓 -->
+        <TextView
+            android:id="@+id/txt_sbp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_5"
+            android:layout_marginStart="@dimen/dp_25"
+            android:layout_below="@+id/check_hbpY"
+            android:text="收縮壓"
+            android:textSize="@dimen/sp_18"
+            android:textColor="#707070"
+            android:fontFamily="@font/glowsanssc_condensed_book"/>
+
+        <CheckBox
+            android:id="@+id/check_sbp1"
+            android:layout_width="@dimen/dp_147"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_25"
+            android:layout_below="@+id/txt_sbp"
+            android:paddingTop="@dimen/dp_3"
+            android:paddingBottom="@dimen/dp_3"
+            android:text="120-140"
+            android:textSize="@dimen/sp_18"
+            android:tag="rd7"
+            style="@style/checkBox_style"/>
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.05"/>
+
+        <CheckBox
+            android:id="@+id/check_sbp2"
+            android:layout_width="@dimen/dp_147"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_15"
+            android:layout_below="@+id/txt_sbp"
+            android:layout_toRightOf="@+id/check_sbp1"
+            android:paddingTop="@dimen/dp_3"
+            android:paddingBottom="@dimen/dp_3"
+            android:text="141-160"
+            android:textSize="@dimen/sp_18"
+            android:tag="rd8"
+            style="@style/checkBox_style"/>
+
+        <CheckBox
+            android:id="@+id/check_sbp3"
+            android:layout_width="@dimen/dp_147"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_8"
+            android:layout_marginStart="@dimen/dp_25"
+            android:layout_below="@+id/check_sbp1"
+            android:paddingTop="@dimen/dp_3"
+            android:paddingBottom="@dimen/dp_3"
+            android:text="&gt;160"
+            android:textSize="@dimen/sp_18"
+            android:tag="rd7"
+            style="@style/checkBox_style"/>
+
+        <!-- 舒張壓 -->
+        <TextView
+            android:id="@+id/txt_dbp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_5"
+            android:layout_marginStart="@dimen/dp_25"
+            android:layout_below="@+id/check_sbp3"
+            android:text="舒張壓"
+            android:textSize="@dimen/sp_18"
+            android:textColor="#707070"
+            android:fontFamily="@font/glowsanssc_condensed_book"/>
+
+        <CheckBox
+            android:id="@+id/check_dbp1"
+            android:layout_width="@dimen/dp_147"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_25"
+            android:layout_below="@+id/txt_dbp"
+            android:paddingTop="@dimen/dp_3"
+            android:paddingBottom="@dimen/dp_3"
+            android:text="81-90"
+            android:textSize="@dimen/sp_18"
+            android:tag="rd7"
+            style="@style/checkBox_style"/>
+
+        <CheckBox
+            android:id="@+id/check_dbp2"
+            android:layout_width="@dimen/dp_147"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_15"
+            android:layout_below="@+id/txt_dbp"
+            android:layout_toRightOf="@+id/check_dbp1"
+            android:paddingTop="@dimen/dp_3"
+            android:paddingBottom="@dimen/dp_3"
+            android:text="91-100"
+            android:textSize="@dimen/sp_18"
+            android:tag="rd8"
+            style="@style/checkBox_style"/>
+
+        <CheckBox
+            android:id="@+id/check_dbp3"
+            android:layout_width="@dimen/dp_147"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_8"
+            android:layout_marginStart="@dimen/dp_25"
+            android:layout_below="@+id/check_dbp1"
+            android:paddingTop="@dimen/dp_3"
+            android:paddingBottom="@dimen/dp_3"
+            android:text="&gt;100"
+            android:textSize="@dimen/sp_18"
+            android:tag="rd7"
+            style="@style/checkBox_style"/>
+
+        <!-- 糖尿病 -->
+        <TextView
+            android:id="@+id/txt_dia"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_5"
+            android:layout_marginStart="@dimen/dp_25"
+            android:layout_below="@+id/check_dbp3"
+            android:text="是否有糖尿病*"
+            android:textSize="@dimen/sp_18"
+            android:textColor="#707070"
+            android:fontFamily="@font/glowsanssc_condensed_book"/>
+
+        <CheckBox
+            android:id="@+id/check_diaN"
+            android:layout_width="@dimen/dp_147"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_25"
+            android:layout_below="@+id/txt_dia"
+            android:paddingTop="@dimen/dp_3"
+            android:paddingBottom="@dimen/dp_3"
+            android:text="否 No"
+            android:textSize="@dimen/sp_18"
+            android:tag="rd5"
+            style="@style/checkBox_style"/>
+
+        <CheckBox
+            android:id="@+id/check_dia0"
+            android:layout_width="@dimen/dp_147"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_15"
+            android:layout_below="@+id/txt_dia"
+            android:layout_toRightOf="@+id/check_diaN"
+            android:paddingTop="@dimen/dp_3"
+            android:paddingBottom="@dimen/dp_3"
+            android:text="糖尿病前期"
+            android:textSize="@dimen/sp_18"
+            android:tag="rd6"
+            style="@style/checkBox_style"/>
+
+        <CheckBox
+            android:id="@+id/check_dia1"
+            android:layout_width="@dimen/dp_147"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_8"
+            android:layout_marginStart="@dimen/dp_25"
+            android:layout_below="@+id/check_diaN"
+            android:paddingTop="@dimen/dp_3"
+            android:paddingBottom="@dimen/dp_3"
+            android:text="一型糖尿病"
+            android:textSize="@dimen/sp_18"
+            android:tag="rd5"
+            style="@style/checkBox_style"/>
+
+        <CheckBox
+            android:id="@+id/check_dia2"
+            android:layout_width="@dimen/dp_147"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_8"
+            android:layout_marginStart="@dimen/dp_15"
+            android:layout_below="@+id/check_diaN"
+            android:layout_toRightOf="@+id/check_dia1"
+            android:paddingTop="@dimen/dp_3"
+            android:paddingBottom="@dimen/dp_3"
+            android:text="二型糖尿病"
+            android:textSize="@dimen/sp_18"
+            android:tag="rd6"
+            style="@style/checkBox_style"/>
+
+        <!-- 血糖單位 -->
+        <TextView
+            android:id="@+id/txt_unit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_5"
+            android:layout_marginStart="@dimen/dp_25"
+            android:layout_below="@id/check_dia1"
+            android:text="單位"
+            android:textSize="@dimen/sp_18"
+            android:textColor="#707070"
+            android:fontFamily="@font/glowsanssc_condensed_book"/>
+
+        <CheckBox
+            android:id="@+id/check_unit1"
+            android:layout_width="@dimen/dp_147"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_25"
+            android:layout_below="@+id/txt_unit"
+            android:paddingTop="@dimen/dp_3"
+            android:paddingBottom="@dimen/dp_3"
+            android:text="mg/dL"
+            android:textSize="@dimen/sp_18"
+            android:tag="rd5"
+            style="@style/checkBox_style"/>
+
+        <CheckBox
+            android:id="@+id/check_unit2"
+            android:layout_width="@dimen/dp_147"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_15"
+            android:layout_below="@+id/txt_unit"
+            android:layout_toRightOf="@+id/check_unit1"
+            android:paddingTop="@dimen/dp_3"
+            android:paddingBottom="@dimen/dp_3"
+            android:text="mmol/L"
+            android:textSize="@dimen/sp_18"
+            android:tag="rd6"
+            style="@style/checkBox_style"/>
+
+        <!-- 早晨空腹血糖 -->
+        <TextView
+            android:id="@+id/txt_empty"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_5"
+            android:layout_marginStart="@dimen/dp_25"
+            android:layout_below="@+id/check_unit1"
+            android:text="早晨空腹血糖"
+            android:textSize="@dimen/sp_18"
+            android:textColor="#707070"
+            android:fontFamily="@font/glowsanssc_condensed_book"/>
+
+        <CheckBox
+            android:id="@+id/check_empty1"
+            android:layout_width="@dimen/dp_147"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_25"
+            android:layout_below="@+id/txt_empty"
+            android:paddingTop="@dimen/dp_3"
+            android:paddingBottom="@dimen/dp_3"
+            android:text="3.9-6.1"
+            android:textSize="@dimen/sp_18"
+            android:tag="rd7"
+            style="@style/checkBox_style"/>
+
+        <CheckBox
+            android:id="@+id/check_empty2"
+            android:layout_width="@dimen/dp_147"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_15"
+            android:layout_below="@+id/txt_empty"
+            android:layout_toRightOf="@+id/check_empty1"
+            android:paddingTop="@dimen/dp_3"
+            android:paddingBottom="@dimen/dp_3"
+            android:text="6.2-7.2"
+            android:textSize="@dimen/sp_18"
+            android:tag="rd8"
+            style="@style/checkBox_style"/>
+
+        <CheckBox
+            android:id="@+id/check_empty3"
+            android:layout_width="@dimen/dp_147"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_8"
+            android:layout_marginStart="@dimen/dp_25"
+            android:layout_below="@+id/check_empty2"
+            android:paddingTop="@dimen/dp_3"
+            android:paddingBottom="@dimen/dp_3"
+            android:text="&gt;7.2"
+            android:textSize="@dimen/sp_18"
+            android:tag="rd7"
+            style="@style/checkBox_style"/>
+
+        <!-- 餐後兩小時血糖 -->
+        <TextView
+            android:id="@+id/txt_twohrs"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_5"
+            android:layout_marginStart="@dimen/dp_25"
+            android:layout_below="@+id/check_empty3"
+            android:text="餐後兩小時血糖"
+            android:textSize="@dimen/sp_18"
+            android:textColor="#707070"
+            android:fontFamily="@font/glowsanssc_condensed_book"/>
+
+        <CheckBox
+            android:id="@+id/check_twohrs1"
+            android:layout_width="@dimen/dp_147"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_25"
+            android:layout_below="@+id/txt_twohrs"
+            android:paddingTop="@dimen/dp_3"
+            android:paddingBottom="@dimen/dp_3"
+            android:text="3.9-7.2"
+            android:textSize="@dimen/sp_18"
+            android:tag="rd7"
+            style="@style/checkBox_style"/>
+
+        <CheckBox
+            android:id="@+id/check_twohrs2"
+            android:layout_width="@dimen/dp_147"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_15"
+            android:layout_below="@+id/txt_twohrs"
+            android:layout_toRightOf="@+id/check_twohrs1"
+            android:paddingTop="@dimen/dp_3"
+            android:paddingBottom="@dimen/dp_3"
+            android:text="7.3-8.8"
+            android:textSize="@dimen/sp_18"
+            android:tag="rd8"
+            style="@style/checkBox_style"/>
+
+        <CheckBox
+            android:id="@+id/check_twohrs3"
+            android:layout_width="@dimen/dp_147"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_8"
+            android:layout_marginStart="@dimen/dp_25"
+            android:layout_below="@+id/check_twohrs1"
+            android:paddingTop="@dimen/dp_3"
+            android:paddingBottom="@dimen/dp_3"
+            android:text="8.9-11.1"
+            android:textSize="@dimen/sp_18"
+            android:tag="rd7"
+            style="@style/checkBox_style"/>
+
+        <CheckBox
+            android:id="@+id/check_twohrs4"
+            android:layout_width="@dimen/dp_147"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_8"
+            android:layout_marginStart="@dimen/dp_15"
+            android:layout_below="@+id/check_twohrs1"
+            android:layout_toRightOf="@+id/check_twohrs3"
+            android:paddingTop="@dimen/dp_3"
+            android:paddingBottom="@dimen/dp_3"
+            android:text="&gt;11.1"
+            android:textSize="@dimen/sp_18"
+            android:tag="rd7"
+            style="@style/checkBox_style"/>
+
+        <!-- 用藥情況 -->
+        <TextView
+            android:id="@+id/txt_medicine"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_5"
+            android:layout_marginStart="@dimen/dp_25"
+            android:layout_below="@+id/check_twohrs3"
+            android:text="用藥情況"
+            android:textSize="@dimen/sp_18"
+            android:textColor="#707070"
+            android:fontFamily="@font/glowsanssc_condensed_book"/>
+
+        <CheckBox
+            android:id="@+id/check_medicine1"
+            android:layout_width="@dimen/dp_147"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_25"
+            android:layout_below="@+id/txt_medicine"
+            android:paddingTop="@dimen/dp_3"
+            android:paddingBottom="@dimen/dp_3"
+            android:text="無用藥"
+            android:textSize="@dimen/sp_18"
+            android:tag="rd7"
+            style="@style/checkBox_style"/>
+
+        <CheckBox
+            android:id="@+id/check_medicine2"
+            android:layout_width="@dimen/dp_147"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_15"
+            android:layout_below="@+id/txt_medicine"
+            android:layout_toRightOf="@+id/check_medicine1"
+            android:paddingTop="@dimen/dp_3"
+            android:paddingBottom="@dimen/dp_3"
+            android:text="有服藥"
+            android:textSize="@dimen/sp_18"
+            android:tag="rd8"
+            style="@style/checkBox_style"/>
+
+        <CheckBox
+            android:id="@+id/check_medicine3"
+            android:layout_width="@dimen/dp_147"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_8"
+            android:layout_marginStart="@dimen/dp_25"
+            android:layout_below="@+id/check_medicine1"
+            android:paddingTop="@dimen/dp_3"
+            android:paddingBottom="@dimen/dp_3"
+            android:text="打胰島素"
+            android:textSize="@dimen/sp_18"
+            android:tag="rd7"
+            style="@style/checkBox_style"/>
+
+        <!-- 低血糖 -->
+        <TextView
+            android:id="@+id/txt_low"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_5"
+            android:layout_marginStart="@dimen/dp_25"
+            android:layout_below="@+id/check_medicine3"
+            android:text="常心悸、暈眩、嗜睡、冒冷汗(低血糖)"
+            android:textSize="@dimen/sp_18"
+            android:textColor="#707070"
+            android:fontFamily="@font/glowsanssc_condensed_book"/>
+
+        <CheckBox
+            android:id="@+id/check_low1"
+            android:layout_width="@dimen/dp_147"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_25"
+            android:layout_below="@+id/txt_low"
+            android:paddingTop="@dimen/dp_3"
+            android:paddingBottom="@dimen/dp_3"
+            android:text="是 Yes"
+            android:textSize="@dimen/sp_18"
+            android:tag="rd5"
+            style="@style/checkBox_style"/>
+
+        <CheckBox
+            android:id="@+id/check_low2"
+            android:layout_width="@dimen/dp_147"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_15"
+            android:layout_below="@+id/txt_low"
+            android:layout_toRightOf="@+id/check_low1"
+            android:paddingTop="@dimen/dp_3"
+            android:paddingBottom="@dimen/dp_3"
+            android:text="否 No"
+            android:textSize="@dimen/sp_18"
+            android:tag="rd6"
+            style="@style/checkBox_style"/>
+
+        <!-- 家族病史 -->
+        <TextView
+            android:id="@+id/txt_family"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_5"
+            android:layout_marginStart="@dimen/dp_25"
+            android:layout_below="@+id/check_low1"
+            android:text="家族病史(多選)"
+            android:textSize="@dimen/sp_18"
+            android:textColor="#707070"
+            android:fontFamily="@font/glowsanssc_condensed_book"/>
+
+        <CheckBox
+            android:id="@+id/check_familyN"
+            android:layout_width="@dimen/dp_147"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_25"
+            android:layout_below="@+id/txt_family"
+            android:paddingTop="@dimen/dp_3"
+            android:paddingBottom="@dimen/dp_3"
+            android:text="無 No"
+            android:textSize="@dimen/sp_18"
+            android:tag="rd5"
+            style="@style/checkBox_style"/>
+
+        <CheckBox
+            android:id="@+id/check_familyHbp"
+            android:layout_width="@dimen/dp_147"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_15"
+            android:layout_below="@+id/txt_family"
+            android:layout_toRightOf="@+id/check_familyN"
+            android:paddingTop="@dimen/dp_3"
+            android:paddingBottom="@dimen/dp_3"
+            android:text="高血壓"
+            android:textSize="@dimen/sp_18"
+            android:tag="rd6"
+            style="@style/checkBox_style"/>
+
+        <CheckBox
+            android:id="@+id/check_familyDia"
+            android:layout_width="@dimen/dp_147"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_8"
+            android:layout_marginStart="@dimen/dp_25"
+            android:layout_below="@+id/check_familyHbp"
+            android:paddingTop="@dimen/dp_3"
+            android:paddingBottom="@dimen/dp_3"
+            android:text="糖尿病"
+            android:textSize="@dimen/sp_18"
+            android:tag="rd5"
+            style="@style/checkBox_style"/>
+
+        <CheckBox
+            android:id="@+id/check_familyHlp"
+            android:layout_width="@dimen/dp_147"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_8"
+            android:layout_marginStart="@dimen/dp_15"
+            android:layout_below="@+id/check_familyHbp"
+            android:layout_toRightOf="@+id/check_familyDia"
+            android:paddingTop="@dimen/dp_3"
+            android:paddingBottom="@dimen/dp_3"
+            android:text="高脂血症"
+            android:textSize="@dimen/sp_18"
+            android:tag="rd6"
+            style="@style/checkBox_style"/>
+
+        <CheckBox
+            android:id="@+id/check_familyDepression"
+            android:layout_width="@dimen/dp_147"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_8"
+            android:layout_marginStart="@dimen/dp_25"
+            android:layout_below="@id/check_familyDia"
+            android:paddingTop="@dimen/dp_3"
+            android:paddingBottom="@dimen/dp_3"
+            android:text="憂鬱症"
+            android:textSize="@dimen/sp_18"
+            android:tag="rd7"
+            style="@style/checkBox_style"/>
+
+        <!-- Covid-19 -->
+        <TextView
+            android:id="@+id/txt_covid"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_5"
+            android:layout_marginStart="@dimen/dp_25"
+            android:layout_below="@+id/check_familyDepression"
+            android:text="是否曾得過Covid-19"
+            android:textSize="@dimen/sp_18"
+            android:textColor="#707070"
+            android:fontFamily="@font/glowsanssc_condensed_book"/>
+
+        <CheckBox
+            android:id="@+id/check_covidY"
+            android:layout_width="@dimen/dp_147"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_25"
+            android:layout_below="@+id/txt_covid"
+            android:paddingTop="@dimen/dp_3"
+            android:paddingBottom="@dimen/dp_3"
+            android:text="是 Yes"
+            android:textSize="@dimen/sp_18"
+            android:tag="rd5"
+            style="@style/checkBox_style"/>
+
+        <CheckBox
+            android:id="@+id/check_covidN"
+            android:layout_width="@dimen/dp_147"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_15"
+            android:layout_below="@+id/txt_covid"
+            android:layout_toRightOf="@+id/check_covidY"
+            android:paddingTop="@dimen/dp_3"
+            android:paddingBottom="@dimen/dp_3"
+            android:text="否 No"
+            android:textSize="@dimen/sp_18"
+            android:tag="rd6"
+            style="@style/checkBox_style"/>
+
+        <!-- Covid-19 疫苗 -->
+        <TextView
+            android:id="@+id/txt_vaccine"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_5"
+            android:layout_marginStart="@dimen/dp_25"
+            android:layout_below="@+id/check_covidY"
+            android:text="是否已接種Covid-19疫苗"
+            android:textSize="@dimen/sp_18"
+            android:textColor="#707070"
+            android:fontFamily="@font/glowsanssc_condensed_book"/>
+
+        <CheckBox
+            android:id="@+id/check_vaccineY"
+            android:layout_width="@dimen/dp_147"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_25"
+            android:layout_below="@+id/txt_vaccine"
+            android:paddingTop="@dimen/dp_3"
+            android:paddingBottom="@dimen/dp_3"
+            android:text="是 Yes"
+            android:textSize="@dimen/sp_18"
+            android:tag="rd5"
+            style="@style/checkBox_style"/>
+
+        <CheckBox
+            android:id="@+id/check_vaccineN"
+            android:layout_width="@dimen/dp_147"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_15"
+            android:layout_below="@+id/txt_vaccine"
+            android:layout_toRightOf="@+id/check_vaccineY"
+            android:paddingTop="@dimen/dp_3"
+            android:paddingBottom="@dimen/dp_3"
+            android:text="否 No"
+            android:textSize="@dimen/sp_18"
+            android:tag="rd6"
+            style="@style/checkBox_style"/>
+
+    </RelativeLayout>
+
+</ScrollView>
