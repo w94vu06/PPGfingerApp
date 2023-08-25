@@ -34,7 +34,7 @@
             android:paddingBottom="@dimen/dp_3"
             android:text="是 Yes"
             android:textSize="@dimen/sp_18"
-            android:tag="rd3"
+            android:tag="1"
             style="@style/checkBox_style"/>
 
         <CheckBox
@@ -48,7 +48,7 @@
             android:paddingBottom="@dimen/dp_3"
             android:text="否 No"
             android:textSize="@dimen/sp_18"
-            android:tag="rd4"
+            android:tag="0"
             style="@style/checkBox_style"/>
 
         <!-- 高血壓 -->
@@ -74,7 +74,7 @@
             android:paddingBottom="@dimen/dp_3"
             android:text="是 Yes"
             android:textSize="@dimen/sp_18"
-            android:tag="rd7"
+            android:tag="1"
             style="@style/checkBox_style"/>
 
         <Space
@@ -93,7 +93,7 @@
             android:paddingBottom="@dimen/dp_3"
             android:text="否 No"
             android:textSize="@dimen/sp_18"
-            android:tag="rd8"
+            android:tag="0"
             style="@style/checkBox_style"/>
 
         <!-- 收縮壓 -->
@@ -119,7 +119,7 @@
             android:paddingBottom="@dimen/dp_3"
             android:text="120-140"
             android:textSize="@dimen/sp_18"
-            android:tag="rd7"
+            android:tag="0"
             style="@style/checkBox_style"/>
 
         <Space
@@ -138,7 +138,7 @@
             android:paddingBottom="@dimen/dp_3"
             android:text="141-160"
             android:textSize="@dimen/sp_18"
-            android:tag="rd8"
+            android:tag="1"
             style="@style/checkBox_style"/>
 
         <CheckBox
@@ -152,7 +152,7 @@
             android:paddingBottom="@dimen/dp_3"
             android:text="&gt;160"
             android:textSize="@dimen/sp_18"
-            android:tag="rd7"
+            android:tag="2"
             style="@style/checkBox_style"/>
 
         <!-- 舒張壓 -->
@@ -178,7 +178,7 @@
             android:paddingBottom="@dimen/dp_3"
             android:text="81-90"
             android:textSize="@dimen/sp_18"
-            android:tag="rd7"
+            android:tag="0"
             style="@style/checkBox_style"/>
 
         <CheckBox
@@ -192,7 +192,7 @@
             android:paddingBottom="@dimen/dp_3"
             android:text="91-100"
             android:textSize="@dimen/sp_18"
-            android:tag="rd8"
+            android:tag="1"
             style="@style/checkBox_style"/>
 
         <CheckBox
@@ -206,7 +206,7 @@
             android:paddingBottom="@dimen/dp_3"
             android:text="&gt;100"
             android:textSize="@dimen/sp_18"
-            android:tag="rd7"
+            android:tag="2"
             style="@style/checkBox_style"/>
 
         <!-- 糖尿病 -->
@@ -232,7 +232,7 @@
             android:paddingBottom="@dimen/dp_3"
             android:text="否 No"
             android:textSize="@dimen/sp_18"
-            android:tag="rd5"
+            android:tag="0"
             style="@style/checkBox_style"/>
 
         <CheckBox
@@ -246,7 +246,7 @@
             android:paddingBottom="@dimen/dp_3"
             android:text="糖尿病前期"
             android:textSize="@dimen/sp_18"
-            android:tag="rd6"
+            android:tag="3"
             style="@style/checkBox_style"/>
 
         <CheckBox
@@ -260,7 +260,7 @@
             android:paddingBottom="@dimen/dp_3"
             android:text="一型糖尿病"
             android:textSize="@dimen/sp_18"
-            android:tag="rd5"
+            android:tag="1"
             style="@style/checkBox_style"/>
 
         <CheckBox
@@ -275,7 +275,7 @@
             android:paddingBottom="@dimen/dp_3"
             android:text="二型糖尿病"
             android:textSize="@dimen/sp_18"
-            android:tag="rd6"
+            android:tag="2"
             style="@style/checkBox_style"/>
 
         <!-- 血糖單位 -->
@@ -301,7 +301,7 @@
             android:paddingBottom="@dimen/dp_3"
             android:text="mg/dL"
             android:textSize="@dimen/sp_18"
-            android:tag="rd5"
+            android:tag="1"
             style="@style/checkBox_style"/>
 
         <CheckBox
@@ -315,7 +315,7 @@
             android:paddingBottom="@dimen/dp_3"
             android:text="mmol/L"
             android:textSize="@dimen/sp_18"
-            android:tag="rd6"
+            android:tag="2"
             style="@style/checkBox_style"/>
 
         <!-- 早晨空腹血糖 -->
@@ -341,7 +341,7 @@
             android:paddingBottom="@dimen/dp_3"
             android:text="3.9-6.1"
             android:textSize="@dimen/sp_18"
-            android:tag="rd7"
+            android:tag="1"
             style="@style/checkBox_style"/>
 
         <CheckBox
@@ -355,7 +355,7 @@
             android:paddingBottom="@dimen/dp_3"
             android:text="6.2-7.2"
             android:textSize="@dimen/sp_18"
-            android:tag="rd8"
+            android:tag="2"
             style="@style/checkBox_style"/>
 
         <CheckBox
@@ -367,9 +367,24 @@
             android:layout_below="@+id/check_empty2"
             android:paddingTop="@dimen/dp_3"
             android:paddingBottom="@dimen/dp_3"
-            android:text="&gt;7.2"
+            android:text="&gt;7.3-8.2"
             android:textSize="@dimen/sp_18"
-            android:tag="rd7"
+            android:tag="3"
+            style="@style/checkBox_style"/>
+
+        <CheckBox
+            android:id="@+id/check_empty4"
+            android:layout_width="@dimen/dp_147"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_8"
+            android:layout_marginStart="@dimen/dp_15"
+            android:layout_toRightOf="@+id/check_empty3"
+            android:layout_below="@id/check_empty2"
+            android:paddingTop="@dimen/dp_3"
+            android:paddingBottom="@dimen/dp_3"
+            android:text="&gt;8.2"
+            android:textSize="@dimen/sp_18"
+            android:tag="4"
             style="@style/checkBox_style"/>
 
         <!-- 餐後兩小時血糖 -->
@@ -395,7 +410,7 @@
             android:paddingBottom="@dimen/dp_3"
             android:text="3.9-7.2"
             android:textSize="@dimen/sp_18"
-            android:tag="rd7"
+            android:tag="1"
             style="@style/checkBox_style"/>
 
         <CheckBox
@@ -409,7 +424,7 @@
             android:paddingBottom="@dimen/dp_3"
             android:text="7.3-8.8"
             android:textSize="@dimen/sp_18"
-            android:tag="rd8"
+            android:tag="2"
             style="@style/checkBox_style"/>
 
         <CheckBox
@@ -423,7 +438,7 @@
             android:paddingBottom="@dimen/dp_3"
             android:text="8.9-11.1"
             android:textSize="@dimen/sp_18"
-            android:tag="rd7"
+            android:tag="3"
             style="@style/checkBox_style"/>
 
         <CheckBox
@@ -438,7 +453,7 @@
             android:paddingBottom="@dimen/dp_3"
             android:text="&gt;11.1"
             android:textSize="@dimen/sp_18"
-            android:tag="rd7"
+            android:tag="4"
             style="@style/checkBox_style"/>
 
         <!-- 用藥情況 -->
@@ -464,7 +479,7 @@
             android:paddingBottom="@dimen/dp_3"
             android:text="無用藥"
             android:textSize="@dimen/sp_18"
-            android:tag="rd7"
+            android:tag="0"
             style="@style/checkBox_style"/>
 
         <CheckBox
@@ -478,7 +493,7 @@
             android:paddingBottom="@dimen/dp_3"
             android:text="有服藥"
             android:textSize="@dimen/sp_18"
-            android:tag="rd8"
+            android:tag="1"
             style="@style/checkBox_style"/>
 
         <CheckBox
@@ -492,7 +507,7 @@
             android:paddingBottom="@dimen/dp_3"
             android:text="打胰島素"
             android:textSize="@dimen/sp_18"
-            android:tag="rd7"
+            android:tag="2"
             style="@style/checkBox_style"/>
 
         <!-- 低血糖 -->
@@ -518,7 +533,7 @@
             android:paddingBottom="@dimen/dp_3"
             android:text="是 Yes"
             android:textSize="@dimen/sp_18"
-            android:tag="rd5"
+            android:tag="1"
             style="@style/checkBox_style"/>
 
         <CheckBox
@@ -532,7 +547,7 @@
             android:paddingBottom="@dimen/dp_3"
             android:text="否 No"
             android:textSize="@dimen/sp_18"
-            android:tag="rd6"
+            android:tag="0"
             style="@style/checkBox_style"/>
 
         <!-- 家族病史 -->
@@ -550,16 +565,17 @@
 
         <CheckBox
             android:id="@+id/check_familyN"
+            style="@style/checkBox_style"
             android:layout_width="@dimen/dp_147"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/dp_25"
             android:layout_below="@+id/txt_family"
+            android:layout_marginStart="@dimen/dp_25"
+            android:layout_marginTop="-1dp"
             android:paddingTop="@dimen/dp_3"
             android:paddingBottom="@dimen/dp_3"
+            android:tag="0"
             android:text="無 No"
-            android:textSize="@dimen/sp_18"
-            android:tag="rd5"
-            style="@style/checkBox_style"/>
+            android:textSize="@dimen/sp_18" />
 
         <CheckBox
             android:id="@+id/check_familyHbp"
@@ -572,7 +588,7 @@
             android:paddingBottom="@dimen/dp_3"
             android:text="高血壓"
             android:textSize="@dimen/sp_18"
-            android:tag="rd6"
+            android:tag="1"
             style="@style/checkBox_style"/>
 
         <CheckBox
@@ -586,7 +602,7 @@
             android:paddingBottom="@dimen/dp_3"
             android:text="糖尿病"
             android:textSize="@dimen/sp_18"
-            android:tag="rd5"
+            android:tag="2"
             style="@style/checkBox_style"/>
 
         <CheckBox
@@ -601,7 +617,7 @@
             android:paddingBottom="@dimen/dp_3"
             android:text="高脂血症"
             android:textSize="@dimen/sp_18"
-            android:tag="rd6"
+            android:tag="3"
             style="@style/checkBox_style"/>
 
         <CheckBox
@@ -615,7 +631,7 @@
             android:paddingBottom="@dimen/dp_3"
             android:text="憂鬱症"
             android:textSize="@dimen/sp_18"
-            android:tag="rd7"
+            android:tag="4"
             style="@style/checkBox_style"/>
 
         <!-- Covid-19 -->
@@ -641,7 +657,7 @@
             android:paddingBottom="@dimen/dp_3"
             android:text="是 Yes"
             android:textSize="@dimen/sp_18"
-            android:tag="rd5"
+            android:tag="1"
             style="@style/checkBox_style"/>
 
         <CheckBox
@@ -655,7 +671,7 @@
             android:paddingBottom="@dimen/dp_3"
             android:text="否 No"
             android:textSize="@dimen/sp_18"
-            android:tag="rd6"
+            android:tag="0"
             style="@style/checkBox_style"/>
 
         <!-- Covid-19 疫苗 -->
@@ -681,7 +697,7 @@
             android:paddingBottom="@dimen/dp_3"
             android:text="是 Yes"
             android:textSize="@dimen/sp_18"
-            android:tag="rd5"
+            android:tag="1"
             style="@style/checkBox_style"/>
 
         <CheckBox
@@ -695,7 +711,7 @@
             android:paddingBottom="@dimen/dp_3"
             android:text="否 No"
             android:textSize="@dimen/sp_18"
-            android:tag="rd6"
+            android:tag="0"
             style="@style/checkBox_style"/>
 
     </RelativeLayout>

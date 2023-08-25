@@ -33,7 +33,7 @@
             android:paddingBottom="@dimen/dp_3"
             android:text="是 Yes"
             android:textSize="@dimen/sp_18"
-            android:tag="rd3"
+            android:tag="1"
             style="@style/checkBox_style"/>
 
         <CheckBox
@@ -47,7 +47,7 @@
             android:paddingBottom="@dimen/dp_3"
             android:text="否 No"
             android:textSize="@dimen/sp_18"
-            android:tag="rd4"
+            android:tag="0"
             style="@style/checkBox_style"/>
 
         <!-- 喝酒 -->
@@ -73,7 +73,7 @@
             android:paddingBottom="@dimen/dp_3"
             android:text="是 Yes"
             android:textSize="@dimen/sp_18"
-            android:tag="rd3"
+            android:tag="1"
             style="@style/checkBox_style"/>
 
         <CheckBox
@@ -87,7 +87,7 @@
             android:paddingBottom="@dimen/dp_3"
             android:text="否 No"
             android:textSize="@dimen/sp_18"
-            android:tag="rd4"
+            android:tag="0"
             style="@style/checkBox_style"/>
 
         <!-- 運動 -->
@@ -113,7 +113,7 @@
             android:paddingBottom="@dimen/dp_3"
             android:text="是 Yes"
             android:textSize="@dimen/sp_18"
-            android:tag="rd3"
+            android:tag="1"
             style="@style/checkBox_style"/>
 
         <CheckBox
@@ -127,7 +127,7 @@
             android:paddingBottom="@dimen/dp_3"
             android:text="否 No"
             android:textSize="@dimen/sp_18"
-            android:tag="rd4"
+            android:tag="0"
             style="@style/checkBox_style"/>
 
         <!-- 夜間睡眠時長 -->
@@ -153,7 +153,7 @@
             android:paddingBottom="@dimen/dp_3"
             android:text="&lt;6hrs"
             android:textSize="@dimen/sp_18"
-            android:tag="rd3"
+            android:tag="0"
             style="@style/checkBox_style"/>
 
         <CheckBox
@@ -167,7 +167,7 @@
             android:paddingBottom="@dimen/dp_3"
             android:text="6-8hrs"
             android:textSize="@dimen/sp_18"
-            android:tag="rd4"
+            android:tag="1"
             style="@style/checkBox_style"/>
 
         <CheckBox
@@ -181,7 +181,7 @@
             android:paddingBottom="@dimen/dp_3"
             android:text="&gt;8hrs"
             android:textSize="@dimen/sp_18"
-            android:tag="rd7"
+            android:tag="2"
             style="@style/checkBox_style"/>
 
     </RelativeLayout>

@@ -48,7 +48,9 @@ public class MainActivity extends AppCompatActivity implements MariaDBCallback {
     private FloatingActionButton fab_measure;
     private String loginName, loginPhone;
     private String userId, userName, email, phone, birth;
-    private int old, height, weight, sex, smokes, diabetes, hbp;
+    private int old, height, weight, sex, smokes, diabetes, hbp,
+            morningdiabetes, aftermealdiabetes, userstatus, mealstatus,
+            medicationstatus, hbpSBp, hbpDBp, md_num;
 
     private DataRecord dataRecordViewModel;
     private SharedPreferences preferences;
@@ -144,6 +146,7 @@ public class MainActivity extends AppCompatActivity implements MariaDBCallback {
         EventBus.getDefault().register(this);
 
     }
+
     @Override
     public void onStop() {
         super.onStop();
@@ -247,12 +250,21 @@ public class MainActivity extends AppCompatActivity implements MariaDBCallback {
                 phone = jsonObject.getString("phone");
                 birth = jsonObject.getString("birth");
                 old = jsonObject.getInt("old");
+                sex = jsonObject.getInt("sex");
                 height = jsonObject.getInt("height");
                 weight = jsonObject.getInt("weight");
-                sex = jsonObject.getInt("sex");
-                smokes = jsonObject.getInt("smokes");
                 diabetes = jsonObject.getInt("diabetes");
+                smokes = jsonObject.getInt("smokes");
                 hbp = jsonObject.getInt("hbp");
+                morningdiabetes = jsonObject.getInt("morningdiabetes");
+                aftermealdiabetes = jsonObject.getInt("aftermealdiabetes");
+                userstatus = jsonObject.getInt("userstatus");
+                mealstatus = jsonObject.getInt("mealstatus");
+                medicationstatus = jsonObject.getInt("medicationstatus");
+                hbpSBp = jsonObject.getInt("hbpSBp");
+                hbpDBp = jsonObject.getInt("hbpDBp");
+//                md_num = jsonObject.getInt("md_num");
+
                 setProfile();
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -273,6 +285,13 @@ public class MainActivity extends AppCompatActivity implements MariaDBCallback {
         editor.putInt("ProfileDiabetes", diabetes);
         editor.putInt("ProfileSmokes", smokes);
         editor.putInt("ProfileHbp", hbp);
+        editor.putInt("ProfileMorningDiabetes", morningdiabetes);
+        editor.putInt("ProfileAfterMealDiabetes", aftermealdiabetes);
+        editor.putInt("ProfileUserStatus", userstatus);
+        editor.putInt("ProfileMealStatus", mealstatus);
+        editor.putInt("ProfileMedicationStatus", medicationstatus);
+        editor.putInt("ProfileHbpSBp", hbpSBp);
+        editor.putInt("ProfileHbpDBp", hbpDBp);
         editor.apply();
     }
 

@@ -8,15 +8,18 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.NumberPicker;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
 import com.example.myapplication.R;
 import com.example.myapplication.Util.CommonUtil;
+import com.example.myapplication.Util.TextUtil;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -33,8 +36,10 @@ public class Info extends Fragment {
     private EditText edit_userName,edit_phone,edit_birth,edit_height,edit_weight,edit_waist;
     @BindViews({R.id.check_sexMale, R.id.check_sexFemale})
     List<CheckBox> radiosSex;
-    private String checkedSex = "";
 
+    private String userName, phone, birth, old, height, weight,waist, checkedSex = "";
+
+    private boolean isValid = true;
     public interface DataReturn{
         public void getResult(String value);
     }
@@ -78,16 +83,7 @@ public class Info extends Fragment {
                 dialog.showDialog();
             }
         });
-//        edt.setOnTouchListener(new View.OnTouchListener() {
-//            @Override
-//            public boolean onTouch(View view, MotionEvent motionEvent) {
-//                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN){
-//                    dialog.showDialog();
-//                    return true;
-//                }
-//                return false;
-//            }
-//        });
+
 
         dialog.onDialogRespond = new BirthPickDialog.OnDialogRespond() {
             @Override
@@ -100,6 +96,72 @@ public class Info extends Fragment {
     public void sendValue(DataReturn dataReturn){
         checkedSex = CommonUtil.getOne(radiosSex);
         dataReturn.getResult(checkedSex);
+
+    }
+
+    private void getValue() {
+        userName = edit_userName.getText().toString();
+        phone = edit_phone.getText().toString();
+        birth = edit_birth.getText().toString();
+        height = edit_height.getText().toString();
+        weight = edit_weight.getText().toString();
+        waist = edit_waist.getText().toString();
+        checkedSex = CommonUtil.getOne(radiosSex);
+
+        checkEmpty();
+        calAge();
+    }
+
+    /**
+     * 判斷輸入欄是否空白
+     **/
+    private boolean checkEmpty() {
+        isValid = true;
+        try {
+            if (userName.isEmpty()) {
+                Toast.makeText(getActivity(), "用戶名稱欄不得空白", Toast.LENGTH_SHORT).show();
+                isValid = false;
+            }
+            if (birth.isEmpty()) {
+                Toast.makeText(getActivity(), "出生日期欄不得空白", Toast.LENGTH_SHORT).show();
+                isValid = false;
+            }
+            if (height.isEmpty()) {
+                Toast.makeText(getActivity(), "身高欄不得空白", Toast.LENGTH_SHORT).show();
+                isValid = false;
+            }
+            if (weight.isEmpty()) {
+                Toast.makeText(getActivity(), "體重欄不得空白", Toast.LENGTH_SHORT).show();
+                isValid = false;
+            }
+            if (checkedSex.isEmpty()) {
+                Toast.makeText(getActivity(), "性別欄不得空白", Toast.LENGTH_SHORT).show();
+                isValid = false;
+            }
+            if (!TextUtil.isPhoneLegal(phone)) {
+                Toast.makeText(getActivity(), "手機號碼格式錯誤", Toast.LENGTH_SHORT).show();
+                isValid = false;
+            }
+        } catch (Exception e) {
+            Toast.makeText(getActivity(), "請正確填寫資料", Toast.LENGTH_SHORT).show();
+            System.out.println(e);
+        }
+        return isValid;
+    }
+
+    private void calAge() {
+        //get current time
+        SimpleDateFormat dtf = new SimpleDateFormat("yyyy");
+        Calendar calendar = Calendar.getInstance();
+        Date date = calendar.getTime();
+        String formattedDate = dtf.format(date);
+
+        //get birth's year
+        String years = birth.substring(0, 4);
+        int pastYear = Integer.parseInt(years);
+        int currentYear = Integer.parseInt(formattedDate);
+        int howOldAreYou = currentYear - pastYear;
+        old = String.valueOf(howOldAreYou);
     }
 
 }

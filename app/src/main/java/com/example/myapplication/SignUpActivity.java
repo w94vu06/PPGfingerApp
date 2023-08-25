@@ -42,6 +42,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import butterknife.BindViews;
 import butterknife.ButterKnife;
@@ -66,6 +67,8 @@ public class SignUpActivity extends AppCompatActivity implements MariaDBCallback
         initWidget();
 //        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN); //禁止自動彈出虛擬鍵盤
         ButterKnife.bind(SignUpActivity.this);
+
+
     }
 
     private void initWidget() {
@@ -101,6 +104,7 @@ public class SignUpActivity extends AppCompatActivity implements MariaDBCallback
             switch (view.getId()){
                 case R.id.btn_nextPage:
                     if (nowFragment == info){
+                        checkInfoData();
                         btn_upPage.setClickable(true);
                         btn_upPage.setVisibility(View.VISIBLE);
                         currentFragment = info;
@@ -167,6 +171,15 @@ public class SignUpActivity extends AppCompatActivity implements MariaDBCallback
         currentFragment=fg;
         transaction.commit();
     }
+
+    public void checkInfoData() {
+        if (info != null) {
+            EditText editText = info.requireView().findViewById(R.id.edit_phone);
+            String terr = editText.getText().toString();
+            Toast.makeText(SignUpActivity.this, ""+terr, Toast.LENGTH_SHORT).show();
+        }
+    }
+
 
     /**
      * 註冊按鈕按下後，從MariaDBCallback，回傳事件代碼
