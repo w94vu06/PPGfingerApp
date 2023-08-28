@@ -5,53 +5,34 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import android.app.Activity;
-import android.app.DatePickerDialog;
-import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.NumberPicker;
 import android.widget.Toast;
 
 import com.example.myapplication.SignUpFragment.Habit;
 import com.example.myapplication.SignUpFragment.Health;
 import com.example.myapplication.SignUpFragment.Info;
-import com.example.myapplication.Util.CommonUtil;
-import com.example.myapplication.Util.FastClickUtil;
 import com.example.myapplication.Util.TextUtil;
 
-import org.greenrobot.eventbus.EventBus;
-import org.json.JSONException;
-import org.json.JSONObject;
 
-
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import butterknife.BindViews;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 public class SignUpActivity extends AppCompatActivity implements MariaDBCallback {
 
-    Button btn_nextPage,btn_upPage;
-    ImageView img_signup,img_signUpback;
+    Button btn_nextPage, btn_upPage;
+    ImageView img_signup, img_signUpback;
     Info info = new Info();
     Health health = new Health();
     Habit habit = new Habit();
@@ -59,6 +40,7 @@ public class SignUpActivity extends AppCompatActivity implements MariaDBCallback
     private FrameLayout container_signup;
     private FragmentManager fragmentManager;
     private FragmentTransaction transaction;
+    Boolean isValid = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,14 +68,14 @@ public class SignUpActivity extends AppCompatActivity implements MariaDBCallback
         btn_upPage.setOnClickListener(lis);
         try {
             setFragment();
-        }catch (Exception e){
-            Log.e("tessttt",e.toString());
+        } catch (Exception e) {
+            Log.e("tessttt", e.toString());
         }
     }
 
-    private void setFragment(){
+    private void setFragment() {
         transaction = fragmentManager.beginTransaction();
-        transaction.add(R.id.container_signup,info);
+        transaction.add(R.id.container_signup, info);
         transaction.commit();
     }
 
@@ -101,43 +83,60 @@ public class SignUpActivity extends AppCompatActivity implements MariaDBCallback
         @Override
         public void onClick(View view) {
             Fragment nowFragment = checkFragment();
-            switch (view.getId()){
+            switch (view.getId()) {
                 case R.id.btn_nextPage:
-                    if (nowFragment == info){
-                        checkInfoData();
+                    if (nowFragment == info) {
+                        checkInfoEmpty();
                         btn_upPage.setClickable(true);
-                        btn_upPage.setVisibility(View.VISIBLE);
                         currentFragment = info;
-                        try {
-                            FragmentHideShow(health);
-                            info.sendValue(new Info.DataReturn() {
-                                @Override
-                                public void getResult(String value) {
-                                    Log.d("getvalue",value);
-                                }
-                            });
-                        }catch (Exception e){
-                            Log.e("change",e.toString());
+                        if (isValid) {
+                            btn_upPage.setVisibility(View.VISIBLE);
+                            try {
+                                FragmentHideShow(health);
+                                info.sendValue(new Info.DataReturn() {
+                                    @Override
+                                    public void getResult(HashMap<String, String> hashMap) {
+                                        for (Map.Entry<String, String> entry : hashMap.entrySet()) {
+                                            String key = entry.getKey();
+                                            String value = entry.getValue();
+                                            Log.d("getInfovalue", "Key: " + key + ", Value: " + value);
+                                        }
+                                    }
+                                });
+                            } catch (Exception e) {
+                                Log.e("change", e.toString());
+                            }
                         }
-                    }else if(nowFragment == health){
+                    } else if (nowFragment == health) {
                         btn_upPage.setClickable(true);
                         btn_upPage.setVisibility(View.VISIBLE);
                         btn_nextPage.setText("註冊");
+                        health.sendValue(new Health.DataReturn() {
+                            @Override
+                            public void getResult(String value) {
+                                Log.d("getHealthValue", ""+value);
+                            }
+                        });
+
+                        if (isValid) {
+
+                        }
+
                         FragmentHideShow(habit);
-                    }else if(nowFragment == habit){
+                    } else if (nowFragment == habit) {
                         try {
                             Intent intent = new Intent(SignUpActivity.this, MainActivity.class);
                             startActivity(intent);
-                        }catch (Exception e){
-                            Log.e("errrr",e.toString());
+                        } catch (Exception e) {
+                            Log.e("errrr", e.toString());
                         }
                     }
                     break;
                 case R.id.btn_upPage:
-                    if (nowFragment == habit){
+                    if (nowFragment == habit) {
                         btn_nextPage.setText("下一頁");
                         FragmentHideShow(health);
-                    }else if(nowFragment == health){
+                    } else if (nowFragment == health) {
                         btn_upPage.setClickable(false);
                         btn_upPage.setVisibility(View.INVISIBLE);
                         FragmentHideShow(info);
@@ -147,37 +146,79 @@ public class SignUpActivity extends AppCompatActivity implements MariaDBCallback
         }
     };
 
-    private Fragment checkFragment(){
+    private Fragment checkFragment() {
         FragmentManager fm = this.getSupportFragmentManager();
         List<Fragment> fragments = fm.getFragments();
-        for (Fragment fragment:fragments){
-            if (fragment != null && fragment.isVisible()){
+        for (Fragment fragment : fragments) {
+            if (fragment != null && fragment.isVisible()) {
                 return fragment;
             }
         }
         return null;
     }
 
-    private void FragmentHideShow(Fragment fg){
+    private void FragmentHideShow(Fragment fg) {
         fragmentManager = getSupportFragmentManager();
-        transaction= fragmentManager.beginTransaction();
-        if(!fg.isAdded()){
+        transaction = fragmentManager.beginTransaction();
+        if (!fg.isAdded()) {
             transaction.hide(currentFragment);
-            transaction.add(R.id.container_signup,fg);
-        }else{
+            transaction.add(R.id.container_signup, fg);
+        } else {
             transaction.hide(currentFragment);
             transaction.show(fg);
         }
-        currentFragment=fg;
+        currentFragment = fg;
         transaction.commit();
     }
-
-    public void checkInfoData() {
+    public void checkInfoEmpty() {
+        isValid = true;
         if (info != null) {
-            EditText editText = info.requireView().findViewById(R.id.edit_phone);
-            String terr = editText.getText().toString();
-            Toast.makeText(SignUpActivity.this, ""+terr, Toast.LENGTH_SHORT).show();
+            Map<Integer, String> fieldMap = new HashMap<>();
+            fieldMap.put(R.id.edit_userName, "用戶名稱欄不得空白");
+            fieldMap.put(R.id.edit_height, "身高欄不得空白");
+            fieldMap.put(R.id.edit_weight, "體重欄不得空白");
+
+            Pattern pattern = Pattern.compile("[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>?/~`]+");
+
+            for (Map.Entry<Integer, String> entry : fieldMap.entrySet()) {
+                EditText editText = info.requireView().findViewById(entry.getKey());
+                String fieldValue = editText.getText().toString().trim();
+
+                if (fieldValue.isEmpty()) {
+                    Toast.makeText(SignUpActivity.this, entry.getValue(), Toast.LENGTH_SHORT).show();
+                    isValid = false;
+                } else {
+                    Matcher matcher = pattern.matcher(fieldValue);
+                    if (matcher.find()) {
+                        Toast.makeText(SignUpActivity.this, "字段不能包含特殊字符", Toast.LENGTH_SHORT).show();
+                        isValid = false;
+                    }
+                }
+            }
+
+            EditText edit_birth = info.requireView().findViewById(R.id.edit_birth);
+            String birthValue = edit_birth.getText().toString().trim();
+            if (birthValue.isEmpty()) {
+                Toast.makeText(SignUpActivity.this, "出生日期欄不得空白", Toast.LENGTH_SHORT).show();
+                isValid = false;
+            }
+            EditText edit_phone = info.requireView().findViewById(R.id.edit_phone);
+            String phoneValue = edit_phone.getText().toString().trim();
+            if (!TextUtil.isPhoneLegal(phoneValue)) {
+                Toast.makeText(SignUpActivity.this, "手機號碼格式錯誤", Toast.LENGTH_SHORT).show();
+                isValid = false;
+            }
         }
+    }
+
+
+    public void checkHealthEmpty() {
+        isValid = true;
+
+    }
+
+    public void checkHabitEmpty() {
+
     }
 
 

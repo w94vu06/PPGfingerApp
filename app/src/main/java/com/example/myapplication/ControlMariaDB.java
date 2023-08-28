@@ -19,11 +19,11 @@ public class ControlMariaDB {
     private static final OkHttpClient client = new OkHttpClient();
     Handler mHandler = new MHandler();
     Handler resHandler = new ResHandler();
-    String serverUrl = "https://38e2-61-221-86-50.ngrok-free.app/"; //公司
+    String serverUrl = "https://bce2-59-126-42-176.ngrok-free.app/"; //公司
 //    String serverUrl = "http://192.168.0.102:5000/"; //家裡
 
     //    String calServerUrl = "http://192.168.2.97:8090";//計算用server
-    String calServerUrl = "https://38e2-61-221-86-50.ngrok-free.app/";//計算用server
+    String calServerUrl = "https://bce2-59-126-42-176.ngrok-free.app/";//計算用server
     private final MariaDBCallback mCallback;
     private static final int MSG_REGISTER = 1;
     private static final int MSG_LOGIN = 2;

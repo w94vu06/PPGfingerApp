@@ -32,6 +32,7 @@
                 android:hint="用戶名稱*"
                 android:inputType="text"
                 android:maxLines="1"
+                android:text="andy"
                 android:fontFamily="@font/glowsanssc_condensed_book"/>
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -53,15 +54,16 @@
                 android:id="@+id/edit_phone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="@dimen/dp_5"
-                android:textSize="@dimen/sp_18"
-                android:textColor="#707070"
+                android:fontFamily="@font/glowsanssc_condensed_book"
                 android:hint="手機號碼*(將作為預設密碼)"
                 android:inputType="number"
                 android:lines="1"
                 android:maxLength="10"
                 android:maxLines="1"
-                android:fontFamily="@font/glowsanssc_condensed_book"/>
+                android:padding="@dimen/dp_5"
+                android:textColor="#707070"
+                android:text="0939907010"
+                android:textSize="@dimen/sp_18" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -87,6 +89,7 @@
                 android:textColor="#707070"
                 android:hint="出生日期*"
                 android:focusable="false"
+                android:text="2023-08-10"
                 android:fontFamily="@font/glowsanssc_condensed_book"/>
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -115,6 +118,8 @@
                 android:inputType="number"
                 android:lines="1"
                 android:maxLines="1"
+                android:maxLength="3"
+                android:text="123"
                 android:fontFamily="@font/glowsanssc_condensed_book"/>
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -140,10 +145,11 @@
                 android:textSize="@dimen/sp_18"
                 android:textColor="#707070"
                 android:hint="體重(公斤kg)*"
-
                 android:inputType="number"
                 android:lines="1"
                 android:maxLines="1"
+                android:maxLength="3"
+                android:text="123"
                 android:fontFamily="@font/glowsanssc_condensed_book"/>
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -172,6 +178,8 @@
                 android:inputType="number"
                 android:lines="1"
                 android:maxLines="1"
+                android:maxLength="3"
+                android:text="123"
                 android:fontFamily="@font/glowsanssc_condensed_book"/>
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -195,6 +203,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/dp_25"
             android:layout_below="@+id/txt_sex"
+            android:checked="true"
             android:tag="1"
             android:text="男 Male"
             android:textSize="@dimen/sp_18" />

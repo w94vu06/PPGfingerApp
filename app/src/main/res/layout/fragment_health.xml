@@ -48,6 +48,7 @@
             android:paddingBottom="@dimen/dp_3"
             android:text="否 No"
             android:textSize="@dimen/sp_18"
+            android:checked="true"
             android:tag="0"
             style="@style/checkBox_style"/>
 
@@ -92,6 +93,7 @@
             android:paddingTop="@dimen/dp_3"
             android:paddingBottom="@dimen/dp_3"
             android:text="否 No"
+            android:checked="true"
             android:textSize="@dimen/sp_18"
             android:tag="0"
             style="@style/checkBox_style"/>

@@ -1,14 +1,18 @@
 package com.example.myapplication.SignUpFragment;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
 import com.example.myapplication.R;
+import com.example.myapplication.SignUpActivity;
 import com.example.myapplication.Util.CommonUtil;
 
 
@@ -51,6 +55,9 @@ public class Health extends Fragment {
             checkedMedicine,checkedLow,checkedCovid,checkedVaccine = "";
     private List<String> checkedFamily;
 
+    private TextView txt_sbp, txt_dbp;
+    private CheckBox check_sbp1;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,7 +72,30 @@ public class Health extends Fragment {
                              Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_health, container, false);
         ButterKnife.bind(this,view);
+        setRadiosHbp();
         return view;
+    }
+
+    public void setRadiosHbp() {
+        txt_sbp = view.findViewById(R.id.txt_sbp);
+        check_sbp1 = view.findViewById(R.id.check_sbp1);
+
+        checkedHeart = CommonUtil.getOne(radiosHeart);
+        if (Integer.parseInt(checkedHeart) == 0) {
+
+            Toast.makeText(getActivity(), "特殊", Toast.LENGTH_SHORT).show();
+            txt_sbp.setTextColor(getResources().getColor(R.color.gray));
+
+            check_sbp1.setEnabled(false);
+            check_sbp1.setAlpha(0.5f);
+            check_sbp1.setTextColor(getResources().getColor(R.color.gray));
+
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
     }
 
     /** 心血管疾病單選 **/
@@ -74,6 +104,7 @@ public class Health extends Fragment {
         CommonUtil.unCheck(radiosHeart);
         checkBox.setChecked(true);
         checkedHeart = CommonUtil.getOne(radiosHeart);
+
     }
 
     /** 高血壓單選 **/
@@ -82,6 +113,9 @@ public class Health extends Fragment {
         CommonUtil.unCheck(radiosHbp);
         checkBox.setChecked(true);
         checkedHbp = CommonUtil.getOne(radiosHbp);
+        if (Integer.parseInt(checkedHbp) == 0) {
+
+        }
     }
 
     /** 收縮壓單選 **/
@@ -170,9 +204,12 @@ public class Health extends Fragment {
         checkedVaccine = CommonUtil.getOne(radiosVaccine);
     }
 
-//    public void sendValue(Information.DataReturn dataReturn){
-//        checkedCovid = CommonUtil.getOne(radiosCovid);
-//        String value = checkedCovid;
-//        dataReturn.getResult(value);
-//    }
+    public void sendValue(DataReturn dataReturn){
+        checkedHeart = CommonUtil.getOne(radiosHeart);
+        checkedHbp = CommonUtil.getOne(radiosHbp);
+        String value = checkedHeart;
+        String value2 = checkedHbp;
+        dataReturn.getResult(value);
+        dataReturn.getResult(value2);
+    }
 }
