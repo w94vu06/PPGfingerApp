@@ -48,6 +48,7 @@
             android:text="否 No"
             android:textSize="@dimen/sp_18"
             android:tag="0"
+            android:checked="true"
             style="@style/checkBox_style"/>
 
         <!-- 喝酒 -->
@@ -88,6 +89,7 @@
             android:text="否 No"
             android:textSize="@dimen/sp_18"
             android:tag="0"
+            android:checked="true"
             style="@style/checkBox_style"/>
 
         <!-- 運動 -->
@@ -128,6 +130,7 @@
             android:text="否 No"
             android:textSize="@dimen/sp_18"
             android:tag="0"
+            android:checked="true"
             style="@style/checkBox_style"/>
 
         <!-- 夜間睡眠時長 -->
@@ -168,6 +171,7 @@
             android:text="6-8hrs"
             android:textSize="@dimen/sp_18"
             android:tag="1"
+            android:checked="true"
             style="@style/checkBox_style"/>
 
         <CheckBox

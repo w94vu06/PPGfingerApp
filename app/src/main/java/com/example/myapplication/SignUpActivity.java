@@ -113,9 +113,14 @@ public class SignUpActivity extends AppCompatActivity implements MariaDBCallback
                         btn_nextPage.setText("註冊");
                         health.sendValue(new Health.DataReturn() {
                             @Override
-                            public void getResult(String value) {
-                                Log.d("getHealthValue", ""+value);
+                            public void getResult(HashMap<String, String> hashMap) {
+                                for (Map.Entry<String, String> entry : hashMap.entrySet()) {
+                                    String key = entry.getKey();
+                                    String value = entry.getValue();
+                                    Log.d("getHealthValue", "Key: " + key + ", Value: " + value);
+                                }
                             }
+
                         });
 
                         if (isValid) {
