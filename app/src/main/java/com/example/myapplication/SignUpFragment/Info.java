@@ -103,22 +103,6 @@ public class Info extends Fragment {
         calAge();
     }
 
-    public void sendValue(DataReturn dataReturn) {
-        HashMap<String, String> infoHashMap = new HashMap<>();
-        getValue();
-        checkedSex = CommonUtil.getOne(radiosSex);
-
-        infoHashMap.put("userName", userName);
-        infoHashMap.put("phone", phone);
-        infoHashMap.put("birth", birth);
-        infoHashMap.put("height", height);
-        infoHashMap.put("weight", weight);
-        infoHashMap.put("waist", waist);
-        infoHashMap.put("checkedSex", checkedSex);
-
-        dataReturn.getResult(infoHashMap);
-    }
-
     private void calAge() {
         //get current time
         SimpleDateFormat dtf = new SimpleDateFormat("yyyy");
@@ -134,6 +118,22 @@ public class Info extends Fragment {
         old = String.valueOf(howOldAreYou);
     }
 
+    public void sendValue(DataReturn dataReturn) {
+        HashMap<String, String> infoHashMap = new HashMap<>();
+        getValue();
+        checkedSex = CommonUtil.getOne(radiosSex);
+
+        infoHashMap.put("userName", userName);
+        infoHashMap.put("phone", phone);
+        infoHashMap.put("birth", birth);
+        infoHashMap.put("old", old);
+        infoHashMap.put("height", height);
+        infoHashMap.put("weight", weight);
+        infoHashMap.put("waist", waist);
+        infoHashMap.put("checkedSex", checkedSex);
+
+        dataReturn.getResult(infoHashMap);
+    }
 }
 
 /**

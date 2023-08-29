@@ -496,7 +496,7 @@
             android:layout_toRightOf="@+id/check_medicine1"
             android:paddingTop="@dimen/dp_3"
             android:paddingBottom="@dimen/dp_3"
-            android:text="有服藥"
+            android:text="偶爾服藥"
             android:textSize="@dimen/sp_18"
             android:tag="1"
             style="@style/checkBox_style"/>
@@ -510,9 +510,24 @@
             android:layout_below="@+id/check_medicine1"
             android:paddingTop="@dimen/dp_3"
             android:paddingBottom="@dimen/dp_3"
-            android:text="打胰島素"
+            android:text="固定服藥"
             android:textSize="@dimen/sp_18"
             android:tag="2"
+            style="@style/checkBox_style"/>
+
+        <CheckBox
+            android:id="@+id/check_medicine4"
+            android:layout_width="@dimen/dp_147"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_8"
+            android:layout_marginStart="@dimen/dp_15"
+            android:layout_below="@+id/check_medicine2"
+            android:layout_toRightOf="@+id/check_medicine3"
+            android:paddingTop="@dimen/dp_3"
+            android:paddingBottom="@dimen/dp_3"
+            android:text="打胰島素"
+            android:textSize="@dimen/sp_18"
+            android:tag="3"
             style="@style/checkBox_style"/>
 
         <!-- 低血糖 -->
@@ -580,6 +595,7 @@
             android:paddingBottom="@dimen/dp_3"
             android:tag="0"
             android:text="無 No"
+            android:checked="true"
             android:textSize="@dimen/sp_18" />
 
         <CheckBox

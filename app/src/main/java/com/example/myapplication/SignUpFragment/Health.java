@@ -43,7 +43,7 @@ public class Health extends Fragment {
     List<CheckBox> radiosEmpty;
     @BindViews({R.id.check_twohrs1, R.id.check_twohrs2, R.id.check_twohrs3, R.id.check_twohrs4})
     List<CheckBox> radiosTwohrs;
-    @BindViews({R.id.check_medicine1, R.id.check_medicine2, R.id.check_medicine3})
+    @BindViews({R.id.check_medicine1, R.id.check_medicine2, R.id.check_medicine3,R.id.check_medicine4})
     List<CheckBox> radiosMedicine;
     @BindViews({R.id.check_low1, R.id.check_low2})
     List<CheckBox> radiosLow;
@@ -54,9 +54,8 @@ public class Health extends Fragment {
     @BindViews({R.id.check_vaccineY, R.id.check_vaccineN})
     List<CheckBox> radiosVaccine;
     String checkedHeart, checkedHbp, checkedSbp, checkedDbp, checkedDia, checkedunit, checkedEmpty, checkedTwohrs,
-            checkedMedicine, checkedLow, checkedCovid, checkedVaccine = "";
+            checkedMedicine, checkedLow, checkedCovid, checkedVaccine ;
     private List<String> checkedFamily;
-    private String checkedFamilyString;
     //收縮壓
     TextView txt_sbp;
     CheckBox check_sbp1, check_sbp2, check_sbp3;
@@ -64,11 +63,12 @@ public class Health extends Fragment {
     TextView txt_dbp;
     CheckBox check_dbp1, check_dbp2, check_dbp3;
     //早晨空腹、餐後兩小、用藥
-    TextView txt_empty,txt_twohrs, txt_medicine;
-    CheckBox check_empty1,check_empty2,check_empty3, check_empty4;
-    CheckBox check_twohrs1,check_twohrs2,check_twohrs3, check_twohrs4;
-    CheckBox check_medicine1,check_medicine2, check_medicine3;
-    CheckBox check_familyN,check_familyHbp, check_familyDia, check_familyHlp,check_familyDepression;
+    TextView txt_empty, txt_twohrs, txt_medicine;
+    CheckBox check_empty1, check_empty2, check_empty3, check_empty4;
+    CheckBox check_twohrs1, check_twohrs2, check_twohrs3, check_twohrs4;
+    CheckBox check_medicine1, check_medicine2, check_medicine3,check_medicine4;
+    CheckBox check_familyN, check_familyHbp, check_familyDia, check_familyHlp, check_familyDepression;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,14 +83,15 @@ public class Health extends Fragment {
                              Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_health, container, false);
         ButterKnife.bind(this, view);
-
         checkedHeart = CommonUtil.getOne(radiosHeart);
+        checkedFamily = CommonUtil.getMany(radiosFamily);
+
         setRadiosHbp();
         setRadiosDia();
         setUnit();
-//        setRadiosFamily();
         return view;
     }
+
     //高血壓為否，就無法選擇收縮壓及舒張壓
     public void setRadiosHbp() {
         checkedHbp = CommonUtil.getOne(radiosHbp);
@@ -164,6 +165,7 @@ public class Health extends Fragment {
         check_medicine1 = view.findViewById(R.id.check_medicine1);
         check_medicine2 = view.findViewById(R.id.check_medicine2);
         check_medicine3 = view.findViewById(R.id.check_medicine3);
+        check_medicine4 = view.findViewById(R.id.check_medicine4);
 
         if (Integer.parseInt(checkedDia) == 0) {
             //早晨空腹
@@ -192,10 +194,12 @@ public class Health extends Fragment {
             check_medicine1.setEnabled(false);
             check_medicine2.setEnabled(false);
             check_medicine3.setEnabled(false);
+            check_medicine4.setEnabled(false);
             txt_medicine.setAlpha(0.5f);
             check_medicine1.setAlpha(0.5f);
             check_medicine2.setAlpha(0.5f);
             check_medicine3.setAlpha(0.5f);
+            check_medicine4.setAlpha(0.5f);
             checkedMedicine = "-1";
         } else {
             //早晨空腹
@@ -222,10 +226,12 @@ public class Health extends Fragment {
             check_medicine1.setEnabled(true);
             check_medicine2.setEnabled(true);
             check_medicine3.setEnabled(true);
+            check_medicine4.setEnabled(true);
             txt_medicine.setAlpha(1f);
             check_medicine1.setAlpha(1f);
             check_medicine2.setAlpha(1f);
             check_medicine3.setAlpha(1f);
+            check_medicine4.setAlpha(1f);
         }
     }
 
@@ -247,8 +253,8 @@ public class Health extends Fragment {
         if (Integer.parseInt(checkedunit) == 1) {
             check_empty1.setText("70-110");
             check_empty2.setText("111-130");
-            check_empty3.setText("131-150");
-            check_empty4.setText(">150");
+            check_empty3.setText("131-147");
+            check_empty4.setText(">147");
 
             check_twohrs1.setText("70-130");
             check_twohrs2.setText("131-158");
@@ -265,51 +271,6 @@ public class Health extends Fragment {
             check_twohrs3.setText("8.9-11.1");
             check_twohrs4.setText(">11.1");
         }
-    }
-
-    public void setRadiosFamily() {
-        checkedFamily = CommonUtil.getMany(radiosFamily);
-
-        check_familyN = view.findViewById(R.id.check_familyN);
-        check_familyHbp = view.findViewById(R.id.check_familyHbp);
-        check_familyDia = view.findViewById(R.id.check_familyDia);
-        check_familyHlp = view.findViewById(R.id.check_familyHlp);
-        check_familyDepression = view.findViewById(R.id.check_familyDepression);
-
-        check_familyN.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                check_familyHbp.setChecked(false);
-                check_familyDia.setChecked(false);
-                check_familyHlp.setChecked(false);
-                check_familyDepression.setChecked(false);
-            }
-        });
-        check_familyHbp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                check_familyN.setChecked(false);
-            }
-        });
-        check_familyDia.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                check_familyN.setChecked(false);
-            }
-        });
-        check_familyHlp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                check_familyN.setChecked(false);
-            }
-        });
-        check_familyDepression.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                check_familyN.setChecked(false);
-            }
-        });
-        Log.d("whyFam", "setRadiosFamily: "+checkedFamily);
     }
 
     @Override
@@ -425,12 +386,26 @@ public class Health extends Fragment {
      **/
     @OnClick({R.id.check_familyN, R.id.check_familyHbp, R.id.check_familyDia, R.id.check_familyHlp, R.id.check_familyDepression})
     void changeFamily(CheckBox checkBox) {
+        check_familyN = view.findViewById(R.id.check_familyN);
         checkedFamily = CommonUtil.getMany(radiosFamily);
-
-        for (String family : checkedFamily) {
-            checkedFamilyString += family + ",";
+        if (checkBox.getId() == R.id.check_familyN && checkBox.isChecked()) {
+            unCheckOtherFamilyCheckboxes(checkBox);
+        } else if (checkBox.getId() != R.id.check_familyN && checkBox.isChecked()) {
+            check_familyN.setChecked(false);
         }
-//        setRadiosFamily();
+        Log.d("whyFam", "setRadiosFamily: " + checkedFamily);
+        if (checkedFamily.isEmpty() && !check_familyN.isChecked()) {
+            check_familyN.setChecked(true);
+        }
+        checkedFamily = CommonUtil.getMany(radiosFamily);
+    }
+
+    private void unCheckOtherFamilyCheckboxes(CheckBox exceptCheckbox) {
+        for (CheckBox checkBox : radiosFamily) {
+            if (checkBox != exceptCheckbox) {
+                checkBox.setChecked(false);
+            }
+        }
     }
 
     /**
@@ -454,7 +429,7 @@ public class Health extends Fragment {
     }
 
     public void sendValue(DataReturn dataReturn) {
-
+        String checkedFamilyString = String.join(",",checkedFamily);
         HashMap<String, String> healthHashMap = new HashMap<>();
         healthHashMap.put("checkedHeart", checkedHeart != null ? checkedHeart : "-1");
         healthHashMap.put("checkedHbp", checkedHbp != null ? checkedHbp : "-1");
@@ -465,12 +440,11 @@ public class Health extends Fragment {
         healthHashMap.put("checkedEmpty", checkedEmpty != null ? checkedEmpty : "-1");
         healthHashMap.put("checkedTwohrs", checkedTwohrs != null ? checkedTwohrs : "-1");
         healthHashMap.put("checkedMedicine", checkedMedicine != null ? checkedMedicine : "-1");
-        healthHashMap.put("checkedFamily", checkedFamilyString != null ? checkedFamilyString : "-1");
+        healthHashMap.put("checkedFamily", checkedFamilyString != null ? checkedFamilyString : "0");
         healthHashMap.put("checkedLow", checkedLow != null ? checkedLow : "-1");
         healthHashMap.put("checkedCovid", checkedCovid != null ? checkedCovid : "-1");
         healthHashMap.put("checkedVaccine", checkedVaccine != null ? checkedVaccine : "-1");
-
+        Log.d("dddd", "sendValue: "+checkedVaccine);
         dataReturn.getResult(healthHashMap);
-
     }
 }

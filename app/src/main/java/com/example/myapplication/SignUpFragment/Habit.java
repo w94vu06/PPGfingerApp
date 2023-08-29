@@ -10,6 +10,8 @@ import androidx.fragment.app.Fragment;
 
 import com.example.myapplication.R;
 import com.example.myapplication.Util.CommonUtil;
+
+import java.util.HashMap;
 import java.util.List;
 
 import butterknife.BindViews;
@@ -27,22 +29,32 @@ public class Habit extends Fragment {
     List<CheckBox> radiosSport;
     @BindViews({R.id.check_sleep1, R.id.check_sleep2, R.id.check_sleep3})
     List<CheckBox> radiosSleep;
-    String checkedSmoke,checkedDrink,checkedSport,checkedSleep = "";
+    String checkedSmoke, checkedDrink, checkedSport, checkedSleep = "";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
 
+    public interface DataReturn {
+        public void getResult(HashMap<String, String> hashMap);
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_habit, container, false);
-        ButterKnife.bind(this,view);
+        ButterKnife.bind(this, view);
+        checkedSmoke = CommonUtil.getOne(radiosSmoke);
+        checkedDrink = CommonUtil.getOne(radiosDrink);
+        checkedSport = CommonUtil.getOne(radiosSport);
+        checkedSleep = CommonUtil.getOne(radiosSleep);
         return view;
     }
 
-    /** 吸菸單選 **/
+    /**
+     * 吸菸單選
+     **/
     @OnClick({R.id.check_smokeY, R.id.check_smokeN})
     void changeSmoke(CheckBox checkBox) {
         CommonUtil.unCheck(radiosSmoke);
@@ -50,7 +62,9 @@ public class Habit extends Fragment {
         checkedSmoke = CommonUtil.getOne(radiosSmoke);
     }
 
-    /** 喝酒單選 **/
+    /**
+     * 喝酒單選
+     **/
     @OnClick({R.id.check_drinkY, R.id.check_drinkN})
     void changeDrink(CheckBox checkBox) {
         CommonUtil.unCheck(radiosDrink);
@@ -58,7 +72,9 @@ public class Habit extends Fragment {
         checkedDrink = CommonUtil.getOne(radiosDrink);
     }
 
-    /** 運動單選 **/
+    /**
+     * 運動單選
+     **/
     @OnClick({R.id.check_sportY, R.id.check_sportN})
     void changeSport(CheckBox checkBox) {
         CommonUtil.unCheck(radiosSport);
@@ -66,11 +82,24 @@ public class Habit extends Fragment {
         checkedSport = CommonUtil.getOne(radiosSport);
     }
 
-    /** 睡眠單選 **/
+    /**
+     * 睡眠單選
+     **/
     @OnClick({R.id.check_sleep1, R.id.check_sleep2, R.id.check_sleep3})
     void changeSleep(CheckBox checkBox) {
         CommonUtil.unCheck(radiosSleep);
         checkBox.setChecked(true);
         checkedSleep = CommonUtil.getOne(radiosSleep);
+    }
+
+    public void sendValue(Habit.DataReturn dataReturn) {
+
+        HashMap<String, String> habitHashMap = new HashMap<>();
+
+        habitHashMap.put("checkedSmoke", checkedSmoke);
+        habitHashMap.put("checkedDrink", checkedDrink);
+        habitHashMap.put("checkedSport", checkedSport);
+        habitHashMap.put("checkedSleep", checkedSleep);
+        dataReturn.getResult(habitHashMap);
     }
 }

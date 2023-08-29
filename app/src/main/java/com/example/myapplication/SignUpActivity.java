@@ -21,6 +21,9 @@ import com.example.myapplication.SignUpFragment.Info;
 import com.example.myapplication.Util.TextUtil;
 
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +33,7 @@ import java.util.regex.Pattern;
 import butterknife.ButterKnife;
 
 public class SignUpActivity extends AppCompatActivity implements MariaDBCallback {
-
+    private ControlMariaDB controlMariaDB = new ControlMariaDB(this);
     Button btn_nextPage, btn_upPage;
     ImageView img_signup, img_signUpback;
     Info info = new Info();
@@ -42,15 +45,18 @@ public class SignUpActivity extends AppCompatActivity implements MariaDBCallback
     private FragmentTransaction transaction;
     Boolean isValid = true;
 
+    private HashMap<String, String> infoHashMap = new HashMap<>();
+    private HashMap<String, String> healthHashMap = new HashMap<>();
+    private HashMap<String, String> habitHashMap = new HashMap<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
+
         initWidget();
 //        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN); //禁止自動彈出虛擬鍵盤
         ButterKnife.bind(SignUpActivity.this);
-
-
     }
 
     private void initWidget() {
@@ -90,9 +96,9 @@ public class SignUpActivity extends AppCompatActivity implements MariaDBCallback
                         btn_upPage.setClickable(true);
                         currentFragment = info;
                         if (isValid) {
-                            btn_upPage.setVisibility(View.VISIBLE);
                             try {
                                 FragmentHideShow(health);
+                                btn_upPage.setVisibility(View.VISIBLE);
                                 info.sendValue(new Info.DataReturn() {
                                     @Override
                                     public void getResult(HashMap<String, String> hashMap) {
@@ -101,6 +107,7 @@ public class SignUpActivity extends AppCompatActivity implements MariaDBCallback
                                             String value = entry.getValue();
                                             Log.d("getInfovalue", "Key: " + key + ", Value: " + value);
                                         }
+                                        infoHashMap = hashMap;
                                     }
                                 });
                             } catch (Exception e) {
@@ -119,19 +126,27 @@ public class SignUpActivity extends AppCompatActivity implements MariaDBCallback
                                     String value = entry.getValue();
                                     Log.d("getHealthValue", "Key: " + key + ", Value: " + value);
                                 }
+                                healthHashMap = hashMap;
                             }
 
                         });
-
-                        if (isValid) {
-
-                        }
-
                         FragmentHideShow(habit);
                     } else if (nowFragment == habit) {
                         try {
-                            Intent intent = new Intent(SignUpActivity.this, MainActivity.class);
-                            startActivity(intent);
+                            habit.sendValue(new Habit.DataReturn() {
+                                @Override
+                                public void getResult(HashMap<String, String> hashMap) {
+                                    for (Map.Entry<String, String> entry : hashMap.entrySet()) {
+                                        String key = entry.getKey();
+                                        String value = entry.getValue();
+                                        Log.d("getHabitValue", "Key: " + key + ", Value: " + value);
+                                    }
+                                    habitHashMap = hashMap;
+                                }
+                            });
+                            putHashMapToJson();
+//                            Intent intent = new Intent(SignUpActivity.this, MainActivity.class);
+//                            startActivity(intent);
                         } catch (Exception e) {
                             Log.e("errrr", e.toString());
                         }
@@ -151,6 +166,76 @@ public class SignUpActivity extends AppCompatActivity implements MariaDBCallback
         }
     };
 
+    private void putHashMapToJson() {
+        JSONObject jsonObject = new JSONObject();
+
+        String userName = infoHashMap.get("userName");
+        String phone = infoHashMap.get("phone");
+        String birth = infoHashMap.get("birth");
+        String old = infoHashMap.get("old");
+        String height = infoHashMap.get("height");
+        String weight = infoHashMap.get("weight");
+        String waist = infoHashMap.get("waist");
+        String checkedSex = infoHashMap.get("checkedSex");
+
+        String checkedHeart = healthHashMap.get("checkedHeart");
+        String checkedHbp = healthHashMap.get("checkedHbp");
+        String checkedSbp = healthHashMap.get("checkedSbp");
+        String checkedDbp = healthHashMap.get("checkedDbp");
+        String checkedDia = healthHashMap.get("checkedDia");
+        String checkedunit = healthHashMap.get("checkedunit");
+        String checkedEmpty = healthHashMap.get("checkedEmpty");
+        String checkedTwohrs = healthHashMap.get("checkedTwohrs");
+        String checkedMedicine = healthHashMap.get("checkedMedicine");
+        String checkedFamily = healthHashMap.get("checkedFamily");
+        String checkedLow = healthHashMap.get("checkedLow");
+        String checkedCovid = healthHashMap.get("checkedCovid");
+        String checkedVaccine = healthHashMap.get("checkedVaccine");
+
+        String checkedSmoke = habitHashMap.get("checkedSmoke");
+        String checkedDrink = habitHashMap.get("checkedDrink");
+        String checkedSport = habitHashMap.get("checkedSport");
+        String checkedSleep = habitHashMap.get("checkedSleep");
+        try {
+            //Info
+            jsonObject.put("userName", userName);
+            jsonObject.put("phone", phone);
+            jsonObject.put("birth", birth);
+            jsonObject.put("old", old);
+            jsonObject.put("height", height);
+            jsonObject.put("weight", weight);
+            jsonObject.put("waist", waist);
+            jsonObject.put("sex", checkedSex);
+            //Health
+            jsonObject.put("cvd", checkedHeart);
+            jsonObject.put("hbp", checkedHbp);
+            jsonObject.put("hbpSBp", checkedSbp);
+            jsonObject.put("hbpDBp", checkedDbp);
+            jsonObject.put("diabetes", checkedDia);
+            jsonObject.put("checkedunit", checkedunit);
+            jsonObject.put("morningdiabetes", checkedEmpty);
+            jsonObject.put("aftermealdiabetes", checkedTwohrs);
+            jsonObject.put("userstatus", checkedMedicine);
+            jsonObject.put("family", checkedFamily);
+            jsonObject.put("low", checkedLow);
+            jsonObject.put("covid", checkedCovid);
+            jsonObject.put("vaccine", checkedVaccine);
+            //Habit
+            jsonObject.put("smokes", checkedSmoke);
+            jsonObject.put("drink", checkedDrink);
+            jsonObject.put("sport", checkedSport);
+            jsonObject.put("sleep", checkedSleep);
+
+            new Thread(() -> {
+                String json = jsonObject.toString();
+                controlMariaDB.userRegister(json);
+            }).start();
+
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
     private Fragment checkFragment() {
         FragmentManager fm = this.getSupportFragmentManager();
         List<Fragment> fragments = fm.getFragments();
@@ -216,22 +301,12 @@ public class SignUpActivity extends AppCompatActivity implements MariaDBCallback
         }
     }
 
-
-    public void checkHealthEmpty() {
-        isValid = true;
-
-    }
-
-    public void checkHabitEmpty() {
-
-    }
-
-
     /**
      * 註冊按鈕按下後，從MariaDBCallback，回傳事件代碼
      */
     @Override
     public void onResult(String result) {
+        Log.d("xxxx", "onResult: "+result);
     }
 
     @Override
