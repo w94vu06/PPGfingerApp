@@ -79,32 +79,18 @@ public class BeginActivity extends AppCompatActivity {
         btn_signin.setOnClickListener(lis);
         btn_signup.setOnClickListener(lis);
     }
-
-    private void isLoggedIn() {
-        boolean isLoggedIn = preferences.getBoolean("isLoggedIn", false);
-        if (isLoggedIn) {
-            Intent intent_IN = new Intent();
-            intent_IN.setClass(BeginActivity.this, MainActivity.class);
-            startActivity(intent_IN);
-            finish();
-        } else {
-
-        }
-    }
-
     View.OnClickListener lis = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
+            Intent intent_IN = new Intent();
             switch (view.getId()){
                 case R.id.btn_signin:
-                    Intent intent_IN = new Intent();
                     intent_IN.setClass(BeginActivity.this, SignInActivity.class);
                     startActivity(intent_IN);
                     break;
                 case R.id.btn_signup:
-                    Intent intent_UP = new Intent();
-                    intent_UP.setClass(BeginActivity.this, SignUpActivity.class);
-                    startActivity(intent_UP);
+                    intent_IN.setClass(BeginActivity.this, SignUpActivity.class);
+                    startActivity(intent_IN);
                     break;
             }
         }

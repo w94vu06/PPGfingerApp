@@ -1,49 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@drawable/background_dialog"
     android:orientation="vertical">
-    
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/dp_5"
         android:layout_marginStart="@dimen/dp_10"
+        android:layout_marginTop="@dimen/dp_5"
         android:layout_marginEnd="@dimen/dp_10">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:text="添加項目"
+            android:fontFamily="@font/glowsanssc_condensed_medium"
+            android:text="目前狀態"
             android:textColor="@color/shironeri"
-            android:textSize="@dimen/sp_20"
-            android:fontFamily="@font/glowsanssc_condensed_medium"/>
+            android:textSize="@dimen/sp_20" />
 
-        <Button
-            android:id="@+id/btn_addSelect"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_alignParentEnd="true"
-            android:layout_marginEnd="@dimen/dp_5"
-            android:padding="@dimen/dp_0"
-            android:background="@null"
-            android:backgroundTint="@null"
-            android:text="Select All"
-            android:textColor="@color/shironeri"
-            android:textSize="@dimen/sp_16"
-            android:fontFamily="@font/glowsanssc_condensed_medium"/>
-        
+        <!--        <Button-->
+        <!--            android:id="@+id/btn_addSelect"-->
+        <!--            android:layout_width="wrap_content"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:layout_centerVertical="true"-->
+        <!--            android:layout_alignParentEnd="true"-->
+        <!--            android:layout_marginEnd="@dimen/dp_5"-->
+        <!--            android:padding="@dimen/dp_0"-->
+        <!--            android:background="@null"-->
+        <!--            android:backgroundTint="@null"-->
+        <!--            android:text="Select All"-->
+        <!--            android:textColor="@color/shironeri"-->
+        <!--            android:textSize="@dimen/sp_16"-->
+        <!--            android:fontFamily="@font/glowsanssc_condensed_medium"/>-->
+
     </RelativeLayout>
-    
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/dp_15"
+        android:layout_marginTop="@dimen/dp_10"
         android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_5"
+            android:fontFamily="@font/glowsanssc_condensed_medium"
+            android:text="用餐狀態"
+            android:textSize="@dimen/sp_18" />
 
         <com.google.android.flexbox.FlexboxLayout
             android:layout_width="match_parent"
@@ -52,79 +60,115 @@
             android:layout_marginEnd="@dimen/dp_10"
             app:flexWrap="wrap">
 
-            <CheckBox
-                android:id="@+id/check_dbp"
-                style="@style/select_flex_style"
-                android:tag="f1"
-                android:text="舒張壓 DBP" />
 
             <CheckBox
-                android:id="@+id/check_sbp"
+                android:id="@+id/state_empty"
                 style="@style/select_flex_style"
-                android:tag="f2"
-                android:text="收縮壓 SBP" />
+                android:tag="1"
+                android:text="早晨空腹" />
 
             <CheckBox
-                android:id="@+id/check_bs"
+                android:id="@+id/state_beforeMeal"
                 style="@style/select_flex_style"
-                android:tag="f3"
-                android:text="血糖 BS-mg/dL" />
+                android:tag="2"
+                android:text="餐前" />
 
             <CheckBox
-                android:id="@+id/check_hr"
+                android:id="@+id/state_afterOne"
                 style="@style/select_flex_style"
-                android:tag="f4"
-                android:text="心率 Heart Rate" />
+                android:tag="3"
+                android:text="餐後一小時內" />
 
             <CheckBox
-                android:id="@+id/check_sdnn"
+                android:id="@+id/state_afterTwo"
                 style="@style/select_flex_style"
-                android:tag="f5"
-                android:text="SDNN" />
+                android:tag="4"
+                android:text="餐後二小時內" />
 
             <CheckBox
-                android:id="@+id/check_rmssd"
+                android:id="@+id/state_afterSleep"
                 style="@style/select_flex_style"
-                android:tag="f6"
-                android:text="RMSSD" />
+                android:tag="5"
+                android:text="睡前" />
 
+            <CheckBox
+                android:id="@+id/state_afterThree"
+                style="@style/select_flex_style"
+                android:tag="6"
+                android:text="餐後三小時內" />
+
+        </com.google.android.flexbox.FlexboxLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_5"
+            android:layout_marginTop="@dimen/dp_5"
+            android:fontFamily="@font/glowsanssc_condensed_medium"
+            android:text="服藥情況"
+            android:textSize="@dimen/sp_18" />
+
+        <com.google.android.flexbox.FlexboxLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_10"
+            android:layout_marginEnd="@dimen/dp_10"
+            app:flexWrap="wrap">
+
+
+            <CheckBox
+                android:id="@+id/state_todayNotYet"
+                style="@style/select_flex_style"
+                android:tag="0"
+                android:text="今天沒服藥" />
+
+            <CheckBox
+                android:id="@+id/state_alreadyMedicine"
+                style="@style/select_flex_style"
+                android:tag="1"
+                android:text="今天已服藥" />
+
+            <CheckBox
+                android:id="@+id/state_alreadyInsulin"
+                style="@style/select_flex_style"
+                android:tag="2"
+                android:text="今天已打胰島素" />
         </com.google.android.flexbox.FlexboxLayout>
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="@dimen/dp_15"
             android:layout_marginStart="@dimen/dp_10"
             android:layout_marginEnd="@dimen/dp_10"
-            android:layout_marginBottom="@dimen/dp_10">
-
-            <Button
-                android:id="@+id/btn_addCancel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="@dimen/dp_5"
-                android:layout_toLeftOf="@+id/btn_addDone"
-                android:padding="@dimen/dp_0"
-                android:minHeight="0dp"
-                android:text="取消"
-                android:textSize="@dimen/sp_18"
-                android:textColor="@color/white"
-                android:fontFamily="@font/glowsanssc_condensed_medium"
-                android:background="@drawable/background_button3"/>
+            android:layout_marginBottom="@dimen/dp_5">
 
             <Button
                 android:id="@+id/btn_addDone"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
-                android:padding="@dimen/dp_0"
-                android:minHeight="0dp"
-                android:text="完成"
-                android:textSize="@dimen/sp_18"
-                android:textColor="@color/white"
+                android:layout_marginTop="@dimen/dp_5"
+                android:layout_marginBottom="@dimen/dp_5"
+                android:background="@drawable/background_button3"
                 android:fontFamily="@font/glowsanssc_condensed_medium"
-                android:background="@drawable/background_button3"/>
-
+                android:gravity="center"
+                android:minHeight="5dp"
+                android:text="完成"
+                android:textColor="@color/white"
+                android:textSize="@dimen/sp_18" />
+            <!--            <Button-->
+            <!--                android:id="@+id/btn_addCancel"-->
+            <!--                android:layout_width="wrap_content"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:layout_marginEnd="@dimen/dp_5"-->
+            <!--                android:layout_toLeftOf="@+id/btn_addDone"-->
+            <!--                android:padding="@dimen/dp_0"-->
+            <!--                android:minHeight="0dp"-->
+            <!--                android:text="取消"-->
+            <!--                android:textSize="@dimen/sp_18"-->
+            <!--                android:textColor="@color/white"-->
+            <!--                android:fontFamily="@font/glowsanssc_condensed_medium"-->
+            <!--                android:background="@drawable/background_button3"/>-->
         </RelativeLayout>
 
     </LinearLayout>

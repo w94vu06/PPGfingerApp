@@ -67,7 +67,7 @@ public class HomePage extends Fragment{
 
 //    ArrayList<DataFeature> featureList = new ArrayList<>();
     Unbinder unbinder;
-    @BindViews({R.id.check_dbp, R.id.check_sbp, R.id.check_bs, R.id.check_hr, R.id.check_sdnn, R.id.check_rmssd})
+//    @BindViews({R.id.check_dbp, R.id.check_sbp, R.id.check_bs, R.id.check_hr, R.id.check_sdnn, R.id.check_rmssd})
     List<CheckBox> dialogCheck;
 
     @Override
@@ -228,8 +228,8 @@ public class HomePage extends Fragment{
         dialog.setContentView(dialogView);
 
         /** 宣告UI參數 **/
-        btn_addSelect = dialogView.findViewById(R.id.btn_addSelect);
-        btn_addCancel = dialogView.findViewById(R.id.btn_addCancel);
+//        btn_addSelect = dialogView.findViewById(R.id.btn_addSelect);
+//        btn_addCancel = dialogView.findViewById(R.id.btn_addCancel);
         btn_addDone = dialogView.findViewById(R.id.btn_addDone);
         unbinder = ButterKnife.bind(this,dialogView);
         dialog.show();
@@ -246,10 +246,10 @@ public class HomePage extends Fragment{
         btn_addCancel.setOnClickListener(lis);
     }
 
-    @OnClick({R.id.check_dbp, R.id.check_sbp, R.id.check_bs, R.id.check_hr, R.id.check_sdnn, R.id.check_rmssd})
-    public void changFeature(CheckBox checkBox){
-        checkFeature = CommonUtil.getMany(dialogCheck);
-    }
+//    @OnClick({R.id.check_dbp, R.id.check_sbp, R.id.check_bs, R.id.check_hr, R.id.check_sdnn, R.id.check_rmssd})
+//    public void changFeature(CheckBox checkBox){
+//        checkFeature = CommonUtil.getMany(dialogCheck);
+//    }
 
     /** 圖片輪播 **/
     public void useBanner(){
@@ -267,9 +267,9 @@ public class HomePage extends Fragment{
                     break;
                 case R.id.btn_count:
                     break;
-                case R.id.btn_addCancel:
-                    dialog.dismiss();
-                    break;
+//                case R.id.btn_addCancel:
+//                    dialog.dismiss();
+//                    break;
 //                case R.id.btn_dialogCancel:
 //                    break;
                 case R.id.btn_addDone:
@@ -283,17 +283,4 @@ public class HomePage extends Fragment{
         }
     };
 
-//    private void notifyDataChanged(){
-//        if (featureList != null){
-//            featureList.clear();
-//            adapter_feature.notifyItemRangeRemoved(0,featureList.size());
-//            //舒張壓:0、收縮壓:1、血糖:2、心率:3、SDNN:4、RMSSD:5
-//            Random x = new Random();
-//            for (int i=0; i<checkFeature.size(); i++){
-//                Double y = (double)Math.round((x.nextDouble()*100.0)/100.0);
-//                featureList.add(new DataFeature(checkFeature.get(i),y));
-//            }
-//            adapter_feature.notifyItemRangeInserted(0,checkFeature.size());
-//        }
-//    }
 }

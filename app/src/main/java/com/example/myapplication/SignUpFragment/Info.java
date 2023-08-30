@@ -129,7 +129,11 @@ public class Info extends Fragment {
         infoHashMap.put("old", old);
         infoHashMap.put("height", height);
         infoHashMap.put("weight", weight);
-        infoHashMap.put("waist", waist);
+        if (waist == null) {
+            infoHashMap.put("waist", "-1");
+        } else {
+            infoHashMap.put("waist", waist);
+        }
         infoHashMap.put("checkedSex", checkedSex);
 
         dataReturn.getResult(infoHashMap);

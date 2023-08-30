@@ -6,6 +6,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -34,6 +35,8 @@ import butterknife.ButterKnife;
 
 public class SignUpActivity extends AppCompatActivity implements MariaDBCallback {
     private ControlMariaDB controlMariaDB = new ControlMariaDB(this);
+    private SharedPreferences preferences;
+    private SharedPreferences.Editor editor;
     Button btn_nextPage, btn_upPage;
     ImageView img_signup, img_signUpback;
     Info info = new Info();
@@ -48,12 +51,12 @@ public class SignUpActivity extends AppCompatActivity implements MariaDBCallback
     private HashMap<String, String> infoHashMap = new HashMap<>();
     private HashMap<String, String> healthHashMap = new HashMap<>();
     private HashMap<String, String> habitHashMap = new HashMap<>();
-
+    private JSONObject jsonObject = new JSONObject();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
-
+        preferences = getSharedPreferences("my_preferences", MODE_PRIVATE);
         initWidget();
 //        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN); //禁止自動彈出虛擬鍵盤
         ButterKnife.bind(SignUpActivity.this);
@@ -144,9 +147,10 @@ public class SignUpActivity extends AppCompatActivity implements MariaDBCallback
                                     habitHashMap = hashMap;
                                 }
                             });
+                            Toast.makeText(SignUpActivity.this, "註冊中，請稍後...", Toast.LENGTH_SHORT).show();
                             putHashMapToJson();
-//                            Intent intent = new Intent(SignUpActivity.this, MainActivity.class);
-//                            startActivity(intent);
+                            registerToDB();
+
                         } catch (Exception e) {
                             Log.e("errrr", e.toString());
                         }
@@ -167,8 +171,6 @@ public class SignUpActivity extends AppCompatActivity implements MariaDBCallback
     };
 
     private void putHashMapToJson() {
-        JSONObject jsonObject = new JSONObject();
-
         String userName = infoHashMap.get("userName");
         String phone = infoHashMap.get("phone");
         String birth = infoHashMap.get("birth");
@@ -202,16 +204,16 @@ public class SignUpActivity extends AppCompatActivity implements MariaDBCallback
             jsonObject.put("phone", phone);
             jsonObject.put("birth", birth);
             jsonObject.put("old", old);
+            jsonObject.put("sex", checkedSex);
             jsonObject.put("height", height);
             jsonObject.put("weight", weight);
             jsonObject.put("waist", waist);
-            jsonObject.put("sex", checkedSex);
             //Health
             jsonObject.put("cvd", checkedHeart);
+            jsonObject.put("diabetes", checkedDia);
             jsonObject.put("hbp", checkedHbp);
             jsonObject.put("hbpSBp", checkedSbp);
             jsonObject.put("hbpDBp", checkedDbp);
-            jsonObject.put("diabetes", checkedDia);
             jsonObject.put("checkedunit", checkedunit);
             jsonObject.put("morningdiabetes", checkedEmpty);
             jsonObject.put("aftermealdiabetes", checkedTwohrs);
@@ -225,16 +227,15 @@ public class SignUpActivity extends AppCompatActivity implements MariaDBCallback
             jsonObject.put("drink", checkedDrink);
             jsonObject.put("sport", checkedSport);
             jsonObject.put("sleep", checkedSleep);
-
-            new Thread(() -> {
-                String json = jsonObject.toString();
-                controlMariaDB.userRegister(json);
-            }).start();
-
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
-
+    }
+    private void registerToDB() {
+        new Thread(() -> {
+            String json = jsonObject.toString();
+            controlMariaDB.userRegister(json);
+        }).start();
     }
     private Fragment checkFragment() {
         FragmentManager fm = this.getSupportFragmentManager();
@@ -306,7 +307,19 @@ public class SignUpActivity extends AppCompatActivity implements MariaDBCallback
      */
     @Override
     public void onResult(String result) {
-        Log.d("xxxx", "onResult: "+result);
+        if (result.equals("success")) {
+            String userName = infoHashMap.get("userName");
+            String phone = infoHashMap.get("phone");
+            editor = preferences.edit();
+            editor.putBoolean("isLoggedIn", true);
+            editor.putString("LoginName", userName);
+            editor.putString("LoginPhone", phone);
+            editor.apply();
+            Toast.makeText(SignUpActivity.this, "註冊成功!!", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(SignUpActivity.this, MainActivity.class);
+            startActivity(intent);
+            finish();
+        }
     }
 
     @Override

@@ -57,8 +57,8 @@ public class SplashActivity extends AppCompatActivity implements MariaDBCallback
     private void isLoggedIn() {
         boolean isLoggedIn = preferences.getBoolean("isLoggedIn", false);
         if (isLoggedIn) {
-            preloadProfile();
-            preloadRecord();
+//            preloadProfile();
+//            preloadRecord();
             intent_IN.setClass(SplashActivity.this, MainActivity.class);
         } else {
             intent_IN.setClass(SplashActivity.this, BeginActivity.class);

@@ -50,8 +50,8 @@ public class MainActivity extends AppCompatActivity implements MariaDBCallback {
     private String userId, userName, email, phone, birth;
     private int old, height, weight, sex, smokes, diabetes, hbp,
             morningdiabetes, aftermealdiabetes, userstatus, mealstatus,
-            medicationstatus, hbpSBp, hbpDBp, md_num;
-
+            medicationstatus, hbpSBp, hbpDBp, waist, cvd, low, covid, vaccine, drink, sport, sleep, md_num;
+    private String family;
     private DataRecord dataRecordViewModel;
     private SharedPreferences preferences;
     private SharedPreferences.Editor editor;
@@ -246,25 +246,34 @@ public class MainActivity extends AppCompatActivity implements MariaDBCallback {
                 JSONObject jsonObject = new JSONObject(json);
                 userId = jsonObject.getString("userId");
                 userName = jsonObject.getString("name");
-                email = jsonObject.getString("email");
+//                email = jsonObject.getString("email");
                 phone = jsonObject.getString("phone");
                 birth = jsonObject.getString("birth");
                 old = jsonObject.getInt("old");
                 sex = jsonObject.getInt("sex");
                 height = jsonObject.getInt("height");
                 weight = jsonObject.getInt("weight");
+                waist = jsonObject.getInt("waist");
                 diabetes = jsonObject.getInt("diabetes");
                 smokes = jsonObject.getInt("smokes");
                 hbp = jsonObject.getInt("hbp");
                 morningdiabetes = jsonObject.getInt("morningdiabetes");
                 aftermealdiabetes = jsonObject.getInt("aftermealdiabetes");
                 userstatus = jsonObject.getInt("userstatus");
-                mealstatus = jsonObject.getInt("mealstatus");
-                medicationstatus = jsonObject.getInt("medicationstatus");
+//                mealstatus = jsonObject.getInt("mealstatus");
+//                medicationstatus = jsonObject.getInt("medicationstatus");
                 hbpSBp = jsonObject.getInt("hbpSBp");
                 hbpDBp = jsonObject.getInt("hbpDBp");
-//                md_num = jsonObject.getInt("md_num");
 
+                cvd = jsonObject.getInt("cvd");
+                family = jsonObject.getString("family");
+                low = jsonObject.getInt("low");
+                covid = jsonObject.getInt("covid");
+                vaccine = jsonObject.getInt("vaccine");
+                drink = jsonObject.getInt("drink");
+                sport = jsonObject.getInt("sport");
+                sleep = jsonObject.getInt("sleep");
+//                md_num = jsonObject.getInt("md_num");
                 setProfile();
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -282,16 +291,25 @@ public class MainActivity extends AppCompatActivity implements MariaDBCallback {
         editor.putInt("ProfileSex", sex);
         editor.putInt("ProfileHeight", height);
         editor.putInt("ProfileWeight", weight);
+        editor.putInt("ProfileWaist", waist);
         editor.putInt("ProfileDiabetes", diabetes);
         editor.putInt("ProfileSmokes", smokes);
         editor.putInt("ProfileHbp", hbp);
         editor.putInt("ProfileMorningDiabetes", morningdiabetes);
         editor.putInt("ProfileAfterMealDiabetes", aftermealdiabetes);
         editor.putInt("ProfileUserStatus", userstatus);
-        editor.putInt("ProfileMealStatus", mealstatus);
-        editor.putInt("ProfileMedicationStatus", medicationstatus);
+//        editor.putInt("ProfileMealStatus", mealstatus);
+//        editor.putInt("ProfileMedicationStatus", medicationstatus);
         editor.putInt("ProfileHbpSBp", hbpSBp);
         editor.putInt("ProfileHbpDBp", hbpDBp);
+        editor.putInt("ProfileCvd", cvd);
+        editor.putString("ProfileFamily", family);
+        editor.putInt("ProfileLow", low);
+        editor.putInt("ProfileCovid", covid);
+        editor.putInt("ProfileVaccine", vaccine);
+        editor.putInt("ProfileDrink", drink);
+        editor.putInt("ProfileSport", sport);
+        editor.putInt("ProfileSleep", sleep);
         editor.apply();
     }
 

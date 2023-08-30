@@ -76,8 +76,8 @@ public class Profile extends Fragment {
         ArrayList<DataProfile> profileList = new ArrayList<>();
         try {
             titleName.setText(name);
-            profileList.add(new DataProfile("手機 Phone", phone));
-            profileList.add(new DataProfile("信箱 Email", email));
+//            profileList.add(new DataProfile("手機 Phone", phone));
+//            profileList.add(new DataProfile("信箱 Email", email));
             profileList.add(new DataProfile("身高 Height", height));
             profileList.add(new DataProfile("體重 Weight", weight));
             profileList.add(new DataProfile("年齡 Age", old));

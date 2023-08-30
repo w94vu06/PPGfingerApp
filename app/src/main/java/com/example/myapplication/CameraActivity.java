@@ -27,15 +27,18 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.util.Range;
 import android.util.Size;
+import android.view.Gravity;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewOutlineProvider;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.Spinner;
@@ -49,6 +52,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.example.myapplication.Util.ChartUtil;
+import com.example.myapplication.Util.CommonUtil;
 import com.example.myapplication.Util.GetPixelUtil;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.YAxis;
@@ -68,6 +72,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.regex.Pattern;
+
+import butterknife.BindViews;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import butterknife.Unbinder;
 
 
 public class CameraActivity extends AppCompatActivity implements MariaDBCallback {
@@ -116,11 +125,20 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
     private TextView txt_phoneCal, txt_aiCal;
     private Button btn_restart, btn_detailed;
     private Dialog dialog;
+    private Dialog stateDialog;
+    private Button btn_addDone;
     private ProgressBar progressBar;
     private TextView progressBar_text;
     private Spinner spinner_beats; // 心跳選擇的下拉選單
     private int lastSelectedItem = 0; // 初始化為預設的索引值，例如 0
     private long elapsedSecond; // 量測的秒數
+    private Unbinder unbinder;
+    @BindViews({R.id.state_empty, R.id.state_beforeMeal, R.id.state_afterOne,
+            R.id.state_afterTwo, R.id.state_afterSleep, R.id.state_afterThree})
+    List<CheckBox> radiosMeal;
+    @BindViews({R.id.state_todayNotYet, R.id.state_alreadyMedicine, R.id.state_alreadyInsulin})
+    List<CheckBox> radiosMedicine;
+    String checkedMeal, checkedMedicine;
 
     // 圖表相關變數
     private boolean chartIsRunning = false; // 圖表是否正在運行
@@ -154,7 +172,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
 
         preferences = getSharedPreferences("my_preferences", MODE_PRIVATE);
         CameraView = findViewById(R.id.texture);
-        CameraView.setSurfaceTextureListener(textureListener);
+//        CameraView.setSurfaceTextureListener(textureListener);
 
         btn_restart = findViewById(R.id.btn_restart);
         btn_detailed = findViewById(R.id.btn_detailed);
@@ -172,6 +190,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         mTimeArray = new long[totalCaptureRate];
         calculateHRV = new CalculateHRV();
         closeTopBar();
+        setStateDialog();
     }
 
     @Override
@@ -185,15 +204,16 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
     protected void onResume() {
         super.onResume();
         setScreenOn();
-        startBackgroundThread();
+        stateDialog.show();
         chartUtil.initChart(chart);//確保畫布初始化
         setPreferChartLimit();
         idleHandler.removeCallbacks(idleRunnable);
-        if (CameraView.isAvailable()) {
-            openCamera();
-        } else {
-            CameraView.setSurfaceTextureListener(textureListener);
-        }
+//        startBackgroundThread();
+//        if (CameraView.isAvailable()) {
+//            openCamera();
+//        } else {
+//            CameraView.setSurfaceTextureListener(textureListener);
+//        }
     }
 
     @Override
@@ -216,6 +236,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        unbinder.unbind();
     }
 
 
@@ -270,6 +291,61 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
         });
         dialog.show();
     }
+
+    public void setStateDialog() {
+        stateDialog = new Dialog(this,R.style.custom_dialog);
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_add,null);
+        stateDialog.setContentView(dialogView);
+        btn_addDone = dialogView.findViewById(R.id.btn_addDone);
+        unbinder = ButterKnife.bind(this,dialogView);
+        //dialog外觀調整
+        Window window = stateDialog.getWindow();
+        window.setGravity(Gravity.CENTER);
+        window.setLayout(WindowManager.LayoutParams.WRAP_CONTENT,WindowManager.LayoutParams.WRAP_CONTENT);
+        WindowManager.LayoutParams lp = stateDialog.getWindow().getAttributes();
+        lp.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+        lp.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+        stateDialog.getWindow().setAttributes(lp);
+        stateDialog.setCancelable(false);//點擊內部按鈕才能關閉
+
+        btn_addDone.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                CameraView.setSurfaceTextureListener(textureListener);
+                startBackgroundThread();
+                if (CameraView.isAvailable()) {
+                    openCamera();
+                } else {
+                    CameraView.setSurfaceTextureListener(textureListener);
+                }
+
+                if (checkedMeal == null) {
+                    checkedMeal = "-1";
+                }
+                if (checkedMedicine == null) {
+                    checkedMedicine = "-1";
+                }
+                stateDialog.dismiss();
+            }
+        });
+
+    }
+
+    @OnClick({R.id.state_empty, R.id.state_beforeMeal, R.id.state_afterOne,
+            R.id.state_afterTwo, R.id.state_afterSleep, R.id.state_afterThree})
+    void stateMeal(CheckBox checkBox) {
+        CommonUtil.unCheck(radiosMeal);
+        checkBox.setChecked(true);
+        checkedMeal = CommonUtil.getOne(radiosMeal);
+    }
+
+    @OnClick({R.id.state_todayNotYet, R.id.state_alreadyMedicine, R.id.state_alreadyInsulin})
+    void stateMedicine(CheckBox checkBox) {
+        CommonUtil.unCheck(radiosMedicine);
+        checkBox.setChecked(true);
+        checkedMedicine = CommonUtil.getOne(radiosMedicine);
+    }
+
 
     public void initProgressBar() {
         progressBar.setVisibility(View.VISIBLE);
@@ -428,13 +504,14 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
                             //計算量測秒數
                             long elapsedTime = (mTimeArray[mNumBeats - 1] - mTimeArray[0]);
                             elapsedSecond = elapsedTime / 1000;
-
                             closeCamera();
-                            Toast.makeText(CameraActivity.this, "伺服端計算中...", Toast.LENGTH_SHORT).show();
-                            calcBPM_RMMSD_SDNN();
                             removeRunnable();
+                            Toast.makeText(CameraActivity.this, "伺服端計算中...", Toast.LENGTH_SHORT).show();
+
+                            calcBPM_RMMSD_SDNN();
                             chartIsRunning = false;
                             calLastTimeChartLimit();
+
                         }
                     }
                 }
@@ -717,7 +794,6 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
             for (String s : showHRVOnPhone) {
                 txt_phoneCal.append(s + "\n");
             }
-
             onPause();
         } catch (Exception e) {
             System.out.println(e);
@@ -745,17 +821,16 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
             String height = String.valueOf(preferences.getInt("ProfileHeight", -1));
             String weight = String.valueOf(preferences.getInt("ProfileWeight", -1));
             String diabetes = String.valueOf(preferences.getInt("ProfileDiabetes", -1));
+
             String smokes = String.valueOf(preferences.getInt("ProfileSmokes", -1));
             String hbp = String.valueOf(preferences.getInt("ProfileHbp", -1));
-            String morningdiabetes = String.valueOf(preferences.getInt("ProfileOld", -1));
-            String aftermealdiabetes = String.valueOf(preferences.getInt("ProfileOld", -1));
-
-//            String userstatus = String.valueOf(preferences.getInt("ProfileOld", 0));
-//            String mealstatus = String.valueOf(preferences.getInt("ProfileOld", 0));
-//            String medicationstatus = String.valueOf(preferences.getInt("ProfileOld", 0));
-//            String hbpSBp = String.valueOf(preferences.getInt("ProfileOld", 0));
-//            String hbpDBp = String.valueOf(preferences.getInt("ProfileOld", 0));
-//            String md_num = String.valueOf(preferences.getInt("ProfileOld", 0));
+            String hbpSBp = String.valueOf(preferences.getInt("ProfileHbpSBp", -1));
+            String hbpDBp = String.valueOf(preferences.getInt("ProfileHbpDBp", -1));
+            String morningdiabetes = String.valueOf(preferences.getInt("ProfileMorningDiabetes", -1));
+            String aftermealdiabetes = String.valueOf(preferences.getInt("ProfileAfterMealDiabetes", -1));
+            String userstatus = String.valueOf(preferences.getInt("ProfileUserStatus", -1));
+            String mealstatus = checkedMeal;
+            String medicationstatus = checkedMedicine;
             try {
                 //proFile
                 jsonData.put("filename", time + "_" + userId);
@@ -775,12 +850,12 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
                 jsonData.put("morningdiabetes", morningdiabetes);
                 jsonData.put("aftermealdiabetes", aftermealdiabetes);
                 //not yet
-                jsonData.put("userstatus", "-1");
-                jsonData.put("mealstatus", "-1");
-                jsonData.put("medicationstatus", "-1");
-                jsonData.put("hbpSBp", "-1");
-                jsonData.put("hbpDBp", "-1");
-                jsonData.put("md_num", "-1");
+                jsonData.put("userstatus", userstatus);
+                jsonData.put("mealstatus", mealstatus);
+                jsonData.put("medicationstatus", medicationstatus);
+                jsonData.put("hbpSBp", hbpSBp);
+                jsonData.put("hbpDBp", hbpDBp);
+                jsonData.put("md_num", "new");
 
                 jsonData.put("rri", jsonTimeDist);
             } catch (JSONException e) {
@@ -788,7 +863,6 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
             }
             String jsonString = jsonData.toString();
             controlMariaDB.jsonUploadToServer(jsonString);
-
         }
     }
 
@@ -835,7 +909,7 @@ public class CameraActivity extends AppCompatActivity implements MariaDBCallback
             texture.setDefaultBufferSize(imageDimension.getWidth(), imageDimension.getHeight());
             Surface surface = new Surface(texture);
             captureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
-            captureRequestBuilder.set(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE,fpsRanges[fpsRanges.length - 1]);
+//            captureRequestBuilder.set(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE,fpsRanges[fpsRanges.length - 1]);
             captureRequestBuilder.addTarget(surface);
             cameraDevice.createCaptureSession(Collections.singletonList(surface), new CameraCaptureSession.StateCallback() {
                 @Override
