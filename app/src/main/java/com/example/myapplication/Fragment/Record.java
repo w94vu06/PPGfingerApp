@@ -10,6 +10,8 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -61,7 +63,6 @@ public class Record extends Fragment implements RecordAdapter.OnItemListener, Ma
     private RecyclerView.Adapter adapter_record;
     private View view;
     private BottomAppBar bottomAppBar;
-
     private ProgressDialog progressDialog;
     ControlMariaDB controlMariaDB = new ControlMariaDB(this);
     private DataRecord dataRecordViewModel;
@@ -72,6 +73,11 @@ public class Record extends Fragment implements RecordAdapter.OnItemListener, Ma
     private String selectDay;
     private String dateStr_date;
     private String dateStr_time;
+    Category category = new Category();
+    private Fragment currentFragment;
+    private FragmentManager fragmentManager;
+    private FragmentTransaction transaction;
+
 
 
     ArrayList<HashMap<String, String>> recordArrayList = new ArrayList<>();
@@ -261,6 +267,7 @@ public class Record extends Fragment implements RecordAdapter.OnItemListener, Ma
                     formatDateTime(time);
 
                     HashMap<String, String> hashMap = new HashMap<>();
+                    hashMap.put("originalData", finalJson);
                     hashMap.put("recordDate", String.valueOf(dateStr_date));
 
                     hashMap.put("ecg_hr_mean", String.valueOf(ecg_hr_mean));
@@ -344,7 +351,30 @@ public class Record extends Fragment implements RecordAdapter.OnItemListener, Ma
     }
     @Override
     public void onItemClick(int position) {
-        Toast.makeText(getActivity(), ""+position, Toast.LENGTH_SHORT).show();
+        Record record = new Record();
+        currentFragment = record;
+        BottomNavigationView navigationView = getActivity().findViewById(R.id.navigationView);
+        try {
+            FragmentHideShow(category);
+            navigationView.setSelectedItemId(R.id.category);
+        }catch (Exception e){
+            Log.e("RecordItemClick",e.toString());
+        }
+//        Toast.makeText(getActivity(), ""+position, Toast.LENGTH_SHORT).show();
+    }
+
+    private void FragmentHideShow(Fragment fg){
+        fragmentManager = getActivity().getSupportFragmentManager();
+        transaction= fragmentManager.beginTransaction();
+        if(!fg.isAdded()){
+            transaction.hide(currentFragment);
+            transaction.add(R.id.container_all,fg);
+        }else{
+            transaction.hide(currentFragment);
+            transaction.show(fg);
+        }
+        currentFragment=fg;
+        transaction.commit();
     }
 }
 

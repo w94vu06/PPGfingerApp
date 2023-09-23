@@ -18,6 +18,9 @@ import java.util.HashMap;
 public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.RecordViewHolder>{
 
     private final RecordAdapter.OnItemListener onItemListener;
+
+    private String originalJsonData;
+
     //    ArrayList<DataRecord> recordList;
     ArrayList<HashMap<String, String>> recordList;
     public RecordAdapter(ArrayList<HashMap<String, String>> recordList, RecordAdapter.OnItemListener onItemListener){
@@ -40,8 +43,7 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.RecordView
         holder.txt_eatIndex.setText((recordList.get(position).get("BSc")));
         holder.txt_BPC.setText((recordList.get(position).get("BPc_sys")+"/"+recordList.get(position).get("BPc_dia")));
 
-//        holder.txt_recordDate.setText(recordList.get(position).getDate());
-//        holder.txt_recordTime.setText(recordList.get(position).getTime());
+        originalJsonData = recordList.get(position).get("originalData");
     }
 
     @Override
@@ -71,6 +73,7 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.RecordView
         @Override
         public void onClick(View view) {
             onItemListener.onItemClick(getAdapterPosition());
+
         }
     }
 }

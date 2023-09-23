@@ -9,7 +9,7 @@
     android:orientation="vertical">
 
     <FrameLayout
-        android:id="@+id/fragmentContainer"
+        android:id="@+id/container_all"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/navigationView"/>

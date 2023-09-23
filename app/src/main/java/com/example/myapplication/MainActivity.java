@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity implements MariaDBCallback {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initPermission();
-        fragmentContainer = findViewById(R.id.fragmentContainer);
+        fragmentContainer = findViewById(R.id.container_all);
         navigationView = findViewById(R.id.navigationView);
         navigationView.setOnItemSelectedListener(NaviSelectedListener);
         bar = findViewById(R.id.bar);
@@ -356,7 +356,7 @@ public class MainActivity extends AppCompatActivity implements MariaDBCallback {
             if (currentFragment != null) {
                 transaction.hide(currentFragment);
             }
-            transaction.add(R.id.fragmentContainer, targetFragment, targetFragment.getClass()
+            transaction.add(R.id.container_all, targetFragment, targetFragment.getClass()
                     .getName());
         } else {
             transaction.hide(currentFragment)
